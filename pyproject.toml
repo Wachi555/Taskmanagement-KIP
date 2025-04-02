@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "TaskManagement"
+version = "0.1.0"
+requires-python = ">= 3.8"
+dependencies = [
+    "openai",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "isort",
+    "flake8",
+]
+
+[tool.black]
+line-length = 120
+
+[tool.flake8]
+max-line-length = 120
