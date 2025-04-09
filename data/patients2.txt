@@ -1,0 +1,60 @@
+Triage Kategorie 4:
+Diagnose: Supinationstrauma Oberes Sprunggelenk (OSG)
+
+Patient: Manuel Meier, 17 Jahre 
+
+Anamnese: Herr Meier stellt sich selbstständig in unserer Notaufnahme vor. Er berichtet, zuhause beim Treppen hinabsteigen die letzte Stufe übersehen zu haben, dabei sei er mit dem rechten Fuß falsch aufgekommen und umgeknickt. Ein Sturz wird verneint. Seither bestehen Schmerzen und Schwellung im rechten Fuß. Keine Allergien, keine Medikamente.
+
+Befund: 
+Schwellung und Hämatomverfärbung über Malleolus lateralis und lateralem Mittelfuß auf Höhe des 4. und 5. Strahls rechts, Druckschmerz über Malleolus lateralis, Mittelfuß und Basis Metatarsale V, kein Druckschmerz über proximaler Fibula/Tibia, Malleolus medialis, keine Überwärmung, Talusvorschub negativ, pDMS intakt
+ROM: Dorsalextension/Plantarflexion 15-0-40, Supination/Pronation 30-0-5
+
+Diagnostik:
+Körperliche Untersuchung
+Radiologische Bildgebung:
+Röntgenbefund:
+
+Kein Hinweis einer Fraktur, Syndesmosespalt nicht pathologisch verbreitert, deutliche Weichteilschwellung über Malleolus lateralis
+
+Therapie: Anlage OSG-Orthese
+
+Procedere: Bei keinem Anhaltspunkt für eine knöcherne Verletzung empfehlen wir Kühlung, Schonung, Hochlagerung sowie eine bedarfsadaptierte Analgesie (z.B. mit Ibuprofen 400 mg oder Novaminsulfon 500 mg bis zu 3x tägl.). Eine Teilbelastung oder Entlastung ist in unserem Ermessen nicht notwendig. Die OSG-Orthese kann bei Besserung der Beschwerden, spätestens aber nach 6 Wochen abgelegt werden. Bei Beschwerdepersistenz empfehlen wir eine erweiterte Bildgebung zur Beurteilung der Bandstrukturen im Sprunggelenk mittels MRT durch einen niedergelassenen Facharzt. 
+ 
+Triage Kategorie 3:
+Diagnose: Schnittverletzung D4 links
+
+Patient: Eva Müller, 45 Jahre
+
+Anamnese: Die Patientin stellt sich selbstständig in unserer Notaufnahme vor. Sie berichtet, beim Brot schneiden mit dem Messer abgerutscht zu sein und sich dabei in den linken Ringfinger geschnitten zu haben. 
+
+Tetanusimpfstatus: anamnestisch letzte Impfung vor mehr als 10 Jahren, Auffrischung gewünscht
+
+Befund: ca 2,5 cm lange, glattrandige Schnittwunde an D4 links radialseitig über Grund- und Mittelglied, kein freiliegender Knochen, kein Anhaltspunkt für knöcherne Verletzung, kapilläre Blutung, keine aktive arterielle Blutung, pDMS intakt, Rekap-Zeit <2 sec, Flexion/Extension in D4 vollständig und kräftig möglich
+
+Diagnostik: 
+Körperliche Untersuchung
+
+Therapie:
+Spülung und Säuberung der Wunde mittels NaCl 0,9%, Wundexploration, chirurgische Wundversorgung mit adaptierenden Nähten mittels Ethilon 4-0 nicht resorbierbar unter Lokalanästhesie in Oberst-Block, Fettgaze, Lavanid-Wundgel, Verband
+Auffrischung Tetanus-Impfstatus mittels Td-pur
+
+Procedere: Wir empfehlen Kühlung, Schonung, Hochlagerung, bedarfsgerechte Analgesie (z.B. Ibuprofen 400 mg/Novaminsulfon 500 mg bis zu 3x tägl.). Regelmäßige Wundkontrolle beim Hausarzt. Fadenentfernung durch Hausarzt nach 8-10 Tagen.
+Bei Zeichen einer Entzündung (z.B. starke Rötung, Schwellung, Überwärmung, Eiteraustritt, Fieber, Schüttelfrost) bitten wir um umgehende Wiedervorstellung. 
+ 
+Triage Kategorie: 1, Schockraum da Sturz aus über 3 m Höhe
+Diagnose: distale Fraktur Femur links, Wirbelkörperkompressionsfraktur LWK 4
+
+Patient: Hans Detlef Huber, 67 Jahre
+
+Anamnese: Der Patient wird mittels Rettungsdienst in Notarztbegleitung in unserer Notaufnahme vorgestellt. Er habe auf dem Dach seines Wohnhauses Dachziegel ausgetauscht und sei dabei abgerutscht und vom Dach (Höhe ca 4m) gefallen. Die Landung habe primär mit den Füßen voraus stattgefunden. Es bestand keine Bewusstlosigkeit, keine Amnesie, kein Kopfsturz, keine Übelkeit, kein Erbrechen, keine Atemnot, keine Annahme suizidale Absicht. Schmerzen bestehen im Bereich der Lendenwirbelsäule und des linken Oberschenkels. 
+
+Befund: 
+Kopf/Hals: GCS 15, 4fach orientiert, freundlich zugewandt, Pupillen isokor und direkt/indirekt prompt lichtreagibel, kein Schädelkalottendruckschmerz, keine offenen Verletzungen am Schädel, HWS frei beweglich
+
+oEx/Thorax: eFAST: kein Nachweis auf Pneumothorax, kein Thoraxkompressionsschmerz, Schultern frei beweglich, oberflächliche Schürfwunde Hand links proximal palmarseitig
+
+Abdomen: eFAST : kein Nachweis auf freie Flüssigkeit, weich, keine Abwehrspannung, keine offenen Verletzungen
+
+Wirbelsäule: kein Klopfschmerz über BWS, Klopfschmerz über mittlerer LWS
+
+Becken: kein Beckenkompressionsschmerz, kein Hinweis einer open book Verletzung, 
