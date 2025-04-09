@@ -1,5 +1,6 @@
-from modules import *
-from common import *
+from backend.modules import process_anamnesis
+from backend.common import InputModel, OutputModel
+
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -23,16 +24,17 @@ async def main():
 @app.post("/process_input")
 async def process_input(input_text: InputModel):
     response = process_anamnesis(input_text.text)
+    print(type(response))
+    print(response)
     return OutputModel(
-        output=json.loads(response)
+        output=response
     )
 
-@app.post("/ask_anything")
-async def ask_anything(input_text: InputModel):
-    response = ask_anything2(input_text.text)
-    return {"output": response}
+# @app.post("/ask_anything")
+# async def ask_anything(input_text: InputModel):
+#     response = ask_anything2(input_text.text)
+#     return {"output": response}
 
 
 if __name__ == "__main__":
-    initialize_gemini_api()
     uvicorn.run(app, port=8000, reload=False)
