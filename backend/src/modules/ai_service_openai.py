@@ -1,8 +1,8 @@
 import os
 from dotenv import load_dotenv
 from openai import OpenAI
-from backend.modules.prompts import test_prompt
-from backend.common import OutputContent
+from modules.prompts import test_prompt
+from common import OutputContent
 
 load_dotenv()
 

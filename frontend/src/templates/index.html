@@ -43,7 +43,7 @@
             outputDiv.textContent = "Processing...";
 
             try {
-                const response = await fetch('http://localhost:8000/process_input', {
+                const response = await fetch('http://localhost:8000/process_input_debug', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

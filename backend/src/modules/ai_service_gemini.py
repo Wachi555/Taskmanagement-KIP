@@ -1,8 +1,8 @@
 import os
 from dotenv import load_dotenv
 from google import genai
-from backend.common import OutputContent
-from backend.modules.prompts import test_prompt
+from common import OutputContent
+from modules.prompts import test_prompt
 import json
 
 load_dotenv()

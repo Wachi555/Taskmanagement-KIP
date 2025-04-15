@@ -1,5 +1,5 @@
-from backend.modules import process_anamnesis
-from backend.common import InputModel, OutputModel
+from modules import process_anamnesis, test_output
+from common import InputModel, OutputModel
 
 
 from fastapi import FastAPI
@@ -29,6 +29,10 @@ async def process_input(input_text: InputModel):
     return OutputModel(
         output=response
     )
+
+@app.post("/process_input_debug")
+async def process_input_debug(input_text: InputModel):
+    return OutputModel(output=json.loads(test_output))
 
 # @app.post("/ask_anything")
 # async def ask_anything(input_text: InputModel):
