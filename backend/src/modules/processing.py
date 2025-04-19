@@ -1,5 +1,7 @@
-# from modules.ai_service_gemini import generate_anamnesis_response
-from modules.ai_service_openai import generate_anamnesis_response
+from modules.ai_service_gemini import generate_anamnesis_response
+
+# from modules.ai_service_openai import generate_anamnesis_response
+
 
 def process_anamnesis(input_text: str) -> str:
     try: 

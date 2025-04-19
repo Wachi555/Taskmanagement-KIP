@@ -1,9 +1,10 @@
+import json
 import os
+
+from common.models import OutputContent
 from dotenv import load_dotenv
 from google import genai
-from common import OutputContent
 from modules.prompts import test_prompt
-import json
 
 load_dotenv()
 

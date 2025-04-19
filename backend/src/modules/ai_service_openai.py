@@ -1,8 +1,9 @@
 import os
+
+from common.models import OutputContent
 from dotenv import load_dotenv
-from openai import OpenAI
 from modules.prompts import test_prompt
-from common import OutputContent
+from openai import OpenAI
 
 load_dotenv()
 

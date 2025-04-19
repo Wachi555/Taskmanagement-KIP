@@ -1,11 +1,11 @@
-from modules import process_anamnesis, test_output
-from common import InputModel, OutputModel
+import json
 
-
+import uvicorn
+from common.models import InputModel, OutputModel
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
-import json
+from modules.debug import test_output
+from modules.processing import process_anamnesis
 
 app = FastAPI()
 
