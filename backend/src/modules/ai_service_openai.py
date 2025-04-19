@@ -17,8 +17,9 @@ model_name = "gpt-4o"
 
 client = OpenAI(base_url=endpoint, api_key=openai_api_key)
 
+
 def generate_anamnesis_response(input_text: str) -> str:
-    try: 
+    try:
         response = client.beta.chat.completions.parse(
             messages=[
                 {
@@ -28,7 +29,7 @@ def generate_anamnesis_response(input_text: str) -> str:
                 {
                     "role": "user",
                     "content": input_text,
-                }
+                },
             ],
             model=model_name,
             # temperature=0.7,
@@ -41,4 +42,3 @@ def generate_anamnesis_response(input_text: str) -> str:
     except Exception as e:
         print(f"Error while trying to generate a response for the anamnesis: {e}")
         return "An error occurred while processing your request."
-

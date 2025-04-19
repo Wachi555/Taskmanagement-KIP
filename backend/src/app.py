@@ -11,28 +11,30 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],  
-    allow_headers=["*"],  
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
+
 
 @app.get("/")
 async def main():
     return {"message": "Hello World"}
+
 
 @app.post("/process_input")
 async def process_input(input_text: InputModel):
     response = process_anamnesis(input_text.text)
     print(type(response))
     print(response)
-    return OutputModel(
-        output=response
-    )
+    return OutputModel(output=response)
+
 
 @app.post("/process_input_debug")
 async def process_input_debug(input_text: InputModel):
     return OutputModel(output=json.loads(test_output))
+
 
 # @app.post("/ask_anything")
 # async def ask_anything(input_text: InputModel):

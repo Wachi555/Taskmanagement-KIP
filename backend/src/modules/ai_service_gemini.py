@@ -15,15 +15,19 @@ if not gemini_api_key:
 
 client = genai.Client(api_key=gemini_api_key)
 
+
 def generate_anamnesis_response(input_text: str) -> str:
-    try: 
-        prompt = f"Your task is the following: <{test_prompt}>\n\nNow with that task, handle the following patient:\n<{input_text}>"
+    try:
+        prompt = (
+            f"Your task is the following: <{test_prompt}>\n\n"
+            f"Now with that task, handle the following patient:\n<{input_text}>"
+        )
         response = client.models.generate_content(
             model="gemini-2.0-flash",
             contents=prompt,
             config={
-                'response_mime_type': 'application/json',
-                'response_schema': OutputContent,
+                "response_mime_type": "application/json",
+                "response_schema": OutputContent,
             },
         )
         if response.text:
@@ -33,12 +37,10 @@ def generate_anamnesis_response(input_text: str) -> str:
         print(f"Error while trying to generate a response for the anamnesis: {e}")
         return "An error occurred while processing your request."
 
+
 def ask_anything2(input_text: str) -> str:
-    try: 
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=input_text
-        )
+    try:
+        response = client.models.generate_content(model="gemini-2.0-flash", contents=input_text)
         if response.text:
             return response.text
         else:

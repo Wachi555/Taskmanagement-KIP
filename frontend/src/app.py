@@ -6,9 +6,11 @@ app = Flask(__name__)
 # app.config['UPLOAD_FOLDER'] = 'uploads'
 # os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-@app.route('/')
+
+@app.route("/")
 def index():
-    return render_template('index.html')
+    return render_template("index.html")
+
 
 # @app.route('/process', methods=['POST'])
 # def process():
@@ -26,5 +28,5 @@ def index():
 
 #     return render_template('result.html', text_input=text_input, file_info=file_info)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)

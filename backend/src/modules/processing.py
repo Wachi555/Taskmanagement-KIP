@@ -4,7 +4,7 @@ from modules.ai_service_gemini import generate_anamnesis_response
 
 
 def process_anamnesis(input_text: str) -> str:
-    try: 
+    try:
         result = generate_anamnesis_response(input_text)
         if result:
             return result
