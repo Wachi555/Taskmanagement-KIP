@@ -10,10 +10,14 @@ dependencies = [
     "fastapi==0.115.12",
     "Flask==3.1.0",
     "google-genai==1.9.0",
+    "openai==1.75.0",
     "python-dotenv==1.1.0",
     "uvicorn==0.34.0",
     "pydantic==2.11.1"
 ]
+
+[tool.setuptools]
+packages = ["backend.src", "frontend.src"]
 
 [project.optional-dependencies]
 dev = [
@@ -27,3 +31,4 @@ line-length = 120
 
 [tool.flake8]
 max-line-length = 120
+ignore = ["E203", "E501", "W503"]
