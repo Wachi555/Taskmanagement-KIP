@@ -27,7 +27,7 @@ async def main():
 async def process_input(input_text: InputModel):
     response = process_anamnesis(input_text.text)
     print(type(response))
-    print(response)
+    print(response, flush=True)
     return OutputModel(output=response)
 
 

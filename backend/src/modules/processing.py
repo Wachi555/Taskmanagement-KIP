@@ -1,11 +1,13 @@
-from modules.ai_service_gemini import generate_anamnesis_response
-
-# from modules.ai_service_openai import generate_anamnesis_response
+from modules.ai_service_gemini import generate_anamnesis_response, extract_contents
+# from modules.ai_service_openai import generate_anamnesis_response, extract_contents
 
 
 def process_anamnesis(input_text: str) -> str:
     try:
-        result = generate_anamnesis_response(input_text)
+        print("DEBUG: Extracting contents from input text")
+        contents = extract_contents(input_text)
+        print(f"DEBUG: Extracted contents: {contents}")
+        result = generate_anamnesis_response(contents)
         if result:
             return result
         raise ValueError("No response text found.")
