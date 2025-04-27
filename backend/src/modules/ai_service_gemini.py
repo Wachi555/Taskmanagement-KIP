@@ -1,10 +1,10 @@
 import json
 import os
 
-from common.models import OutputContent
+from common.models import OutputContent, EvaluationInput, ExtractedContent
 from dotenv import load_dotenv
 from google import genai
-from modules.prompts import test_prompt
+from modules.prompts import extraction_prompt, evaluation_prompt, build_evaluation_input
 
 load_dotenv()
 
@@ -15,13 +15,26 @@ if not gemini_api_key:
 
 client = genai.Client(api_key=gemini_api_key)
 
+def extract_contents(input_text: str) -> ExtractedContent:
+    prompt = extraction_prompt + input_text
 
-def generate_anamnesis_response(input_text: str) -> str:
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=prompt,
+        config={
+            "response_mime_type": "application/json",
+            "response_schema": ExtractedContent,
+        },
+    )
+
+    if response.text:
+        return ExtractedContent.model_validate_json(response.text)
+        # return json.loads(response.text)
+    raise ValueError("No response text found.")
+
+def generate_anamnesis_response(input_contents: EvaluationInput) -> str:
     try:
-        prompt = (
-            f"Your task is the following: <{test_prompt}>\n\n"
-            f"Now with that task, handle the following patient:\n<{input_text}>"
-        )
+        prompt = evaluation_prompt + build_evaluation_input(input_contents)
         response = client.models.generate_content(
             model="gemini-2.0-flash",
             contents=prompt,
@@ -35,7 +48,8 @@ def generate_anamnesis_response(input_text: str) -> str:
         raise ValueError("No response text found.")
     except Exception as e:
         print(f"Error while trying to generate a response for the anamnesis: {e}")
-        return "An error occurred while processing your request."
+        print(f"Input contents: {input_contents}")
+        raise e
 
 
 def ask_anything2(input_text: str) -> str:
