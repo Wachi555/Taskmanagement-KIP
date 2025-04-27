@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "TaskManagement"
 version = "0.1.0"
-requires-python = "== 3.11.3"
+requires-python = ">= 3.11.3"
 dependencies = [
     "fastapi==0.115.12",
     "Flask==3.1.0",
