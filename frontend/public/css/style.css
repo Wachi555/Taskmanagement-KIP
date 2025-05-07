@@ -230,3 +230,12 @@ body {
 #toggleExams[aria-expanded="true"] i {
   transform: rotate(0deg);
 }
+
+
+/* Ein klein wenig mehr Abstand zwischen Checkbox und Label */
+.exams-container .form-check-input {
+  margin-top: 0; /* vertikal mittig zu Text ausrichten */
+}
+.exams-container .form-check-label {
+  margin-bottom: 0; /* verhindert zusätzliche Zeilenhöhe */
+}
