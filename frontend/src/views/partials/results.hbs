@@ -1,0 +1,32 @@
+  <div class="output-box">
+    <!-- Wrapper für Titel + Kreise -->
+    <div class="output-header">
+      <h6>Auswertung</h6>
+      <div id="triageIndicator" class="triage-indicator">
+        {{#each levels}}
+          <div
+            class="triage-circle level-{{this}} {{#if (eq ../triage this)}}active{{/if}}"
+            title="Triagestufe {{this}}"
+          ></div>
+        {{/each}}
+      </div>
+    </div>
+
+    <ul id="resultData" class="list-group list-group-flush mb-0">
+      <li class="list-group-item">
+        <strong>Triagestufe:</strong> {{triage}}
+      </li>
+      <li class="list-group-item">
+        <strong>Untersuchungen:</strong>
+        {{#if exams.length}}
+          {{#each exams}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+        {{else}}–{{/if}}
+      </li>
+      <li class="list-group-item">
+        <strong>Experten:</strong>
+        {{#if experts.length}}
+          {{#each experts}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+        {{else}}–{{/if}}
+      </li>
+    </ul>
+  </div>
