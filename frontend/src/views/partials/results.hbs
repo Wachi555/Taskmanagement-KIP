@@ -1,32 +1,28 @@
-  <div class="output-box">
-    <!-- Wrapper für Titel + Kreise -->
-    <div class="output-header">
-      <h6>Auswertung</h6>
-      <div id="triageIndicator" class="triage-indicator">
-        {{#each levels}}
-          <div
-            class="triage-circle level-{{this}} {{#if (eq ../triage this)}}active{{/if}}"
-            title="Triagestufe {{this}}"
-          ></div>
-        {{/each}}
-      </div>
+<div class="output-box">
+  <div class="output-header">
+    <h6>Auswertung</h6>
+    <div id="triageIndicator" class="triage-indicator">
+      {{#each levels}}<div class="triage-circle level-{{this}}"></div>{{/each}}
     </div>
-
-    <ul id="resultData" class="list-group list-group-flush mb-0">
-      <li class="list-group-item">
-        <strong>Triagestufe:</strong> {{triage}}
-      </li>
-      <li class="list-group-item">
-        <strong>Untersuchungen:</strong>
-        {{#if exams.length}}
-          {{#each exams}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
-        {{else}}–{{/if}}
-      </li>
-      <li class="list-group-item">
-        <strong>Experten:</strong>
-        {{#if experts.length}}
-          {{#each experts}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
-        {{else}}–{{/if}}
-      </li>
-    </ul>
   </div>
+
+  <ul id="resultData" class="list-group list-group-flush mb-0">
+    <li class="list-group-item">
+      <strong>Triagestufe:</strong> <span id="triageValue"></span>
+    </li>
+    
+    <li class="list-group-item" id="examsItem">
+      <div class="d-flex justify-content-between align-items-center">
+        <strong>Untersuchungen:</strong> 
+        <button id="toggleExams" class="btn btn-sm btn-outline-secondary">
+          <i class="bi bi-chevron-down"></i>
+        </button>
+      </div>
+      <ul id="examsList" class="list-group list-group-flush mt-2" style="display:none;"></ul>
+    </li>
+    
+    <li class="list-group-item">
+      <strong>Experten:</strong> <span id="expertsValue"></span>
+    </li>
+  </ul>
+</div>

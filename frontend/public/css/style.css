@@ -205,3 +205,28 @@ body {
   border-radius: 0.25rem;
   padding: 0.5rem 0;          /* nur vertikales Padding */
 }
+
+/* --- Untersuchungen Toggle Styles --- */
+/* Liste initial verstecken */
+#examsList {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.2s ease;
+}
+/* Liste geöffnet */
+#examsList.open {
+  max-height: 500px; /* ausreichend für Einträge */
+  opacity: 1;
+}
+/* Pfeil-Icon Transition & Ausrichtung */
+#toggleExams i {
+  display: inline-block;
+  transition: transform 0.2s ease;
+  /* initial: Pfeil zeigt nach rechts */
+  transform: rotate(-90deg);
+}
+/* nach dem Öffnen: Pfeil nach unten */
+#toggleExams[aria-expanded="true"] i {
+  transform: rotate(0deg);
+}
