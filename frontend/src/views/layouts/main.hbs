@@ -9,21 +9,100 @@
     rel="stylesheet"
   />
   <link rel="stylesheet" href="/css/style.css"/>
+
+  <!-- Override nur für die Sidebar-Pills -->
+  <style>
+    /* Nav-Pills in der Sidebar in eine Zeile und Enden auseinander drücken */
+    #sidebar .nav.nav-pills {
+      display: flex !important;
+      justify-content: space-between;  /* linkes und rechtes Ende */
+      padding-left: 0;
+      margin-bottom: 1rem;
+    }
+    #sidebar .nav-pills .nav-link {
+      white-space: nowrap;
+      border-radius: 0.25rem;
+    }
+  </style>
 </head>
 <body>
   {{> header}}
 
-    <div id="page-wrapper" class="d-flex">
-        <aside id="sidebar" class="collapsed">
-        {{> sidebar}}
-        </aside>
+  <div id="page-wrapper" class="d-flex">
+    <aside id="sidebar" class="collapsed">
+      <!-- Horizontale Nav-Pills mit Space-Between -->
+      <ul class="nav nav-pills mb-3" id="sidebarTabs" role="tablist">
+        <!-- Wartende Patienten links -->
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="tab-waiting"
+            data-bs-toggle="pill"
+            data-bs-target="#pane-waiting"
+            type="button"
+            role="tab"
+            aria-controls="pane-waiting"
+            aria-selected="false">
+            Wartende Patienten
+          </button>
+        </li>
+        <!-- In Behandlung rechts -->
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link active"
+            id="tab-main"
+            data-bs-toggle="pill"
+            data-bs-target="#pane-main"
+            type="button"
+            role="tab"
+            aria-controls="pane-main"
+            aria-selected="true">
+            In Behandlung
+          </button>
+        </li>
+      </ul>
 
-        <main id="main-content" class="flex-grow-1 overflow-auto">
-        <div class="container-fluid h-100 py-3">
-            {{{ body }}}
+      <!-- Tab-Inhalte -->
+      <div class="tab-content mt-2" id="sidebarTabsContent">
+        <!-- Wartende Patienten -->
+        <div
+          class="tab-pane fade"
+          id="pane-waiting"
+          role="tabpanel"
+          aria-labelledby="tab-waiting">
+          <ul class="list-group list-group-flush">
+            {{#each waitingPatients}}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{this.name}}
+                <span class="badge bg-secondary">{{this.waitTime}} min</span>
+              </li>
+            {{/each}}
+            {{#unless waitingPatients}}
+              <li class="list-group-item text-center text-muted">
+                Keine wartenden Patienten.
+              </li>
+            {{/unless}}
+          </ul>
         </div>
-        </main>
-    </div>
+
+        <!-- In Behandlung (dein existierendes Sidebar-Partial) -->
+        <div
+          class="tab-pane fade show active"
+          id="pane-main"
+          role="tabpanel"
+          aria-labelledby="tab-main">
+          {{> sidebar}}
+        </div>
+      </div>
+    </aside>
+
+    <main id="main-content" class="flex-grow-1 overflow-auto">
+      <div class="container-fluid h-100 py-3">
+        {{{ body }}}
+      </div>
+    </main>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="/js/main.js"></script>
 </body>

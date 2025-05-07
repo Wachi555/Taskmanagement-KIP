@@ -25,8 +25,8 @@ body {
 
 /* SIDEBAR */
 #sidebar {
-  width: 250px;
-  min-width: 250px;
+  width: 500px;      /* feste Breite in Pixeln */
+  min-width: 400px;  /* Mindestbreite */
   transition: width 0.3s;
   overflow-y: auto;
   background-color: #f8f9fa;
@@ -45,16 +45,24 @@ body {
   padding: 0.75rem 1rem;
   font-size: 1rem;
   text-align: center;
-  box-sizing: border-box;
 }
-#sidebar h5 { padding: 1rem 1rem 0.5rem; }
-#sidebar ul { list-style: none; }
-#sidebar ul li {
+#sidebar h5 {
+  padding: 1rem 1rem 0.5rem;
+}
+
+/* ––– Patientenliste: nur list-group ––– */
+#sidebar ul.list-group {
+  list-style: none;
+  margin-bottom: 1rem;
+}
+#sidebar ul.list-group li {
   padding: 0.5rem 1rem;
   border-bottom: 1px solid #eee;
   cursor: pointer;
 }
-#sidebar ul li:last-child { border-bottom: none; }
+#sidebar ul.list-group li:last-child {
+  border-bottom: none;
+}
 
 /* MAIN-CONTENT */
 #main-content {
@@ -74,7 +82,9 @@ body {
   display: flex;
   flex-direction: column;
 }
-#input-section h5 { margin-bottom: 0.75rem; }
+#input-section h5 {
+  margin-bottom: 0.75rem;
+}
 #input-section textarea {
   flex: 1;
   padding: 0.5rem;
@@ -87,7 +97,10 @@ body {
   margin-bottom: 0.25rem;
   font-weight: bold;
 }
-#input-section button { margin-top: 1rem; align-self: flex-start; }
+#input-section button {
+  margin-top: 1rem;
+  align-self: flex-start;
+}
 
 /* OUTPUT-BEREICH (1/3 Breite) */
 #output-section {
@@ -122,23 +135,21 @@ body {
 /* Wrapper für Titel + Kreise (Auswertung) */
 .output-header {
   display: flex;
-  justify-content: space-between; /* Titel links, Kreise rechts */
+  justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
-  background-color: #f8f9fa;            /* grauer Hintergrund wie Patientendaten */
-  padding: 0.75rem 1rem;                /* gleicher Padding wie .output-box > h6 */
-  border-top-left-radius: 0.5rem;       /* gerundete Ecken oben */
+  background-color: #f8f9fa;
+  padding: 0.75rem 1rem;
+  border-top-left-radius: 0.5rem;
   border-top-right-radius: 0.5rem;
-  border-bottom: 1px solid #ccc;        /* Trennt Kopf von Inhalt */
+  border-bottom: 1px solid #ccc;
 }
-/* Überschrift innerhalb des Headers klar fett */
 .output-header > h6 {
   margin: 0;
-  font-weight: bold !important;        /* Fettschrift, wichtiger als andere Regeln */
-  padding: 0;                           /* kein eigenes Padding */
+  font-weight: bold !important;
+  padding: 0;
   background: none;
 }
-
 
 /* Inhalt unterhalb der Kopfzeile */
 .output-box > *:not(.output-header):not(h6) {
@@ -151,7 +162,7 @@ body {
 .triage-indicator {
   display: flex;
   gap: 0.5rem;
-  margin: 0; /* kein zusätzlicher Abstand innerhalb header */
+  margin: 0;
 }
 .triage-circle {
   width: 24px;
@@ -160,17 +171,37 @@ body {
   border: 2px solid #ccc;
   transition: all 0.2s;
 }
-
 /* Rahmenfarben */
 .triage-circle.level-1 { border-color: #dc3545; }
 .triage-circle.level-2 { border-color: #fd7e14; }
 .triage-circle.level-3 { border-color: #ffc107; }
 .triage-circle.level-4 { border-color: #28a745; }
 .triage-circle.level-5 { border-color: #007bff; }
-
 /* Ausgefüllte Kreise */
 .triage-circle.active.level-1 { background-color: #dc3545; }
 .triage-circle.active.level-2 { background-color: #fd7e14; }
 .triage-circle.active.level-3 { background-color: #ffc107; }
 .triage-circle.active.level-4 { background-color: #28a745; }
 .triage-circle.active.level-5 { background-color: #007bff; }
+
+/* ––– Nav-Pills Override: horizontales Layout & gleichmäßige Breite ––– */
+#sidebar .nav.nav-pills {
+  display: flex !important;
+  width: 100% !important;     /* nimmt volle Sidebar-Breite ein */
+  padding-left: 0;
+  margin-bottom: 1rem;
+}
+
+#sidebar .nav-pills .nav-item {
+  flex: 1 1 auto;             /* teilt die Breite gleich auf alle Items auf */
+}
+
+#sidebar .nav-pills .nav-link {
+  display: block;
+  width: 100%;                /* füllt das nav-item komplett aus */
+  text-align: center;
+  box-sizing: border-box;
+  white-space: nowrap;
+  border-radius: 0.25rem;
+  padding: 0.5rem 0;          /* nur vertikales Padding */
+}
