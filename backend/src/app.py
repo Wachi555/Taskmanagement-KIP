@@ -24,8 +24,8 @@ async def main():
 
 
 @app.post("/process_input")
-async def process_input(input_text: InputModel):
-    response = process_anamnesis(input_text.text)
+async def process_input(input_model: InputModel):
+    response = process_anamnesis(input_model.text)
     print(type(response))
     print(response, flush=True)
     return OutputModel(output=response)
