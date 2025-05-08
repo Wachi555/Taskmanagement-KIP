@@ -32,7 +32,8 @@ async def process_input(input_text: InputModel):
 
 
 @app.post("/process_input_debug")
-async def process_input_debug(input_text: InputModel):
+async def process_input_debug(input_model: InputModel):
+    print(input_model.text, flush=True)
     return OutputModel(output=json.loads(test_output))
 
 
