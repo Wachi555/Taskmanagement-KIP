@@ -1,6 +1,6 @@
 import os
 
-from common.models import OutputContent, EvaluationInput, ExtractedContent
+from common.pydantic_models import OutputContent, EvaluationInput, ExtractedContent
 from dotenv import load_dotenv
 from modules.prompts import extraction_prompt, evaluation_prompt, build_evaluation_input
 from openai import OpenAI

@@ -1,13 +1,20 @@
 import json
 
 import uvicorn
-from common.models import InputModel, OutputModel
+# from backend.src.modules import crud as crud
+# from backend.src.common.pydantic_models import InputModel, OutputModel
+from common.pydantic_models import InputAnamnesis, InputPatient, OutputModel
+from modules import crud
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from modules.debug import test_output
 from modules.processing import process_anamnesis
+from modules.database import init_db
 
 app = FastAPI()
+init_db()
+
+# TODO: Add ResponseModels -> Success: bool, Error-messages, etc.
 
 app.add_middleware(
     CORSMiddleware,
@@ -22,9 +29,10 @@ app.add_middleware(
 async def main():
     return {"message": "Hello World"}
 
+# ==================== Processing routes ========================
 
 @app.post("/process_input")
-async def process_input(input_model: InputModel):
+async def process_input(input_model: InputAnamnesis):
     response = process_anamnesis(input_model.text)
     print(type(response))
     print(response, flush=True)
@@ -32,15 +40,44 @@ async def process_input(input_model: InputModel):
 
 
 @app.post("/process_input_debug")
-async def process_input_debug(input_model: InputModel):
+async def process_input_debug(input_model: InputAnamnesis):
     print(input_model.text, flush=True)
     return OutputModel(output=json.loads(test_output))
 
+# ==================== Database routes ==========================
 
-# @app.post("/ask_anything")
-# async def ask_anything(input_text: InputModel):
-#     response = ask_anything2(input_text.text)
-#     return {"output": response}
+@app.get("/patients")
+async def get_patients():
+    patients = crud.get_all_patients()
+    return OutputModel(output=patients)
+
+
+@app.get("/patient/{patient_id}")
+async def get_patient(patient_id: int):
+    patient = crud.get_patient_by_id(patient_id)
+    if patient:
+        return OutputModel(output=patient)
+    else:
+        return OutputModel(output="", success=False, error_code=404, error_message="Patient not found")
+
+
+@app.post("/patient")
+async def create_patient(input_model: InputPatient):
+    patient_id = crud.create_patient(input_model.first_name, input_model.last_name, input_model.date_of_birth, input_model.age)
+    patient = crud.get_patient_by_id(patient_id)
+    if patient:
+        return OutputModel(output=patient)
+    else:
+        return OutputModel(output="", success=False, error_code=500, error_message="Failed to create patient")
+
+
+@app.delete("/patient/{patient_id}")
+async def delete_patient(patient_id: int):
+    success = crud.delete_patient(patient_id)
+    if success:
+        return OutputModel(output="", success=True)
+    else:
+        return OutputModel(output="", success=False, error_code=404, error_message="Patient not found")
 
 
 if __name__ == "__main__":

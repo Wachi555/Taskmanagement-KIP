@@ -21,8 +21,14 @@ class OutputContent(BaseModel):
 
 # ===============================================================
 
-class InputModel(BaseModel):
+class InputAnamnesis(BaseModel):
     text: str
+
+class InputPatient(BaseModel):
+    first_name: str
+    last_name: str
+    date_of_birth: str
+    age: int    
 
 class OutputModel(BaseModel):
     output: OutputContent
@@ -33,7 +39,8 @@ class OutputModel(BaseModel):
 # ===============================================================
 
 class ExtractedContent(BaseModel):
-    name: str
+    frist_name: str
+    last_name: str
     date_of_birth: str
     age: int
     symptoms: List[str]

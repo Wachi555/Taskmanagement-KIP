@@ -1,5 +1,5 @@
-from modules.ai_service_gemini import generate_anamnesis_response, extract_contents
-# from modules.ai_service_openai import generate_anamnesis_response, extract_contents
+# from modules.ai_service_gemini import generate_anamnesis_response, extract_contents
+from modules.ai_service_openai import generate_anamnesis_response, extract_contents
 
 
 def process_anamnesis(input_text: str) -> str:

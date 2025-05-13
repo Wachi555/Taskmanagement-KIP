@@ -1,4 +1,4 @@
-from common.models import EvaluationInput
+from common.pydantic_models import EvaluationInput
 
 extraction_prompt = """
 You are given a german text about a patient in a hospital. 
