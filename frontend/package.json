@@ -8,7 +8,8 @@
     },
     "dependencies": {
         "express": "^4.18.2",
-        "express-handlebars": "^6.0.7"
+        "express-handlebars": "^6.0.7",
+        "node-fetch": "^3.3.2"
     },
     "devDependencies": {
         "nodemon": "^2.0.22"

@@ -3,6 +3,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   setupSidebarToggle();
   setupAnalyzeButton();
+  setupSidebarSearch();
   // setupExamToggle wird in displayExams aufgerufen,
   // sobald der Button im DOM ist.
 });
@@ -10,22 +11,19 @@ document.addEventListener("DOMContentLoaded", () => {
 // Sidebar ein-/ausblenden
 function setupSidebarToggle() {
   const toggleBtn = document.getElementById("toggle-sidebar");
-  const sidebar = document.getElementById("sidebar");
-  
+  const sidebar   = document.getElementById("sidebar");
   if (!toggleBtn || !sidebar) return;
-  
-  // Klick-Handler
+
   toggleBtn.addEventListener("click", () => {
     sidebar.classList.toggle("collapsed");
     localStorage.setItem(
-      'sidebarCollapsed',
-      sidebar.classList.contains('collapsed')
+      "sidebarCollapsed",
+      sidebar.classList.contains("collapsed")
     );
   });
-  
-  // Status beim Laden wiederherstellen
-  if (localStorage.getItem('sidebarCollapsed') === 'true') {
-    sidebar.classList.add('collapsed');
+
+  if (localStorage.getItem("sidebarCollapsed") === "true") {
+    sidebar.classList.add("collapsed");
   }
 }
 
@@ -33,7 +31,7 @@ function setupSidebarToggle() {
 function setupAnalyzeButton() {
   const processBtn = document.getElementById("process-btn");
   if (!processBtn) return;
-  
+
   processBtn.addEventListener("click", async () => {
     try {
       await processInput();
@@ -41,6 +39,54 @@ function setupAnalyzeButton() {
       console.error("Analyse fehlgeschlagen:", error);
       showError(error.message);
     }
+  });
+}
+
+// Suchleiste in der Sidebar
+function setupSidebarSearch() {
+  const searchInput = document.getElementById("sidebar-search");
+  const tabList     = document.getElementById("sidebarTabs");
+  if (!searchInput || !tabList) return;
+
+  // Filter-Funktion
+  function filterSidebarList() {
+    const filter   = searchInput.value.trim().toLowerCase();
+    const activePane = document.querySelector(".tab-pane.show.active");
+    if (!activePane) return;
+
+    const listItems = activePane.querySelectorAll("li.list-group-item");
+    let anyVisible = false;
+
+    // entferne alten "Keine Ergebnisse"-Hinweis
+    const oldNo = activePane.querySelector(".no-results");
+    if (oldNo) oldNo.remove();
+
+    listItems.forEach(li => {
+      const text = li.textContent.trim().toLowerCase();
+      if (filter === "" || text.includes(filter)) {
+        li.style.display = "";
+        anyVisible = true;
+      } else {
+        li.style.display = "none";
+      }
+    });
+
+    // wenn gar nichts sichtbar, Hinweis anhängen
+    if (!anyVisible) {
+      const noRes = document.createElement("li");
+      noRes.className = "list-group-item text-center text-muted no-results";
+      noRes.textContent = "Keine Patienten gefunden.";
+      activePane.querySelector(".list-group").appendChild(noRes);
+    }
+  }
+
+  // bei jeder Eingabe filtern
+  searchInput.addEventListener("input", filterSidebarList);
+
+  // beim Tab-Wechsel Suchfeld zurücksetzen + Liste neu anzeigen
+  tabList.addEventListener("shown.bs.tab", () => {
+    searchInput.value = "";
+    filterSidebarList();
   });
 }
 
@@ -84,7 +130,7 @@ function displayResults(data) {
 // Ergebnisse zurücksetzen
 function resetResults() {
   document.getElementById("patientData").innerHTML = "";
-  document.getElementById("resultData").innerHTML = "";
+  document.getElementById("resultData").innerHTML  = "";
   document.getElementById("triageIndicator").innerHTML = "";
 }
 
@@ -102,9 +148,8 @@ function displayPatientData(patientData) {
 // Triagestufe anzeigen
 function displayTriageLevel(triageLevel) {
   const triageContainer = document.getElementById("triageIndicator");
-  const resultUl = document.getElementById("resultData");
+  const resultUl        = document.getElementById("resultData");
 
-  // Kreise
   [1,2,3,4,5].forEach(level => {
     const circle = document.createElement("div");
     circle.className = `triage-circle level-${level} ${
@@ -114,7 +159,6 @@ function displayTriageLevel(triageLevel) {
     triageContainer.appendChild(circle);
   });
 
-  // Text
   const li = document.createElement("li");
   li.className = "list-group-item";
   li.innerHTML = `<strong>Triagestufe:</strong> ${triageLevel}`;
@@ -188,8 +232,8 @@ function displayExperts(experts) {
 function showLoading(show) {
   const spinner    = document.getElementById("loading-spinner");
   const processBtn = document.getElementById("process-btn");
-  if (spinner) spinner.style.display = show ? "inline-block" : "none";
-  if (processBtn) processBtn.disabled = show;
+  if (spinner)    spinner.style.display = show ? "inline-block" : "none";
+  if (processBtn) processBtn.disabled   = show;
 }
 
 // Fehlermeldung anzeigen
