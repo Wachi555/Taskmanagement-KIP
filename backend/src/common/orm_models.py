@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, Boolean, String, Float, ForeignKey
 from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
@@ -12,17 +12,95 @@ class Patient(Base):
     last_name = Column(String, nullable=False)
     age = Column(Integer, nullable=False)
     date_of_birth = Column(String, nullable=False)
+    is_waiting = Column(Boolean, nullable=False)
     # Optional for easy access to a patient's entries
     entries = relationship("Entry", back_populates="patient")
 
 # Entries table (one for each entry in the patient's history)
-class Entry(Base):
-    __tablename__ = 'entries'
+class PatientEntry(Base):
+    __tablename__ = 'patient_entries'
 
     id = Column(Integer, primary_key=True)
     patient_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
     entry_date = Column(String, nullable=False)
     entry_text = Column(String, nullable=False)
     # Optional for easy access to the patient of an entry
-    patient = relationship("Patient", back_populates="entries")
+    patient = relationship("Patient", back_populates="patient_entries")
+
+# ========================================================================
+
+# TODO: Maybe remove this and just add a source_str to the entry table that contains the json from the llm
+class ExtractedContent(Base):
+    __tablename__ = 'extracted_content'
+
+    id = Column(Integer, primary_key=True)
+    first_name = Column(String, nullable=False)
+    last_name = Column(String, nullable=False)
+    date_of_birth = Column(String, nullable=False)
+    age = Column(Integer, nullable=False)
+    symptoms = Column(String, nullable=False)
+    history = Column(String, nullable=False)
+    medications = Column(String, nullable=False)
+    allergies = Column(String, nullable=False)
+    family_history = Column(String, nullable=False)
+    additional_notes = Column(String, nullable=False)
+
+# ========================================================================
+
+class Examination(Base):
+    __tablename__ = 'examinations'
+
+    id = Column(Integer, primary_key=True)
+    result_id = Column(Integer, ForeignKey('results.id'), nullable=False)
+    name = Column(String, nullable=False)
+    priority = Column(Integer, nullable=True)
+
+# Chosen expert table (one for each expert for each result -> The reason will be stored with the expert)
+class Expert(Base):
+    __tablename__ = 'experts'
+
+    id = Column(Integer, primary_key=True)
+    result_id = Column(Integer, ForeignKey('results.id'), nullable=False)
+    name = Column(String, nullable=False)
+    reason = Column(String, nullable=False)
+
+class Result(Base):
+    __tablename__ = 'results'
+    id = Column(Integer, primary_key=True)
+    patient_entry_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
+    triage_level = Column(Integer, nullable=False)
+
+# ========================================================================
+
+class Symptom(Base):
+    __tablename__ = 'symptoms'
+
+    id = Column(Integer, primary_key=True)
+    patient_entry_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
+    name = Column(String, nullable=False)
+
+class Medication(Base):
+    __tablename__ = 'medications'
+
+    id = Column(Integer, primary_key=True)
+    patient_entry_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
+    name = Column(String, nullable=False)
+    dosage = Column(String, nullable=False)
     
+class Allergy(Base):
+    __tablename__ = 'allergies'
+
+    id = Column(Integer, primary_key=True)
+    patient_entry_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
+    name = Column(String, nullable=False)
+    
+class Diagnosis(Base):
+    __tablename__ = 'diagnoses'
+
+    id = Column(Integer, primary_key=True)
+    patient_entry_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
+    name = Column(String, nullable=False)
+    reason = Column(String, nullable=False)
+    confidence = Column(Float, nullable=False)
+    # Optional for easy access to the patient of a diagnosis
+    patient = relationship("Patient", back_populates="diagnoses")

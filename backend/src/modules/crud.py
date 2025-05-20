@@ -1,6 +1,6 @@
 # Create, Read, Update, Delete for the database
 
-from common.orm_models import Patient, Entry
+from common.orm_models import Patient, PatientEntry
 from .database import SessionLocal
 
 def get_all_patients():
@@ -71,7 +71,7 @@ def create_entry(patient_id: int, entry_date: str, entry_text: str):
     session = SessionLocal()
     patient = session.query(Patient).filter(Patient.id == patient_id).first()
     if patient:
-        new_entry = Entry(patient_id=patient_id, entry_date=entry_date, entry_text=entry_text)
+        new_entry = PatientEntry(patient_id=patient_id, entry_date=entry_date, entry_text=entry_text)
         session.add(new_entry)
         session.commit()
         session.refresh(new_entry)
@@ -83,7 +83,7 @@ def create_entry(patient_id: int, entry_date: str, entry_text: str):
 
 def delete_entry(entry_id: int):
     session = SessionLocal()
-    entry = session.query(Entry).filter(Entry.id == entry_id).first()
+    entry = session.query(PatientEntry).filter(PatientEntry.id == entry_id).first()
     if entry:
         session.delete(entry)
         session.commit()

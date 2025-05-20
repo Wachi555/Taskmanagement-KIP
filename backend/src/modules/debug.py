@@ -1,4 +1,4 @@
-from common.orm_models import Patient, Entry
+from common.orm_models import Patient, PatientEntry
 
 test_output = """
 {
@@ -51,12 +51,12 @@ example_patients = [
     age=32,
     date_of_birth="1993-01-01",
     entries=[
-      Entry(
+      PatientEntry(
         id=1,
         entry_date="2023-10-01",
         entry_text="Patient reports abdominal pain and nausea."
       ),
-      Entry(
+      PatientEntry(
         id=2,
         entry_date="2023-10-02",
         entry_text="Patient has a history of gastroenteritis."
@@ -70,12 +70,12 @@ example_patients = [
     age=25,
     date_of_birth="1998-05-15",
     entries=[
-      Entry(
+      PatientEntry(
         id=3,
         entry_date="2023-10-03",
         entry_text="Patient has a family history of diabetes."
       ),
-      Entry(
+      PatientEntry(
         id=4,
         entry_date="2023-10-04",
         entry_text="Patient reports fatigue and increased thirst."
