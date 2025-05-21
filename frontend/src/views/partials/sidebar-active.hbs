@@ -4,20 +4,25 @@
   role="tabpanel"
   aria-labelledby="tab-main"
 >
-  <ul class="list-group mb-3">
-    {{#each patients}}
-      <li class="list-group-item">{{this}}</li>
-    {{/each}}
+<ul class="list-group mb-3">
+  {{#each patients}}
+    <li class="list-group-item">
+    <a href="/patient/{{encodeURIComponent this}}" class="text-decoration-none">
+        {{this}}
+    </a>
 
-    {{!-- wenn das Array leer ist --}}
-    {{#unless patients.length}}
-      <li class="list-group-item text-center text-muted">
-        Keine Patienten in Behandlung.
-      </li>
-    {{/unless}}
-  </ul>
 
-  <button id="add-patient" class="btn btn-outline-primary w-100">
-    + Hinzufügen
-  </button>
+
+    </li>
+  {{/each}}
+  {{#unless patients.length}}
+    <li class="list-group-item text-center text-muted">
+      Keine Patienten in Behandlung.
+    </li>
+  {{/unless}}
+</ul>
+<button id="add-patient" class="btn btn-outline-primary w-100">
+  + Hinzufügen
+</button>
+
 </div>
