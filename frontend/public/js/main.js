@@ -1,8 +1,10 @@
 // public/js/main.js
+import { setupAudioRecorder } from './audio.js';
 
 document.addEventListener("DOMContentLoaded", () => {
   setupSidebarToggle();
   setupAnalyzeButton();
+    setupAudioRecorder(); 
   // setupExamToggle wird in displayExams aufgerufen,
   // sobald der Button im DOM ist.
 });

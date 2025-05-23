@@ -2,6 +2,7 @@ const path    = require('path');
 const express = require('express');
 const { engine } = require('express-handlebars');
 const homeCtrl   = require('./src/controllers/home');
+const audioCtrl  = require('./src/controllers/audio');
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.set('views', path.join(__dirname, 'src', 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use('/', audioCtrl);
 
 app.use('/', homeCtrl);
 

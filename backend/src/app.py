@@ -10,6 +10,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from modules.debug import test_output
 from modules.processing import process_anamnesis
 from modules.database import init_db
+from fastapi import UploadFile, File
+import whisper
+import tempfile
+
+
 
 app = FastAPI()
 init_db()
@@ -43,6 +48,20 @@ async def process_input(input_model: InputAnamnesis):
 async def process_input_debug(input_model: InputAnamnesis):
     print(input_model.text, flush=True)
     return OutputModel(output=json.loads(test_output))
+
+
+# ==================== STT routes =============================
+
+model = whisper.load_model("base") # Options: tiny, base, small, medium, large
+
+@app.post("/transcribe")
+async def transcribe(file: UploadFile = File(...)):
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".webm") as temp_audio:
+        temp_audio.write(await file.read())
+        temp_audio.flush()
+        result = model.transcribe(temp_audio.name)
+    return {"transcription": result["text"]}
+
 
 # ==================== Database routes ==========================
 

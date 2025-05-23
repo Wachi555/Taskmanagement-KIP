@@ -36,7 +36,7 @@ router.post('/analyse', async (req, res) => {
     if (!response.ok) {
       throw new Error('Failed to fetch data: ' + response.statusText);
     }
-    console.log("Response ok:", response.ok);
+    //console.log("Response ok:", response.ok);
     
     const data = await response.json();
     

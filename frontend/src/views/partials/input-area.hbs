@@ -8,4 +8,21 @@
   </div>
   <button id="process-btn" class="btn btn-primary mt-auto">Verarbeiten</button>
 </section>
+<div class="mt-3">
+  <div class="btn-group" role="group" aria-label="Audio Controls">
+    <button id="record-btn" class="btn btn-outline-primary">
+      <i class="bi bi-mic-fill"></i> Aufnahme starten
+    </button>
+    <button id="stop-btn" class="btn btn-outline-warning" disabled>
+      <i class="bi bi-stop-fill"></i> Stopp
+    </button>
+    <button id="send-audio-btn" class="btn btn-outline-success" disabled>
+      <i class="bi bi-upload"></i> Audio analysieren
+    </button>
+  </div>
+  <small class="text-muted d-block mt-1">
+    Sprich deine Eingabe und sende sie zur Analyse.
+    <p id="transcription-output"></p>
+  </small>
+ 
 

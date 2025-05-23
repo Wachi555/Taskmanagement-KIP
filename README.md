@@ -10,6 +10,7 @@ Des wird super
    ```
     GEMINI_API_KEY="<your_api_key>"
     OPENAI_API_KEY="<your_api_key>"
+    GOOGLE_APPLICATION_CREDENTIALS="<your_api_key>"
    ```
 5. Start the backend server by running `python backend/src/app.py`.
 6. View the frontend by opening the HTML file in the `frontend` folder in a web browser or by running `python -m http.server 8001` in the `frontend` folder and navigating to `http://localhost:8001`.
