@@ -13,6 +13,7 @@ from modules.database import init_db
 from fastapi import UploadFile, File
 import whisper
 import tempfile
+import os
 
 
 
@@ -56,7 +57,11 @@ model = whisper.load_model("base") # Options: tiny, base, small, medium, large
 
 @app.post("/transcribe")
 async def transcribe(file: UploadFile = File(...)):
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".webm") as temp_audio:
+    # Get the original extension (e.g. .mp3, .wav, .webm)
+    _, ext = os.path.splitext(file.filename)
+    if not ext:
+        ext = ".webm"  # fallback
+    with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as temp_audio:
         temp_audio.write(await file.read())
         temp_audio.flush()
         result = model.transcribe(temp_audio.name)

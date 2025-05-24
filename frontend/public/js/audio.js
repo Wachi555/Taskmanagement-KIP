@@ -1,63 +1,138 @@
 let mediaRecorder;
 let recordedChunks = [];
+let isPaused = false;
 
 function showError(message) {
   alert("Error: " + message);
 }
 
-function displayResults(result) {
-  console.log("Transcription:", result.transcription);
-  // Optional: display in the HTML
-  const outputElement = document.getElementById("transcription-output");
-  if (outputElement) {
-    outputElement.textContent = result.transcription;
-  }
-}
-
 export function setupAudioRecorder() {
-  const recordBtn = document.getElementById("record-btn");
-  const stopBtn = document.getElementById("stop-btn");
-  const sendBtn = document.getElementById("send-audio-btn");
+  const mainBtn = document.getElementById("audio-main-btn");
+  const uploadBtn = document.getElementById("audio-upload-btn");
+  const fileInput = document.getElementById("audioFile");
+  const pauseBtn = document.getElementById("audio-pause-btn");
+  const continueBtn = document.getElementById("audio-continue-btn");
+  const stopBtn = document.getElementById("audio-stop-btn");
+  const rerecordBtn = document.getElementById("audio-rerecord-btn");
+  const processBtn = document.getElementById("audio-process-btn");
+  const transcriptionOutput = document.getElementById("transcription-output");
 
-  recordBtn.addEventListener("click", async () => {
+  function setState(state) {
+    [mainBtn, uploadBtn, pauseBtn, continueBtn, stopBtn, rerecordBtn, processBtn].forEach(btn => btn.classList.add("d-none"));
+    if (state === "idle") {
+      mainBtn.classList.remove("d-none");
+      uploadBtn.classList.remove("d-none");
+    } else if (state === "recording") {
+      pauseBtn.classList.remove("d-none");
+      stopBtn.classList.remove("d-none");
+    } else if (state === "paused") {
+      continueBtn.classList.remove("d-none");
+      stopBtn.classList.remove("d-none");
+    } else if (state === "stopped") {
+      rerecordBtn.classList.remove("d-none");
+      processBtn.classList.remove("d-none");
+    } else if (state === "processing") {
+      // All buttons hidden during processing
+    }
+  }
+
+  setState("idle");
+
+  mainBtn.addEventListener("click", async () => {
     recordedChunks = [];
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const stream = await navigator.mediaDevices.getUserMedia({
+    audio: {
+      sampleRate: 44100,
+      channelCount: 1,
+      echoCancellation: true,
+      noiseSuppression: true
+    }
+    });
+
+    // Use this format — FFmpeg handles this well
+    mediaRecorder = new MediaRecorder(stream, {
+      mimeType: "audio/webm;codecs=opus"
+    });
     mediaRecorder = new MediaRecorder(stream);
     mediaRecorder.ondataavailable = e => recordedChunks.push(e.data);
+    mediaRecorder.onstop = () => setState("stopped");
     mediaRecorder.start();
-    recordBtn.disabled = true;
-    stopBtn.disabled = false;
+    setState("recording");
+    isPaused = false;
+  });
+
+  uploadBtn.addEventListener("click", () => {
+    fileInput.value = ""; // Reset file input
+    fileInput.click();
+  });
+
+  pauseBtn.addEventListener("click", () => {
+    if (mediaRecorder && mediaRecorder.state === "recording") {
+      mediaRecorder.pause();
+      isPaused = true;
+      setState("paused");
+    }
+  });
+
+  continueBtn.addEventListener("click", () => {
+    if (mediaRecorder && mediaRecorder.state === "paused") {
+      mediaRecorder.resume();
+      isPaused = false;
+      setState("recording");
+    }
   });
 
   stopBtn.addEventListener("click", () => {
-    mediaRecorder.stop();
-    stopBtn.disabled = true;
-    sendBtn.disabled = false;
-  });
-
-  sendBtn.addEventListener("click", async () => {
-    const blob = new Blob(recordedChunks, { type: "audio/webm" });
-    const formData = new FormData();
-    formData.append("file", blob, "recording.webm");
-
-    console.log("Audio Blob size:", blob.size);  // should be > 1 KB
-    const url = URL.createObjectURL(blob);
-    const audio = new Audio(url);
-    audio.play();  // Listen to your own recording
-
-    try {
-      const res = await fetch("http://localhost:8000/transcribe", {
-        method: "POST",
-        body: formData
-      });
-      const result = await res.json();
-      const transcription = result.transcription;
-      const anamneseField = document.getElementById("inputText"); // change to actual ID
-      if (anamneseField) {
-        anamneseField.value = transcription;
-      }
-    } catch (err) {
-      showError(err.message);
+    if (mediaRecorder && (mediaRecorder.state === "recording" || mediaRecorder.state === "paused")) {
+      mediaRecorder.stop();
     }
   });
+
+  rerecordBtn.addEventListener("click", () => {
+    setState("idle");
+    transcriptionOutput.textContent = "";
+  });
+
+  processBtn.addEventListener("click", async () => {
+    const blob = new Blob(recordedChunks, { type: "audio/webm" });
+    await uploadAndTranscribe(blob);
+  });
+
+  fileInput.addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      await uploadAndTranscribe(file);
+    }
+  });
+
+  async function uploadAndTranscribe(fileBlob) {
+  setState("processing");
+  transcriptionOutput.textContent = "Audio wird verarbeitet...";
+  const formData = new FormData();
+
+  // Use the original filename if available (for uploads), otherwise default to webm
+  let filename = "audio.webm";
+  if (fileBlob instanceof File && fileBlob.name) {
+    filename = fileBlob.name;
+  }
+  formData.append("file", fileBlob, filename);
+
+  try {
+    const res = await fetch("http://localhost:8000/transcribe", {
+      method: "POST",
+      body: formData
+    });
+    const result = await res.json();
+    const transcription = result.transcription;
+    const anamneseField = document.getElementById("inputText");
+    if (anamneseField) {
+      anamneseField.value = transcription;
+    }
+    transcriptionOutput.textContent = transcription;
+  } catch (err) {
+    showError(err.message);
+    transcriptionOutput.textContent = "Fehler bei der Transkription.";
+  }
+  setState("idle");
+  }
 }
