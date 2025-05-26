@@ -14,7 +14,7 @@ class Patient(Base):
     date_of_birth = Column(String, nullable=False)
     is_waiting = Column(Boolean, nullable=False)
     # Optional for easy access to a patient's entries
-    entries = relationship("Entry", back_populates="patient")
+    # entries = relationship("PatientEntry", back_populates="patient")
 
 # Entries table (one for each entry in the patient's history)
 class PatientEntry(Base):
@@ -51,17 +51,30 @@ class Examination(Base):
     __tablename__ = 'examinations'
 
     id = Column(Integer, primary_key=True)
-    result_id = Column(Integer, ForeignKey('results.id'), nullable=False)
     name = Column(String, nullable=False)
-    priority = Column(Integer, nullable=True)
+
+class ExaminationToResult(Base):
+    __tablename__ = 'examination_to_result'
+
+    id = Column(Integer, primary_key=True)
+    examination_id = Column(Integer, ForeignKey('examinations.id'), nullable=False)
+    result_id = Column(Integer, ForeignKey('results.id'), nullable=False)
+    priority = Column(Integer, nullable=False)
+    reason = Column(String, nullable=False)
 
 # Chosen expert table (one for each expert for each result -> The reason will be stored with the expert)
 class Expert(Base):
     __tablename__ = 'experts'
 
     id = Column(Integer, primary_key=True)
-    result_id = Column(Integer, ForeignKey('results.id'), nullable=False)
     name = Column(String, nullable=False)
+
+class ExpertToResult(Base):
+    __tablename__ = 'expert_to_result'
+
+    id = Column(Integer, primary_key=True)
+    expert_id = Column(Integer, ForeignKey('experts.id'), nullable=False)
+    result_id = Column(Integer, ForeignKey('results.id'), nullable=False)
     reason = Column(String, nullable=False)
 
 class Result(Base):

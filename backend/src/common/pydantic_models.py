@@ -7,11 +7,9 @@ class Diagnosis(BaseModel):
     reason: Optional[str] = None
     confidence: Optional[float] = None
 
-
 class Examination(BaseModel):
     name: str
     priority: Optional[int] = None
-
 
 class OutputContent(BaseModel):
     diagnosis: List[Diagnosis]
@@ -19,7 +17,7 @@ class OutputContent(BaseModel):
     treatments: List[str]
     symptoms: List[str]
 
-# ===============================================================
+# ==== Input Output from Frontend ====
 
 class InputAnamnesis(BaseModel):
     text: str
@@ -49,7 +47,6 @@ class ExtractedContent(BaseModel):
     allergies: List[str]
     family_history: str
     additional_notes: str
-
 
 class EvaluationInput(BaseModel):
     age: int
