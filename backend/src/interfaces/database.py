@@ -5,6 +5,7 @@ import database.crud_symptoms as crud_symptoms
 import database.crud_medications as crud_medications
 import database.crud_diagnoses as crud_diagnoses
 import database.crud_experts as crud_experts
+import database.crud_examinations as crud_examinations
 from common.pydantic_models import InputPatient
 
 # --- Patient Management ---
@@ -268,25 +269,55 @@ def remove_expert_from_result(expert_id: int, result_id: int):
         
 # --- Examination Management ---
 
+def get_all_examinations():
+    examinations = crud_examinations.get_all_examinations()
+    if examinations:
+        return examinations
+    else:
+        ...
+
+def get_examination_by_id(examination_id: int):
+    examination = crud_examinations.get_examination_by_id(examination_id)
+    if examination:
+        return examination
+    else:
+        ...
+        
+# Add an examination to the database
+def add_examination(examination_data):
+    examination_id = crud_examinations.create_examination(examination_data)
+    if examination_id:
+        return examination_id
+    else:
+        ...
+        
+# Remove an examination from the database
+def remove_examination(examination_id: int):
+    success = crud_examinations.delete_examination(examination_id)
+    if success:
+        return True
+    else:
+        ...
+
 # Get all examinations for a result
 def get_examinations_for_result(result_id: int):
-    examinations = crud.get_examinations_for_result(result_id)
+    examinations = crud_examinations.get_examinations_for_result(result_id)
     if examinations:
         return examinations
     else:
         ...
         
 # Add an examination to a result
-def add_examination_to_result(result_id: int, examination_data):
-    examination_id = crud.create_examination(result_id, examination_data)
+def add_examination_to_result(examination_id: int, result_id: int):
+    examination_id = crud_examinations.add_examination_to_result(examination_id, result_id)
     if examination_id:
         return examination_id
     else:
         ...
         
 # Remove an examination from a result
-def remove_examination_from_result(examination_id: int):
-    success = crud.delete_examination(examination_id)
+def remove_examination_from_result(examination_id: int, result_id: int):
+    success = crud_examinations.remove_examination_from_result(examination_id, result_id)
     if success:
         return True
     else:
