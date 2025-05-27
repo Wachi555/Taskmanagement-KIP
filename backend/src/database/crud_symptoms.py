@@ -1,5 +1,5 @@
-from sqlalchemy.orm import SessionLocal
-from orm_models import Symptom
+from database.session import SessionLocal
+from database.orm_models import Symptom
 
 def get_symptoms_for_entry(entry_id: int):
     session = SessionLocal()

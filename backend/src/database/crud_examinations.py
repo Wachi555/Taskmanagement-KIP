@@ -1,5 +1,5 @@
-from sqlalchemy.orm import SessionLocal
-from orm_models import Examination, ExaminationToResult
+from database.session import SessionLocal
+from database.orm_models import Examination, ExaminationToResult
     
 def get_all_examinations():
     session = SessionLocal()

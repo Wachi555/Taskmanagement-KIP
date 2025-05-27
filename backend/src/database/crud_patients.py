@@ -1,5 +1,5 @@
-from sqlalchemy.orm import SessionLocal
-from orm_models import Patient
+from database.session import SessionLocal
+from database.orm_models import Patient
 
 def get_all_patients():
     session = SessionLocal()

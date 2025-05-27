@@ -1,5 +1,5 @@
-from sqlalchemy.orm import SessionLocal
-from orm_models import Result
+from database.session import SessionLocal
+from database.orm_models import Result
 
 def create_result(patient_entry_id: int, triage_level: int):
     session = SessionLocal()

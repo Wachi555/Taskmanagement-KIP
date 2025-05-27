@@ -4,12 +4,12 @@ import uvicorn
 # from backend.src.modules import crud as crud
 # from backend.src.common.pydantic_models import InputModel, OutputModel
 from common.pydantic_models import InputAnamnesis, InputPatient, OutputModel
-from modules import crud
+from interfaces import database as crud
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from modules.debug import test_output
 from modules.processing import process_anamnesis
-from modules.database import init_db
+from database.session import init_db
 
 app = FastAPI()
 init_db()

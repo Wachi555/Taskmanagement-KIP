@@ -1,4 +1,4 @@
-from common.orm_models import Patient, PatientEntry
+from database.orm_models import Patient
 
 test_output = """
 {
@@ -50,18 +50,19 @@ example_patients = [
     last_name="Müller",
     age=32,
     date_of_birth="1993-01-01",
-    entries=[
-      PatientEntry(
-        id=1,
-        entry_date="2023-10-01",
-        entry_text="Patient reports abdominal pain and nausea."
-      ),
-      PatientEntry(
-        id=2,
-        entry_date="2023-10-02",
-        entry_text="Patient has a history of gastroenteritis."
-      )
-    ]
+    is_waiting=False,
+    # entries=[
+      # PatientEntry(
+      #   id=1,
+      #   entry_date="2023-10-01",
+      #   entry_text="Patient reports abdominal pain and nausea."
+      # ),
+      # PatientEntry(
+      #   id=2,
+      #   entry_date="2023-10-02",
+      #   entry_text="Patient has a history of gastroenteritis."
+      # )
+    # ]
   ),
   Patient(
     id=2,
@@ -69,17 +70,18 @@ example_patients = [
     last_name="Smith",
     age=25,
     date_of_birth="1998-05-15",
-    entries=[
-      PatientEntry(
-        id=3,
-        entry_date="2023-10-03",
-        entry_text="Patient has a family history of diabetes."
-      ),
-      PatientEntry(
-        id=4,
-        entry_date="2023-10-04",
-        entry_text="Patient reports fatigue and increased thirst."
-      )
-    ]
+    is_waiting=True
+    # entries=[
+      # PatientEntry(
+      #   id=3,
+      #   entry_date="2023-10-03",
+      #   entry_text="Patient has a family history of diabetes."
+      # ),
+      # PatientEntry(
+      #   id=4,
+      #   entry_date="2023-10-04",
+      #   entry_text="Patient reports fatigue and increased thirst."
+      # )
+    # ]
   )
 ]

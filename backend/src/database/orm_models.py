@@ -25,7 +25,7 @@ class PatientEntry(Base):
     entry_date = Column(String, nullable=False)
     entry_text = Column(String, nullable=False)
     # Optional for easy access to the patient of an entry
-    patient = relationship("Patient", back_populates="patient_entries")
+    # patient = relationship("Patient", back_populates="patient_entries")
 
 # ========================================================================
 
@@ -116,4 +116,4 @@ class Diagnosis(Base):
     reason = Column(String, nullable=False)
     confidence = Column(Float, nullable=False)
     # Optional for easy access to the patient of a diagnosis
-    patient = relationship("Patient", back_populates="diagnoses")
+    # patient = relationship("Patient", back_populates="diagnoses")

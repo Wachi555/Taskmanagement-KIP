@@ -1,5 +1,5 @@
-from sqlalchemy.orm import SessionLocal
-from orm_models import Expert, ExpertToResult
+from database.session import SessionLocal
+from database.orm_models import Expert, ExpertToResult
 
 def get_expert_by_id(expert_id: int):
     session = SessionLocal()

@@ -1,5 +1,5 @@
-from sqlalchemy.orm import SessionLocal
-from orm_models import Medication
+from database.session import SessionLocal
+from database.orm_models import Medication
 
 def get_medications_for_entry(entry_id: int):
     session = SessionLocal()
