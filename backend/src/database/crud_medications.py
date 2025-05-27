@@ -7,9 +7,9 @@ def get_medications_for_entry(entry_id: int):
     session.close()
     return medications
 
-def create_medication(entry_id: int, medication_data: dict):
+def create_medication(entry_id: int, name: str, dosage: str):
     session = SessionLocal()
-    new_medication = Medication(patient_entry_id=entry_id, **medication_data)
+    new_medication = Medication(patient_entry_id=entry_id, name=name, dosage=dosage)
     session.add(new_medication)
     session.commit()
     session.refresh(new_medication)

@@ -40,7 +40,7 @@ def extract_contents(input_text: str) -> ExtractedContent:
         return result
     raise ValueError("No response text found.")
 
-def generate_anamnesis_response(input_contents: EvaluationInput) -> str:
+def generate_anamnesis_response(input_contents: EvaluationInput) -> OutputContent:
     try:
         user_prompt = build_evaluation_input(input_contents)
         response = client.beta.chat.completions.parse(

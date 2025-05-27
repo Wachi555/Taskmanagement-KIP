@@ -83,8 +83,8 @@ def get_patient_entry(entry_id: int):
         ...
 
 # Add an entry for a patient
-def add_patient_entry(patient_id: int, entry_data):
-    entry_id = crud_paitent_entries.create_patient_entry(patient_id, entry_data)
+def add_patient_entry(patient_id: int, date: str, patient_history: str, additional_notes: str, content_json: str):
+    entry_id = crud_paitent_entries.create_patient_entry(patient_id, date, patient_history, additional_notes, content_json)
     if entry_id:
         return entry_id
     else:
@@ -143,8 +143,8 @@ def get_medications_for_entry(entry_id: int):
         ...
         
 # Add a medication to a patient entry
-def add_medication_to_entry(entry_id: int, medication_data):
-    medication_id = crud_medications.create_medication(entry_id, medication_data)
+def add_medication_to_entry(entry_id: int, name: str, dosage: str):
+    medication_id = crud_medications.create_medication(entry_id, name, dosage)
     if medication_id:
         return medication_id
     else:
@@ -157,6 +157,9 @@ def remove_medication_from_entry(medication_id: int):
         return True
     else:
         ...
+
+# --- Allergy Management ---
+# TODO
         
 # --- Diagnosis Management ---
 

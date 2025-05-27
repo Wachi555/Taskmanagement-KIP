@@ -45,7 +45,6 @@ class ExtractedContent(BaseModel):
     history: str
     medications: List[str]
     allergies: List[str]
-    family_history: str
     additional_notes: str
 
 class EvaluationInput(BaseModel):

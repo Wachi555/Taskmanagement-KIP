@@ -23,13 +23,15 @@ class PatientEntry(Base):
     id = Column(Integer, primary_key=True)
     patient_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
     entry_date = Column(String, nullable=False)
-    entry_text = Column(String, nullable=False)
+    patient_history = Column(String, nullable=False)
+    additional_notes = Column(String, nullable=True)
+    extracted_contents_json = Column(String, nullable=False)
     # Optional for easy access to the patient of an entry
     # patient = relationship("Patient", back_populates="patient_entries")
 
 # ========================================================================
 
-# TODO: Maybe remove this and just add a source_str to the entry table that contains the json from the llm
+# TODO: Remove this and just add a source_str to the entry table that contains the json from the LLM
 class ExtractedContent(Base):
     __tablename__ = 'extracted_content'
 
