@@ -1,16 +1,19 @@
-let patients = ['Ute Russ', 'Hans Weber', 'Uwe Taniz'];
+// src/stores/patient_store.js
+let patients = [
+  {
+    name: 'Ute Russ',
+    dob: '12.05.1975',
+    gender: 'w',
+    symptoms: ['Husten','Fieber'],
+    history: [
+      { date: '2023-11-01', event: 'Grippe' },
+      { date: '2022-08-15', event: 'Magen-Darm-Infekt' }
+    ]
+  },
+  // …
+];
 
 module.exports = {
-  // Liefert das komplette Array
-  getAll: () => patients,
-
-  // Fügt einen neuen Patienten hinzu
-  add: (name) => { 
-    patients.push(name); 
-  },
-
-  // Entfernt einen Patienten nach Namen
-  remove: (name) => {
-    patients = patients.filter(p => p !== name);
-  }
+  getAll: () => patients.map(p => p.name),
+  getDetails: (name) => patients.find(p => p.name === name)
 };
