@@ -27,7 +27,7 @@ router.post('/analyse', async (req, res) => {
 
     console.log("Input text: ", inputText);
     
-    const response = await fetch("http://localhost:8000/process_input_debug", { // Hier auf /process_input umstellen wenn haupt-Anfrage gewünscht
+    const response = await fetch("http://localhost:8000/process_input", { // Hier auf /process_input umstellen wenn haupt-Anfrage gewünscht
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({text: inputText}) // Changed to match InputModel structure
