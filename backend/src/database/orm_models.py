@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, Boolean, String, Float, ForeignKey
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
@@ -49,7 +49,6 @@ class Allergy(Base):
     patient_entry_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
     name = Column(String, nullable=False)
     
-
 # ========================================================================
 
 class Examination(Base):
