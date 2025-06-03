@@ -13,8 +13,8 @@ class Patient(Base):
     age = Column(Integer, nullable=False)
     date_of_birth = Column(String, nullable=False)
     is_waiting = Column(Boolean, nullable=False)
-    # Optional for easy access to a patient's entries
-    # entries = relationship("PatientEntry", back_populates="patient")
+
+# ========================================================================
 
 # Entries table (one for each entry in the patient's history)
 class PatientEntry(Base):
@@ -26,26 +26,29 @@ class PatientEntry(Base):
     patient_history = Column(String, nullable=False)
     additional_notes = Column(String, nullable=True)
     extracted_contents_json = Column(String, nullable=False)
-    # Optional for easy access to the patient of an entry
-    # patient = relationship("Patient", back_populates="patient_entries")
 
-# ========================================================================
-
-# TODO: Remove this and just add a source_str to the entry table that contains the json from the LLM
-class ExtractedContent(Base):
-    __tablename__ = 'extracted_content'
+class Symptom(Base):
+    __tablename__ = 'symptoms'
 
     id = Column(Integer, primary_key=True)
-    first_name = Column(String, nullable=False)
-    last_name = Column(String, nullable=False)
-    date_of_birth = Column(String, nullable=False)
-    age = Column(Integer, nullable=False)
-    symptoms = Column(String, nullable=False)
-    history = Column(String, nullable=False)
-    medications = Column(String, nullable=False)
-    allergies = Column(String, nullable=False)
-    family_history = Column(String, nullable=False)
-    additional_notes = Column(String, nullable=False)
+    patient_entry_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
+    name = Column(String, nullable=False)
+
+class Medication(Base):
+    __tablename__ = 'medications'
+
+    id = Column(Integer, primary_key=True)
+    patient_entry_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
+    name = Column(String, nullable=False)
+    dosage = Column(String, nullable=False)
+    
+class Allergy(Base):
+    __tablename__ = 'allergies'
+
+    id = Column(Integer, primary_key=True)
+    patient_entry_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
+    name = Column(String, nullable=False)
+    
 
 # ========================================================================
 
@@ -85,37 +88,11 @@ class Result(Base):
     patient_entry_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
     triage_level = Column(Integer, nullable=False)
 
-# ========================================================================
-
-class Symptom(Base):
-    __tablename__ = 'symptoms'
-
-    id = Column(Integer, primary_key=True)
-    patient_entry_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
-    name = Column(String, nullable=False)
-
-class Medication(Base):
-    __tablename__ = 'medications'
-
-    id = Column(Integer, primary_key=True)
-    patient_entry_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
-    name = Column(String, nullable=False)
-    dosage = Column(String, nullable=False)
-    
-class Allergy(Base):
-    __tablename__ = 'allergies'
-
-    id = Column(Integer, primary_key=True)
-    patient_entry_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
-    name = Column(String, nullable=False)
-    
 class Diagnosis(Base):
     __tablename__ = 'diagnoses'
 
     id = Column(Integer, primary_key=True)
-    patient_entry_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
+    result_id = Column(Integer, ForeignKey('results.id'), nullable=False)
     name = Column(String, nullable=False)
     reason = Column(String, nullable=False)
     confidence = Column(Float, nullable=False)
-    # Optional for easy access to the patient of a diagnosis
-    # patient = relationship("Patient", back_populates="diagnoses")
