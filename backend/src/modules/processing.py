@@ -13,17 +13,20 @@ def process_anamnesis(input_text: str, current_patient_id: int) -> str:
         entry_id = db.add_patient_entry(current_patient_id, current_date, contents.history, contents.additional_notes, contents.model_dump_json())
         # TODO: Save upper database part to database
         symptoms = contents.symptoms
+        medications = contents.medications
+        allergies = contents.allergies
         for symptom in symptoms:
             db.add_symptom_to_entry(entry_id, symptom, current_date)
-        medications = contents.medications
         for medication in medications:
             db.add_medication_to_entry(entry_id, medication, "N/A") # Dosage not implemented yet
-        allergies = contents.allergies
         # TODO: Allergy implementation in db
         ...
         
         # Process the extracted contents
         result = generate_anamnesis_response(contents)
+        diagnosis = result.diagnosis
+        examinations = result.examinations
+        treatments = result.treatments
         # TODO: Save result in database
         if result:
             return result

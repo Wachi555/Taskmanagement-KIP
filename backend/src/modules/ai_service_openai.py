@@ -1,6 +1,6 @@
 import os
 
-from common.pydantic_models import OutputContent, EvaluationInput, ExtractedContent
+from common.pydantic_models import LLMResult, EvaluationInput, ExtractedContent
 from dotenv import load_dotenv
 from modules.prompts import extraction_prompt, evaluation_prompt, build_evaluation_input
 from openai import OpenAI
@@ -40,7 +40,7 @@ def extract_contents(input_text: str) -> ExtractedContent:
         return result
     raise ValueError("No response text found.")
 
-def generate_anamnesis_response(input_contents: EvaluationInput) -> OutputContent:
+def generate_anamnesis_response(input_contents: EvaluationInput) -> LLMResult:
     try:
         user_prompt = build_evaluation_input(input_contents)
         response = client.beta.chat.completions.parse(
@@ -56,7 +56,7 @@ def generate_anamnesis_response(input_contents: EvaluationInput) -> OutputConten
             ],
             model=model_name,
             # temperature=0.7,
-            response_format=OutputContent,
+            response_format=LLMResult,
         )
         result = response.choices[0].message.parsed
         if result:

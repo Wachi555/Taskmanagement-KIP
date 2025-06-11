@@ -11,11 +11,11 @@ class Examination(BaseModel):
     name: str
     priority: Optional[int] = None
 
-class OutputContent(BaseModel):
+class LLMResult(BaseModel):
     diagnosis: List[Diagnosis]
     examinations: List[Examination]
     treatments: List[str]
-    symptoms: List[str]
+    # symptoms: List[str] # TODO: Why did I put this here? It shouldn't be here, right?
 
 # ==== Input Output from Frontend ====
 
@@ -29,7 +29,7 @@ class InputPatient(BaseModel):
     age: int    
 
 class OutputModel(BaseModel):
-    output: OutputContent
+    output: LLMResult
     success: bool = True
     error: str = None
     error_code: int = None
