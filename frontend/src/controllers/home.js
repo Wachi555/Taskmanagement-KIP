@@ -1,61 +1,54 @@
 // frontend/controllers/home.js
-
 const express = require('express');
 const router  = express.Router();
-
-// Da models/ jetzt direkt unter frontend/ liegt,
 const store   = require('../models/patient_store');
 
-// GET-Route für die Startseite
+// Mock: Wer ist wartend?
+const mockWaiting = ['Hans Weber', 'Uwe Taniz'];
+
 router.get('/', (req, res) => {
+  const allPatients = store.getAll(); // ['Ute Russ', 'Hans Weber', 'Uwe Taniz']
+
+  const waitingPatients = allPatients
+    .filter(name => mockWaiting.includes(name))
+    .map(name => ({ name }));
+
+  const activePatients = allPatients.filter(name => !mockWaiting.includes(name));
+
   res.render('index', {
-    appName:  'Task Management Demo',
-    patients: store.getAll(),  // z.B. ['Ute Russ','Hans Weber','Uwe Taniz']
-    data:     {},              // leer beim ersten Laden
-    triage:   null,
-    exams:    [],
-    experts:  [],
-    levels:   [1,2,3,4,5]
+    appName:         'Task Management Demo',
+    waitingPatients: waitingPatients,
+    patients:        activePatients,
+    data:            {},
+    triage:          null,
+    exams:           [],
+    experts:         [],
+    levels:          [1, 2, 3, 4, 5]
   });
 });
 
-// POST-Route für den Analyse-Request
 router.post('/analyse', async (req, res) => {
-  // später: hier Text + Audio verarbeiten
   try {
-    var inputText = req.body.text; 
-
-    console.log("Input text: ", inputText);
-    
-    const response = await fetch("http://localhost:8000/process_input", { // Hier auf /process_input umstellen wenn haupt-Anfrage gewünscht
-      method: 'POST',
+    const inputText = req.body.text;
+    const response = await fetch("http://localhost:8000/process_input", {
+      method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({text: inputText}) // Changed to match InputModel structure
+      body:    JSON.stringify({ text: inputText })
     });
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch data: ' + response.statusText);
-    }
-    console.log("Response ok:", response.ok);
-    
+    if (!response.ok) throw new Error('Failed to fetch data');
+
     const data = await response.json();
-    
     const result = {
       data: {
-        Name: 'Patient', 
-        'Symptome': data.output.symptoms.join(', ')
+        Name: 'Patient',
+        Symptome: data.output.symptoms.join(', ')
       },
-      triage: 3, // Defaultwert, da noch nicht in der API
-      exams: data.output.examinations.map(exam => exam.name),
-      experts: data.output.treatments // Aktuell noch nicht in der API deshalb derweil die treatments genommen
+      triage: 3,
+      exams: data.output.examinations.map(e => e.name),
+      experts: data.output.treatments
     };
-  // const result = {
-  //   data:    { Name: 'Müller, Anna', 'Geb. Datum': '12.03.1980', Symptome: 'Husten, Fieber' },
-  //   triage:  3,
-  //   exams:   ['Blutentnahme', 'Röntgen'],
-  //   experts: ['HNO', 'Internist']
-  // };
-    
+
     res.json(result);
   } catch (error) {
     console.error('Error:', error);

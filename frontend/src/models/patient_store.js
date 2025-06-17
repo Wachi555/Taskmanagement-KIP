@@ -1,4 +1,4 @@
-// src/stores/patient_store.js
+// src/models/patient_store.js
 let patients = [
   {
     name: 'Ute Russ',
@@ -10,7 +10,20 @@ let patients = [
       { date: '2022-08-15', event: 'Magen-Darm-Infekt' }
     ]
   },
-  // …
+  {
+    name: 'Hans Weber',
+    dob: '02.11.1968',
+    gender: 'm',
+    symptoms: ['Brustschmerzen'],
+    history: []
+  },
+  {
+    name: 'Uwe Taniz',
+    dob: '01.01.1990',
+    gender: 'm',
+    symptoms: ['Atemnot'],
+    history: []
+  }
 ];
 
 module.exports = {

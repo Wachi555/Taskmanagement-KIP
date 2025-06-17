@@ -4,22 +4,18 @@ document.addEventListener("DOMContentLoaded", () => {
   setupSidebarToggle();
   setupAnalyzeButton();
   setupSidebarSearch();
-  // setupExamToggle wird in displayExams aufgerufen,
-  // sobald der Button im DOM ist.
+  setupMoveButtons();
 });
 
 // Sidebar ein-/ausblenden
 function setupSidebarToggle() {
   const toggleBtn = document.getElementById("toggle-sidebar");
-  const sidebar   = document.getElementById("sidebar");
+  const sidebar = document.getElementById("sidebar");
   if (!toggleBtn || !sidebar) return;
 
   toggleBtn.addEventListener("click", () => {
     sidebar.classList.toggle("collapsed");
-    localStorage.setItem(
-      "sidebarCollapsed",
-      sidebar.classList.contains("collapsed")
-    );
+    localStorage.setItem("sidebarCollapsed", sidebar.classList.contains("collapsed"));
   });
 
   if (localStorage.getItem("sidebarCollapsed") === "true") {
@@ -42,27 +38,69 @@ function setupAnalyzeButton() {
   });
 }
 
-// Suchleiste in der Sidebar
+// Patienten verschieben (Wartend → In Behandlung)
+function setupMoveButtons() {
+  const waitingPane = document.getElementById("pane-waiting");
+  const activePane = document.getElementById("pane-main");
+
+  if (!waitingPane || !activePane) return;
+
+  waitingPane.addEventListener("click", (e) => {
+    const btn = e.target.closest(".move-to-active");
+    if (!btn) return;
+
+    const name = btn.getAttribute("data-name");
+    const listItem = btn.closest("li");
+
+    if (!name || !listItem) return;
+
+    // Entfernen aus Warteliste
+    listItem.remove();
+
+    // Hinzufügen zur aktiven Liste
+    const activeList = activePane.querySelector("ul.list-group");
+    const newItem = document.createElement("li");
+    newItem.className = "list-group-item";
+    newItem.innerHTML = `<a href="/patient/${encodeURIComponent(name)}" class="text-decoration-none patient-name">${name}</a>`;
+    activeList.appendChild(newItem);
+
+    // Falls keine Patienten mehr wartend → Hinweis einblenden
+    const remaining = waitingPane.querySelectorAll("li.list-group-item:not(.text-muted)");
+    if (remaining.length === 0) {
+      const noRes = document.createElement("li");
+      noRes.className = "list-group-item text-center text-muted";
+      noRes.textContent = "Keine wartenden Patienten.";
+      waitingPane.querySelector("ul.list-group").appendChild(noRes);
+    }
+
+    // Entferne ggf. alten „keine Patienten“ Hinweis in aktiver Liste
+    const noPatients = activePane.querySelector("li.text-muted");
+    if (noPatients) noPatients.remove();
+  });
+}
+
+// Sidebar-Suche
 function setupSidebarSearch() {
   const searchInput = document.getElementById("sidebar-search");
-  const tabList     = document.getElementById("sidebarTabs");
+  const tabList = document.getElementById("sidebarTabs");
   if (!searchInput || !tabList) return;
 
-  // Filter-Funktion
   function filterSidebarList() {
-    const filter   = searchInput.value.trim().toLowerCase();
+    const filter = searchInput.value.trim().toLowerCase();
     const activePane = document.querySelector(".tab-pane.show.active");
     if (!activePane) return;
 
     const listItems = activePane.querySelectorAll("li.list-group-item");
     let anyVisible = false;
 
-    // entferne alten "Keine Ergebnisse"-Hinweis
-    const oldNo = activePane.querySelector(".no-results");
-    if (oldNo) oldNo.remove();
+    activePane.querySelectorAll(".no-results").forEach(e => e.remove());
 
     listItems.forEach(li => {
-      const text = li.textContent.trim().toLowerCase();
+      if (li.classList.contains("no-results")) return;
+
+      const nameEl = li.querySelector(".patient-name, a");
+      const text = nameEl ? nameEl.textContent.trim().toLowerCase() : "";
+
       if (filter === "" || text.includes(filter)) {
         li.style.display = "";
         anyVisible = true;
@@ -71,7 +109,6 @@ function setupSidebarSearch() {
       }
     });
 
-    // wenn gar nichts sichtbar, Hinweis anhängen
     if (!anyVisible) {
       const noRes = document.createElement("li");
       noRes.className = "list-group-item text-center text-muted no-results";
@@ -80,17 +117,14 @@ function setupSidebarSearch() {
     }
   }
 
-  // bei jeder Eingabe filtern
   searchInput.addEventListener("input", filterSidebarList);
-
-  // beim Tab-Wechsel Suchfeld zurücksetzen + Liste neu anzeigen
   tabList.addEventListener("shown.bs.tab", () => {
     searchInput.value = "";
     filterSidebarList();
   });
 }
 
-// Hauptanalysefunktion
+// Analyse
 async function processInput() {
   const text = document.getElementById("inputText").value.trim();
   if (!text) {
@@ -105,9 +139,9 @@ async function processInput() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text })
     });
-    if (!response.ok) {
-      throw new Error(`Serverfehler: ${response.status}`);
-    }
+
+    if (!response.ok) throw new Error(`Serverfehler: ${response.status}`);
+
     const data = await response.json();
     displayResults(data);
   } catch (error) {
@@ -118,7 +152,7 @@ async function processInput() {
   }
 }
 
-// Ergebnisse anzeigen
+// Ergebnisanzeige
 function displayResults(data) {
   resetResults();
   displayPatientData(data.data);
@@ -127,14 +161,12 @@ function displayResults(data) {
   displayExperts(data.experts);
 }
 
-// Ergebnisse zurücksetzen
 function resetResults() {
   document.getElementById("patientData").innerHTML = "";
-  document.getElementById("resultData").innerHTML  = "";
+  document.getElementById("resultData").innerHTML = "";
   document.getElementById("triageIndicator").innerHTML = "";
 }
 
-// Patientendaten anzeigen
 function displayPatientData(patientData) {
   const patientUl = document.getElementById("patientData");
   Object.entries(patientData).forEach(([key, val]) => {
@@ -145,16 +177,13 @@ function displayPatientData(patientData) {
   });
 }
 
-// Triagestufe anzeigen
 function displayTriageLevel(triageLevel) {
   const triageContainer = document.getElementById("triageIndicator");
-  const resultUl        = document.getElementById("resultData");
+  const resultUl = document.getElementById("resultData");
 
-  [1,2,3,4,5].forEach(level => {
+  [1, 2, 3, 4, 5].forEach(level => {
     const circle = document.createElement("div");
-    circle.className = `triage-circle level-${level} ${
-      level === triageLevel ? 'active' : ''
-    }`;
+    circle.className = `triage-circle level-${level} ${level === triageLevel ? 'active' : ''}`;
     circle.title = `Triagestufe ${level}`;
     triageContainer.appendChild(circle);
   });
@@ -165,7 +194,6 @@ function displayTriageLevel(triageLevel) {
   resultUl.appendChild(li);
 }
 
-// Untersuchungen anzeigen
 function displayExams(exams) {
   const resultUl = document.getElementById("resultData");
   const li = document.createElement("li");
@@ -174,9 +202,7 @@ function displayExams(exams) {
   li.innerHTML = `
     <div class="d-flex justify-content-between align-items-center">
       <strong>Untersuchungen:</strong>
-      <button id="toggleExams"
-              class="btn btn-sm btn-outline-secondary"
-              aria-expanded="false">
+      <button id="toggleExams" class="btn btn-sm btn-outline-secondary" aria-expanded="false">
         <i class="bi bi-chevron-down"></i>
       </button>
     </div>
@@ -189,24 +215,19 @@ function displayExams(exams) {
     const item = document.createElement("li");
     item.className = "list-group-item d-flex align-items-center";
     item.innerHTML = `
-      <input class="form-check-input me-2"
-             type="checkbox"
-             id="exam-${idx}" />
-      <label class="form-check-label flex-grow-1"
-             for="exam-${idx}">
+      <input class="form-check-input me-2" type="checkbox" id="exam-${idx}" />
+      <label class="form-check-label flex-grow-1" for="exam-${idx}">
         ${exam}
       </label>
     `;
     examsList.appendChild(item);
   });
 
-  // Toggle-Listener erst nach DOM-Befüllung
   setupExamToggle();
 }
 
-// Toggle-Button für Untersuchungen
 function setupExamToggle() {
-  const btn  = document.getElementById("toggleExams");
+  const btn = document.getElementById("toggleExams");
   const list = document.getElementById("examsList");
   if (!btn || !list) return;
 
@@ -217,26 +238,20 @@ function setupExamToggle() {
   });
 }
 
-// Experten anzeigen
 function displayExperts(experts) {
   const li = document.createElement("li");
   li.className = "list-group-item";
-  li.innerHTML = `
-    <strong>Experten:</strong>
-    ${experts.length ? experts.join(", ") : "–"}
-  `;
+  li.innerHTML = `<strong>Experten:</strong> ${experts.length ? experts.join(", ") : "–"}`;
   document.getElementById("resultData").appendChild(li);
 }
 
-// Ladeanzeige
 function showLoading(show) {
-  const spinner    = document.getElementById("loading-spinner");
+  const spinner = document.getElementById("loading-spinner");
   const processBtn = document.getElementById("process-btn");
-  if (spinner)    spinner.style.display = show ? "inline-block" : "none";
-  if (processBtn) processBtn.disabled   = show;
+  if (spinner) spinner.style.display = show ? "inline-block" : "none";
+  if (processBtn) processBtn.disabled = show;
 }
 
-// Fehlermeldung anzeigen
 function showError(message) {
   const resultUl = document.getElementById("resultData");
   resultUl.innerHTML = `
