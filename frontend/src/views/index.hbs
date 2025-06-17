@@ -1,9 +1,17 @@
-<div class="row h-100 gx-4">
-  <div class="col-md-7 d-flex flex-column">
-    {{> input-area}}
-  </div>
-  <div class="col-md-5 d-flex flex-column gap-4">
-    {{> patient-data data=data}}
-    {{> results}}
+<div class="container-fluid vh-100">
+  <div class="row h-100">
+    <!-- Linke Spalte mit Bild -->
+    <div class="col-md-6 d-flex justify-content-center align-items-center bg-dark">
+      <img src="./krankenhaus.jpg" alt="Krankenhaus" class="img-fluid" style="max-height: 80%; max-width: 90%;">
+    </div>
+
+    <!-- Rechte Spalte mit Auswahl -->
+    <div class="col-md-6 d-flex flex-column justify-content-center align-items-center bg-light text-center">
+      <h1 class="mb-5">Personengruppe auswählen</h1>
+      <div class="d-grid gap-4 col-6 mx-auto">
+        <a href="/dashboard?role=arzt" class="btn btn-outline-primary btn-lg py-3">Arzt / Ärztin</a>
+        <a href="/dashboard?role=pflege" class="btn btn-outline-secondary btn-lg py-3">Pflegepersonal</a>
+      </div>
+    </div>
   </div>
 </div>

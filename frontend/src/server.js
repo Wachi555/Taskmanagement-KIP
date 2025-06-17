@@ -25,6 +25,7 @@ app.set('views', path.join(__dirname, 'views'));
 
 // Static-Files und Body-Parser
 app.use(express.static(path.join(__dirname, '../public')));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
