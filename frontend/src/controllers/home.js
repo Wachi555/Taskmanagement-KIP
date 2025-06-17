@@ -6,41 +6,35 @@ const store   = require('../models/patient_store');
 // Mock: Wer ist wartend?
 const mockWaiting = ['Hans Weber', 'Uwe Taniz'];
 
+// Anmeldemaske (Startseite)
 router.get('/', (req, res) => {
-  const allPatients = store.getAll(); // ['Ute Russ', 'Hans Weber', 'Uwe Taniz']
+  res.render('index', {
+    layout: false,
+    appName: 'Notaufnahme Universitätsklinikum Regensburg',
+    showSidebarToggle: false
+  });
+});
 
+// Dashboard
+router.get('/dashboard', (req, res) => {
+  const allPatients = store.getAll();
   const waitingPatients = allPatients
     .filter(name => mockWaiting.includes(name))
     .map(name => ({ name }));
 
   const activePatients = allPatients.filter(name => !mockWaiting.includes(name));
 
-  res.render('index', {
-    appName:         'Notaufnahme Universitätsklinikum Regensburg',
-    waitingPatients: waitingPatients,
-    patients:        activePatients,
-    data:            {},
-    triage:          null,
-    exams:           [],
-    experts:         [],
-    levels:          [1, 2, 3, 4, 5]
+  res.render('dashboard', {
+    layout: 'main', // oder false, wenn du kein Layout willst
+    appName: 'Notaufnahme Universitätsklinikum Regensburg',
+    waitingPatients,
+    patients: activePatients,
+    data: {},
+    triage: null,
+    exams: [],
+    experts: [],
+    levels: [1, 2, 3, 4, 5]
   });
-});
-
-// Startseite (Anmeldemaske)
-router.get('/', (req, res) => {
-  res.render('index', {
-    layout: 'index',            // oder 'index', wenn du ein reduziertes Layout hast
-    showSidebarToggle: false,  // kein Sidebar-Button auf der Startseite
-    appName: 'Notaufnahme'     // falls du {{appName}} im Layout nutzt
-  });
-});
-
-res.render('index', {
-  layout: 'minimal',
-  appName: 'Notaufnahme',
-  showSidebarToggle: false,
-  showHomeButton: false
 });
 
 
