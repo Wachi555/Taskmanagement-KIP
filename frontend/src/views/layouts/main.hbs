@@ -4,74 +4,16 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>{{appName}}</title>
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  />
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
-  />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"/>
   <link rel="stylesheet" href="/css/style.css"/>
 </head>
 <body>
   {{> header}}
 
-  <div id="page-wrapper" class="d-flex">
-    <aside id="sidebar" class="collapsed">
-      <!-- 🟢 Tab: Wartende Patienten jetzt standardmäßig aktiv -->
-      <ul class="nav nav-pills mb-3" id="sidebarTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-          <button
-            class="nav-link active"
-            id="tab-waiting"
-            data-bs-toggle="pill"
-            data-bs-target="#pane-waiting"
-            type="button"
-            role="tab"
-            aria-controls="pane-waiting"
-            aria-selected="true">
-            Wartende Patienten
-          </button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button
-            class="nav-link"
-            id="tab-main"
-            data-bs-toggle="pill"
-            data-bs-target="#pane-main"
-            type="button"
-            role="tab"
-            aria-controls="pane-main"
-            aria-selected="false">
-            In Behandlung
-          </button>
-        </li>
-      </ul>
-
-      <!-- Suchleiste -->
-      <div class="px-3 mb-2">
-        <input
-          type="text"
-          id="sidebar-search"
-          class="form-control"
-          placeholder="Patient suchen…"
-        >
-      </div>
-
-      <!-- Tab-Inhalte -->
-      <div class="tab-content mt-2" id="sidebarTabsContent">
-        {{> sidebar-waiting}}
-        {{> sidebar-active}}
-      </div>
-    </aside>
-
-    <main id="main-content" class="flex-grow-1 overflow-auto">
-      <div class="container-fluid h-100 py-3">
-        {{{ body }}}
-      </div>
-    </main>
-  </div>
+  <main id="main-content" class="container-fluid py-4">
+    {{{ body }}}
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="/js/main.js"></script>

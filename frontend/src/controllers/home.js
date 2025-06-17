@@ -37,6 +37,20 @@ router.get('/dashboard', (req, res) => {
   });
 });
 
+router.get('/registration', (req, res) => {
+  const allPatients = store.getAll();
+  const waiting = allPatients.filter(name => mockWaiting.includes(name));
+  const active = allPatients.filter(name => !mockWaiting.includes(name));
+
+  res.render('registration', {
+    layout: 'main',
+    appName: 'Notaufnahme Universitätsklinikum Regensburg',
+    waitingPatients: waiting.map(name => ({ name })),
+    patients: active
+  });
+});
+
+
 
 
 router.post('/analyse', async (req, res) => {

@@ -1,5 +1,3 @@
-// public/js/main.js
-
 document.addEventListener("DOMContentLoaded", () => {
   setupSidebarToggle();
   setupAnalyzeButton();
@@ -40,8 +38,8 @@ function setupAnalyzeButton() {
 
 // Patienten verschieben (Wartend → In Behandlung)
 function setupMoveButtons() {
-  const waitingPane = document.getElementById("pane-waiting");
-  const activePane = document.getElementById("pane-main");
+  const waitingPane = document.getElementById("pane-waiting") || document.querySelector(".waiting-patients");
+  const activePane = document.getElementById("pane-main") || document.querySelector(".active-patients");
 
   if (!waitingPane || !activePane) return;
 
@@ -54,15 +52,23 @@ function setupMoveButtons() {
 
     if (!name || !listItem) return;
 
-    // Entfernen aus Warteliste
-    listItem.remove();
+    // Entferne ggf. alten Hinweis in aktiver Liste
+    const activeList = activePane.querySelector("ul.list-group");
+    const hint = activeList.querySelector("li.text-muted");
+    if (hint) hint.remove();
+
+    // Prüfen ob Patient bereits in aktiver Liste existiert
+    const alreadyExists = [...activeList.querySelectorAll("a")].some(a => a.textContent === name);
+    if (alreadyExists) return;
 
     // Hinzufügen zur aktiven Liste
-    const activeList = activePane.querySelector("ul.list-group");
     const newItem = document.createElement("li");
     newItem.className = "list-group-item";
     newItem.innerHTML = `<a href="/patient/${encodeURIComponent(name)}" class="text-decoration-none patient-name">${name}</a>`;
     activeList.appendChild(newItem);
+
+    // Entfernen aus Warteliste
+    listItem.remove();
 
     // Falls keine Patienten mehr wartend → Hinweis einblenden
     const remaining = waitingPane.querySelectorAll("li.list-group-item:not(.text-muted)");
@@ -72,10 +78,6 @@ function setupMoveButtons() {
       noRes.textContent = "Keine wartenden Patienten.";
       waitingPane.querySelector("ul.list-group").appendChild(noRes);
     }
-
-    // Entferne ggf. alten „keine Patienten“ Hinweis in aktiver Liste
-    const noPatients = activePane.querySelector("li.text-muted");
-    if (noPatients) noPatients.remove();
   });
 }
 
@@ -87,7 +89,7 @@ function setupSidebarSearch() {
 
   function filterSidebarList() {
     const filter = searchInput.value.trim().toLowerCase();
-    const activePane = document.querySelector(".tab-pane.show.active");
+    const activePane = document.querySelector(".tab-pane.show.active") || document.querySelector(".waiting-patients, .active-patients");
     if (!activePane) return;
 
     const listItems = activePane.querySelectorAll("li.list-group-item");
@@ -152,7 +154,6 @@ async function processInput() {
   }
 }
 
-// Ergebnisanzeige
 function displayResults(data) {
   resetResults();
   displayPatientData(data.data);
