@@ -1,43 +1,49 @@
-<div class="d-flex justify-content-between align-items-center mb-4" style="margin-top: 2rem;">
+<div class="d-flex justify-content-between align-items-center mb-4 mt-4">
   <a href="/new-patient" class="btn btn-primary">
     <i class="bi bi-plus-circle me-2"></i> Neuen Patienten anlegen
   </a>
 </div>
 
-<div class="row mt-4">
-  <!-- Wartende Patienten -->
-  <div class="col-md-6 border-end pe-4" id="pane-waiting">
-    <h4 class="mb-4" style="margin-top: 3rem;">Wartende Patienten</h4>
-    <ul class="list-group">
-      {{#each waitingPatients}}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          {{this.name}}
-          <button class="btn btn-sm btn-outline-success move-to-active" data-name="{{this.name}}">
-            <i class="bi bi-arrow-right-circle"></i>
-          </button>
-        </li>
-      {{/each}}
+<!-- Horizontale Trennlinie -->
+<hr class="mb-0" style="border-top: 1px solid #ccc;" />
 
-      {{#unless waitingPatients.length}}
-        <li class="list-group-item text-muted text-center">Keine wartenden Patienten</li>
-      {{/unless}}
-    </ul>
-  </div>
+<!-- Grauer Bereich mit Patientenlisten -->
+<div class="container-fluid bg-light py-4 px-3 rounded">
+  <div class="row">
+    <!-- Wartende Patienten -->
+    <div class="col-md-6 border-end pe-4" id="pane-waiting">
+      <h4 class="mb-4 mt-3">Wartende Patienten</h4>
+      <ul class="list-group">
+        {{#each waitingPatients}}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{this.name}}
+            <button class="btn btn-sm btn-outline-success move-to-active" data-name="{{this.name}}">
+              <i class="bi bi-arrow-right-circle"></i>
+            </button>
+          </li>
+        {{/each}}
 
-  <!-- Aktive Patienten -->
-  <div class="col-md-6 ps-4" id="pane-main">
-    <h4 class="mb-4" style="margin-top: 3rem;">In Behandlung</h4>
-    <ul class="list-group">
-      {{#each patients}}
-        <li class="list-group-item">
-          <a href="/patient/{{encodeURIComponent this}}" class="text-decoration-none">{{this}}</a>
-        </li>
-      {{/each}}
+        {{#unless waitingPatients.length}}
+          <li class="list-group-item text-muted text-center">Keine wartenden Patienten</li>
+        {{/unless}}
+      </ul>
+    </div>
 
-      {{#unless patients.length}}
-        <li class="list-group-item text-muted text-center">Keine aktiven Patienten</li>
-      {{/unless}}
-    </ul>
+    <!-- Aktive Patienten -->
+    <div class="col-md-6 ps-4" id="pane-main">
+      <h4 class="mb-4 mt-3">In Behandlung</h4>
+      <ul class="list-group">
+        {{#each patients}}
+          <li class="list-group-item">
+            <a href="/patient/{{encodeURIComponent this}}" class="text-decoration-none">{{this}}</a>
+          </li>
+        {{/each}}
+
+        {{#unless patients.length}}
+          <li class="list-group-item text-muted text-center">Keine aktiven Patienten</li>
+        {{/unless}}
+      </ul>
+    </div>
   </div>
 </div>
 
