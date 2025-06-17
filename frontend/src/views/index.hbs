@@ -1,20 +1,39 @@
-<div class="container-fluid vh-100">
-  <div class="row h-100">
-    <!-- Linke Spalte mit Bild -->
-    <div class="col-md-6 d-flex justify-content-center align-items-center bg-dark">
-     <img src="/images/krankenhaus.jpg" alt="Krankenhaus"
-     class="img-fluid"
-     style="max-height: 80%; max-width: 90%; border: none; box-shadow: none;">
+<style>
+  html, body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+  }
+  .fixed-container {
+  width: 1500px;
+  height: 650px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  overflow: hidden;
+}
 
-    </div>
+</style>
 
-    <!-- Rechte Spalte mit Auswahl -->
-    <div class="col-md-6 d-flex flex-column justify-content-center align-items-center bg-light text-center">
-      <h1 class="mb-5">Personengruppe auswählen</h1>
-      <div class="d-grid gap-4 col-6 mx-auto">
-        <a href="/dashboard?role=arzt" class="btn btn-outline-primary btn-lg py-3">Arzt / Ärztin</a>
-        <a href="/dashboard?role=pflege" class="btn btn-outline-secondary btn-lg py-3">Pflegepersonal</a>
-      </div>
+<div class="fixed-container">
+  <!-- Linke Seite mit Bild -->
+  <div style="width: 70%; background-color: #fff; height: 100%;">
+    <img src="/images/krankenhaus.jpg" alt="Krankenhaus"
+         style="width: 100%; height: 100%; object-fit: cover; display: block;">
+  </div>
+
+  <!-- Rechte Seite mit Auswahl -->
+  <div class="d-flex flex-column justify-content-center align-items-center bg-light text-center" style="width: 70%; height: 100%;">
+    <h1 class="mb-4" style="font-size: 1.7rem;">Personengruppe auswählen</h1>
+    <div class="d-grid gap-3 col-8 mx-auto">
+      <a href="/dashboard?role=arzt" class="btn btn-outline-primary btn-md py-2">Arzt / Ärztin</a>
+      <a href="/dashboard?role=pflege" class="btn btn-outline-secondary btn-md py-2">Pflegepersonal</a>
     </div>
   </div>
 </div>
