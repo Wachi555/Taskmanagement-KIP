@@ -16,7 +16,7 @@ router.get('/', (req, res) => {
   const activePatients = allPatients.filter(name => !mockWaiting.includes(name));
 
   res.render('index', {
-    appName:         'Task Management Demo',
+    appName:         'Notaufnahme Universitätsklinikum Regensburg',
     waitingPatients: waitingPatients,
     patients:        activePatients,
     data:            {},
@@ -26,6 +26,24 @@ router.get('/', (req, res) => {
     levels:          [1, 2, 3, 4, 5]
   });
 });
+
+// Startseite (Anmeldemaske)
+router.get('/', (req, res) => {
+  res.render('index', {
+    layout: 'index',            // oder 'index', wenn du ein reduziertes Layout hast
+    showSidebarToggle: false,  // kein Sidebar-Button auf der Startseite
+    appName: 'Notaufnahme'     // falls du {{appName}} im Layout nutzt
+  });
+});
+
+res.render('index', {
+  layout: 'minimal',
+  appName: 'Notaufnahme',
+  showSidebarToggle: false,
+  showHomeButton: false
+});
+
+
 
 router.post('/analyse', async (req, res) => {
   try {

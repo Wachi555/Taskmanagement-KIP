@@ -1,53 +1,129 @@
-/* Basis-Reset */
+/* ===== BASIS-RESET & GLOBALE EINSTELLUNGEN ===== */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  font-family: inherit;
 }
 
-/* Vollseiten-Layout */
-html, body {
-  height: 100%;
-  font-family: Arial, sans-serif;
+html {
+  font-size: 16px;
+  line-height: 1.5;
 }
+
 body {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  color: #333;
+  background-color: #f5f5f5;
+}
+
+/* ===== ANMELDEMASKE (INDEX.HBS) ===== */
+body.no-scroll {
+  margin: 0;
+  padding: 0;
+  width: 100%; /* Nicht 100vw (vermeidet Scrollleisten-Bug) */
+  height: 100vh;
+  overflow: hidden !important; /* Erzwingt Hidden für Body */
+}
+
+.index-fullscreen {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+.fixed-container {
+  width: 90vw;
+  max-width: 1500px;
+  height: 650px;
+  position: absolute;
+  top: 53%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.fixed-container .left-image {
+  width: 50%;
+  height: 100%;
+}
+
+.fixed-container .left-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.fixed-container .right-selection {
+  width: 50%;
+  height: 100%;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background-color: #f8f9fa;
 }
 
-/* Wrapper für Sidebar + Main */
+.fixed-container .right-selection h1 {
+  font-size: 1.7rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  color: #333;
+}
+
+.fixed-container .right-selection .btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 5px;
+  transition: all 0.2s ease;
+  width: 100%;
+  max-width: 400px;
+  margin: 0.5rem 0;
+}
+
+/* ===== LAYOUT FÜR DASHBOARD ===== */
 #page-wrapper {
   display: flex;
   height: calc(100vh - 56px);
   overflow: hidden;
 }
 
-/* SIDEBAR */
+/* ===== SIDEBAR ===== */
 #sidebar {
   width: 500px;
   min-width: 400px;
-  transition: width 0.3s;
+  transition: all 0.3s ease;
   overflow-y: auto;
   background-color: #f8f9fa;
   border-right: 1px solid #dee2e6;
+  padding: 1rem;
 }
+
 #sidebar.collapsed {
   width: 0;
   min-width: 0;
+  padding: 0;
   border-right: none;
-  overflow: hidden;
 }
-#sidebar button#add-patient {
-  display: block;
-  width: 100%;
-  margin: 1rem 0;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  text-align: center;
-}
+
 #sidebar h5 {
   padding: 1rem 1rem 0.5rem;
+  color: #495057;
+  border-bottom: 1px solid #dee2e6;
 }
 
 /* Patientenliste */
@@ -55,189 +131,159 @@ body {
   list-style: none;
   margin-bottom: 1rem;
 }
+
 #sidebar ul.list-group li {
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1rem;
   border-bottom: 1px solid #eee;
   cursor: pointer;
-}
-#sidebar ul.list-group li:last-child {
-  border-bottom: none;
+  transition: background-color 0.2s;
 }
 
-/* MAIN-CONTENT */
+#sidebar ul.list-group li:hover {
+  background-color: #e9ecef;
+}
+
+/* ===== HAUPTINHALT ===== */
 #main-content {
   flex: 1;
   overflow-y: auto;
-  padding: 1rem;
+  padding: 1.5rem;
+  background-color: #fff;
 }
+
 #scrollable-content {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
   height: 100%;
 }
 
-/* INPUT-BEREICH */
-#input-section {
-  flex: 2;
-  display: flex;
-  flex-direction: column;
-}
-#input-section h5 {
-  margin-bottom: 0.75rem;
-}
-#input-section textarea {
-  flex: 1;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  resize: vertical;
-}
-#input-section .form-label {
-  margin-top: 1rem;
-  margin-bottom: 0.25rem;
-  font-weight: bold;
-}
-#input-section button {
-  margin-top: 1rem;
-  align-self: flex-start;
+.navbar {
+  min-height: 56px; /* gleiche Höhe wie sonstige Bootstrap-Header */
+  align-items: center; /* zentriert vertikal */
 }
 
-/* OUTPUT-BEREICH */
-#output-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-.output-box {
-  flex: 1;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-.output-box > h6 {
-  margin: 0;
-  padding: 0.75rem 1rem;
-  background-color: #f8f9fa;
-  border-top-left-radius: 0.5rem;
-  border-top-right-radius: 0.5rem;
-  border-bottom: 1px solid #ccc;
+
+/* ===== FORMULARE & INPUTS ===== */
+.form-label {
   font-weight: 600;
-}
-.output-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
-  background-color: #f8f9fa;
-  padding: 0.75rem 1rem;
-  border-top-left-radius: 0.5rem;
-  border-top-right-radius: 0.5rem;
-  border-bottom: 1px solid #ccc;
-}
-.output-header > h6 {
-  margin: 0;
-  font-weight: bold !important;
-  padding: 0;
-  background: none;
-}
-.output-box > *:not(.output-header):not(h6) {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
+  margin-bottom: 0.5rem;
+  display: block;
 }
 
-/* Triagestufen-Kreise */
+.form-control, .form-select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background-color: #0d6efd;
+  color: white;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #0b5ed7;
+}
+
+/* ===== TRIAGE-STUFEN ===== */
 .triage-indicator {
   display: flex;
   gap: 0.5rem;
-  margin: 0;
+  margin: 0.5rem 0;
 }
+
 .triage-circle {
   width: 24px;
   height: 24px;
   border-radius: 50%;
   border: 2px solid #ccc;
-  transition: all 0.2s;
+  cursor: pointer;
 }
+
 .triage-circle.level-1 { border-color: #dc3545; }
 .triage-circle.level-2 { border-color: #fd7e14; }
 .triage-circle.level-3 { border-color: #ffc107; }
 .triage-circle.level-4 { border-color: #28a745; }
 .triage-circle.level-5 { border-color: #007bff; }
-.triage-circle.active.level-1 { background-color: #dc3545; }
-.triage-circle.active.level-2 { background-color: #fd7e14; }
-.triage-circle.active.level-3 { background-color: #ffc107; }
-.triage-circle.active.level-4 { background-color: #28a745; }
-.triage-circle.active.level-5 { background-color: #007bff; }
 
-/* Nav-Pills */
-#sidebar .nav.nav-pills {
-  display: flex !important;
-  width: 100% !important;
-  padding-left: 0;
-  margin-bottom: 1rem;
-}
-#sidebar .nav-pills .nav-item {
-  flex: 1 1 auto;
-}
-#sidebar .nav-pills .nav-link {
-  display: block;
-  width: 100%;
-  text-align: center;
-  box-sizing: border-box;
-  white-space: nowrap;
-  border-radius: 0.25rem;
-  padding: 0.5rem 0;
+.triage-circle.active {
+  border-width: 3px;
 }
 
-/* Untersuchungen Toggle */
-#examsList {
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease, opacity 0.2s ease;
-}
-#examsList.open {
-  max-height: 500px;
-  opacity: 1;
-}
-#toggleExams i {
-  display: inline-block;
-  transition: transform 0.2s ease;
-  transform: rotate(-90deg);
-}
-#toggleExams[aria-expanded="true"] i {
-  transform: rotate(0deg);
-}
-.exams-container .form-check-input {
-  margin-top: 0;
-}
-.exams-container .form-check-label {
-  margin-bottom: 0;
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 1200px) {
+  #sidebar {
+    width: 400px;
+    min-width: 350px;
+  }
 }
 
-/* Stil für den Pfeil-Button */
-.btn-custom-arrow {
-  color: #444;
-  background-color: transparent;
-  padding: 0.5rem 0.75rem;
-  border-radius: 100%;
-  font-size: 1.3rem; /* größerer Icon-Text */
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
-  transition: all 0.2s ease;
+@media (max-width: 992px) {
+  #scrollable-content {
+    flex-direction: column;
+  }
 }
 
-.btn-custom-arrow:hover {
-  background-color: #444;
-  color: #fff;
+@media (max-width: 768px) {
+  /* Anmeldemaske */
+  .fixed-container {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 0;
+  }
+
+  .fixed-container .left-image,
+  .fixed-container .right-selection {
+    width: 100%;
+  }
+
+  .fixed-container .left-image {
+    height: 40vh;
+  }
+
+  /* Dashboard */
+  #sidebar {
+    width: 100%;
+    position: fixed;
+    z-index: 1000;
+    height: auto;
+    max-height: 50vh;
+    bottom: 0;
+    left: 0;
+  }
+
+  #sidebar.collapsed {
+    height: 0;
+  }
+
+  #main-content {
+    padding-bottom: 2rem;
+  }
 }
 
+@media (max-width: 576px) {
+  .fixed-container .right-selection {
+    padding: 1.5rem;
+  }
+
+  .fixed-container .right-selection h1 {
+    font-size: 1.5rem;
+  }
+}

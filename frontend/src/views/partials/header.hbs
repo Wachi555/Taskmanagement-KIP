@@ -1,12 +1,19 @@
 <nav class="navbar navbar-light bg-light px-3">
-  <!-- Container für Home-Icon + Patienten-Button -->
   <div class="d-flex align-items-center">
-    <a href="/" class="btn btn-outline-secondary me-2" aria-label="Startseite">
-      <i class="bi bi-house-fill"></i>
-    </a>
-    <button id="toggle-sidebar" class="btn btn-outline-secondary">
-      ☰ Patienten
-    </button>
+    {{#if showHomeButton}}
+      <a href="/" class="btn btn-outline-secondary me-2" aria-label="Startseite">
+        <i class="bi bi-house-fill"></i>
+      </a>
+    {{/if}}
+
+    {{#if showSidebarToggle}}
+      <button id="toggle-sidebar" class="btn btn-outline-secondary">
+        ☰ Patienten
+      </button>
+    {{/if}}
   </div>
 
+  <div class="mx-auto fw-bold text-center" style="position: absolute; left: 50%; transform: translateX(-50%);">
+    {{appName}} 🏥
+  </div>
 </nav>

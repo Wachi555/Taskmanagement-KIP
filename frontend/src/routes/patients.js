@@ -1,7 +1,5 @@
-// routes/patients.js
 const express       = require('express');
 const router        = express.Router();
-// Falls dein patient_store in 'models', nicht 'stores'
 const { getAll, getDetails } = require('../models/patient_store');
 const symptomStore  = require('../models/symptom_store');
 const historyStore  = require('../models/history_store');
@@ -31,6 +29,8 @@ router.get('/patient/:name', (req, res) => {
 
   res.render('patient', {
     layout: 'main',
+
+    showSidebarToggle: true, // ✅ Button im Header anzeigen
 
     // Sidebar-Context
     waitingPatients,

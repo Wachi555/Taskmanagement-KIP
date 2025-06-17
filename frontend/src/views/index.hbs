@@ -1,39 +1,18 @@
-<style>
-  html, body {
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    margin: 0;
-    padding: 0;
-  }
-  .fixed-container {
-  width: 1500px;
-  height: 650px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  overflow: hidden;
-}
-
-</style>
-
-<div class="fixed-container">
-  <!-- Linke Seite mit Bild -->
-  <div style="width: 70%; background-color: #fff; height: 100%;">
-    <img src="/images/krankenhaus.jpg" alt="Krankenhaus"
-         style="width: 100%; height: 100%; object-fit: cover; display: block;">
-  </div>
-
-  <!-- Rechte Seite mit Auswahl -->
-  <div class="d-flex flex-column justify-content-center align-items-center bg-light text-center" style="width: 70%; height: 100%;">
-    <h1 class="mb-4" style="font-size: 1.7rem;">Personengruppe auswählen</h1>
-    <div class="d-grid gap-3 col-8 mx-auto">
-      <a href="/dashboard?role=arzt" class="btn btn-outline-primary btn-md py-2">Arzt / Ärztin</a>
-      <a href="/dashboard?role=pflege" class="btn btn-outline-secondary btn-md py-2">Pflegepersonal</a>
+<body class="no-scroll">
+<div class="index-fullscreen">
+  <div class="fixed-container">
+    <div class="left-image">
+      <img src="/images/krankenhaus.jpg" alt="Krankenhaus" />
     </div>
+
+    <div class="right-selection text-center">
+  <h1>Personengruppe auswählen</h1>
+  <div class="button-group">
+    <a href="/dashboard?role=anmeldung" class="btn btn-outline-secondary btn-md">Anmeldung</a>
+    <a href="/dashboard?role=koordination" class="btn btn-outline-primary btn-md">Koordination</a>
   </div>
 </div>
+
+  </div>
+</div>
+</body>
