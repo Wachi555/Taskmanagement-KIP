@@ -50,6 +50,22 @@ router.get('/registration', (req, res) => {
   });
 });
 
+router.get('/new-patient', (req, res) => {
+  res.render('new-patient', {
+    layout: 'main',
+    appName: 'Notaufnahme'
+  });
+});
+
+router.post('/new-patient', (req, res) => {
+  const name = req.body.name?.trim();
+  if (name) {
+    store.add(name); // du brauchst ggf. eine `add`-Funktion im patient_store
+  }
+  res.redirect('/registration');
+});
+
+
 
 
 
