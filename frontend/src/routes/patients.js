@@ -27,8 +27,8 @@ router.get('/patient/:name', (req, res) => {
   const waitingPatients = [];
   const patients = allNames;
 
-  res.render('patient', {
-    layout: 'main',
+  res.render('patient-input', {
+    layout: 'patient',
 
     showSidebarToggle: true, // ✅ Button im Header anzeigen
 

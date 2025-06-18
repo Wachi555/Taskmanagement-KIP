@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupAnalyzeButton();
   setupSidebarSearch();
   setupMoveButtons();
+  setupFullViewSearch();
 });
 
 // Sidebar ein-/ausblenden
@@ -125,6 +126,38 @@ function setupSidebarSearch() {
     filterSidebarList();
   });
 }
+
+function setupFullViewSearch() {
+  const searchWaiting = document.getElementById("search-waiting");
+  const searchActive = document.getElementById("search-active");
+
+  if (searchWaiting) {
+    searchWaiting.addEventListener("input", () => {
+      const filter = searchWaiting.value.trim().toLowerCase();
+      const items = document.querySelectorAll("#pane-waiting ul.list-group > li");
+
+      items.forEach(li => {
+        const nameEl = li.querySelector(".patient-name") || li;
+        const name = nameEl.textContent.trim().toLowerCase();
+        li.style.display = name.includes(filter) ? "" : "none";
+      });
+    });
+  }
+
+  if (searchActive) {
+    searchActive.addEventListener("input", () => {
+      const filter = searchActive.value.trim().toLowerCase();
+      const items = document.querySelectorAll("#pane-main ul.list-group > li");
+
+      items.forEach(li => {
+        const nameEl = li.querySelector(".patient-name, a") || li;
+        const name = nameEl.textContent.trim().toLowerCase();
+        li.style.display = name.includes(filter) ? "" : "none";
+      });
+    });
+  }
+}
+
 
 // Analyse
 async function processInput() {
