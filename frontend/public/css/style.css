@@ -163,16 +163,26 @@ body.no-scroll {
   background-color: #0b5ed7;
 }
 
+.btn-grey {
+  color: #6c757d;
+  background-color: transparent;
+}
+.btn-grey:hover {
+  background-color: #6c757d;
+  color: white;
+}
+
+
 /* ===== TRIAGE ===== */
 .triage-indicator {
-  display: flex;
+  display: inline-flex;
   gap: 0.5rem;
   margin: 0.5rem 0;
 }
 
 .triage-circle {
-  width: 24px;
-  height: 24px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   border: 2px solid #ccc;
   cursor: pointer;
@@ -183,6 +193,12 @@ body.no-scroll {
 .triage-circle.level-3 { border-color: #ffc107; }
 .triage-circle.level-4 { border-color: #28a745; }
 .triage-circle.level-5 { border-color: #007bff; }
+
+.triage-circle.active.level-1 { background-color: #dc3545; }
+.triage-circle.active.level-2 { background-color: #fd7e14; }
+.triage-circle.active.level-3 { background-color: #ffc107; }
+.triage-circle.active.level-4 { background-color: #28a745; }
+.triage-circle.active.level-5 { background-color: #007bff; }
 
 .triage-circle.active {
   border-width: 3px;
