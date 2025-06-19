@@ -1,7 +1,11 @@
 <nav class="navbar navbar-light bg-light px-3">
   <div class="d-flex align-items-center">
-    {{#if showHomeButton}}
-      <a href="/" class="btn btn-outline-secondary me-2" aria-label="Startseite">
+    {{#if showHome}}
+      <a
+        href="/"
+        class="btn btn-outline-secondary me-2 home-btn"
+        aria-label="Startseite"
+      >
         <i class="bi bi-house-fill"></i>
       </a>
     {{/if}}
@@ -13,7 +17,10 @@
     {{/if}}
   </div>
 
-  <div class="mx-auto fw-bold text-center" style="position: absolute; left: 50%; transform: translateX(-50%);">
+  <div
+    class="mx-auto fw-bold text-center"
+    style="position: absolute; left: 50%; transform: translateX(-50%);"
+  >
     {{appName}} 🏥
   </div>
 </nav>

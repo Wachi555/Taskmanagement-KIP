@@ -54,15 +54,12 @@ function setupMoveButtons() {
 
     if (!name || !triage || !listItem) return;
 
-    // Entferne ggf. alten Hinweis in aktiver Liste
     const hint = activeList.querySelector("li.text-muted");
     if (hint) hint.remove();
 
-    // Prüfen, ob Patient bereits in aktiver Liste existiert
     const alreadyExists = [...activeList.querySelectorAll("a")].some(a => a.textContent.trim() === name);
     if (alreadyExists) return;
 
-    // Neues Listenelement erzeugen
     const newItem = document.createElement("li");
     newItem.className = "list-group-item d-flex justify-content-between align-items-center";
     newItem.innerHTML = `
@@ -72,11 +69,8 @@ function setupMoveButtons() {
       </span>
     `;
     activeList.appendChild(newItem);
-
-    // Entferne den Patienten aus der Warteliste
     listItem.remove();
 
-    // Falls keine Patienten mehr → Hinweis anzeigen
     const remaining = waitingPane.querySelectorAll("ul.list-group > li:not(.text-muted)");
     if (remaining.length === 0) {
       const noRes = document.createElement("li");
@@ -132,54 +126,46 @@ function setupSidebarSearch() {
   });
 }
 
-// Suche im Hauptbereich
+// Suche im Hauptbereich (inkl. Alle/Wartende/Aktive)
 function setupFullViewSearch() {
-  const searchWaiting = document.getElementById("search-waiting");
-  const searchActive = document.getElementById("search-active");
-  const searchAll = document.getElementById("search-all");
+  const all = document.querySelector("#search-all input");
+  const waiting = document.querySelector("#search-waiting input");
+  const active = document.querySelector("#search-active input");
 
-  if (searchAll) {
-    searchAll.addEventListener("input", () => {
-      const filter = searchAll.value.trim().toLowerCase();
-      const items = document.querySelectorAll("div.col-md-6.border-end ul.list-group > li");
-
-      items.forEach(li => {
-        const nameEl = li.querySelector(".patient-name") || li;
-        const name = nameEl.textContent.trim().toLowerCase();
+  if (all) {
+    all.addEventListener("input", () => {
+      const filter = all.value.trim().toLowerCase();
+      document.querySelectorAll(".col-md-6.border-end ul.list-group > li").forEach(li => {
+        const name = (li.querySelector(".patient-name") || li).textContent.trim().toLowerCase();
         li.style.display = name.includes(filter) ? "" : "none";
       });
     });
   }
 
-
-  if (searchWaiting) {
-    searchWaiting.addEventListener("input", () => {
-      const filter = searchWaiting.value.trim().toLowerCase();
-      const items = document.querySelectorAll("#pane-waiting ul.list-group > li");
-
-      items.forEach(li => {
-        const nameEl = li.querySelector(".patient-name") || li;
-        const name = nameEl.textContent.trim().toLowerCase();
+  if (waiting) {
+    waiting.addEventListener("input", () => {
+      const filter = waiting.value.trim().toLowerCase();
+      document.querySelectorAll("#pane-waiting ul.list-group > li").forEach(li => {
+        const name = (li.querySelector(".patient-name") || li).textContent.trim().toLowerCase();
         li.style.display = name.includes(filter) ? "" : "none";
       });
     });
   }
 
-  if (searchActive) {
-    searchActive.addEventListener("input", () => {
-      const filter = searchActive.value.trim().toLowerCase();
-      const items = document.querySelectorAll("#active-patient-list > li");
-
-      items.forEach(li => {
-        const nameEl = li.querySelector(".patient-name, a") || li;
-        const name = nameEl.textContent.trim().toLowerCase();
+  if (active) {
+    active.addEventListener("input", () => {
+      const filter = active.value.trim().toLowerCase();
+      document.querySelectorAll("#active-patient-list > li").forEach(li => {
+        const name = (li.querySelector(".patient-name, a") || li).textContent.trim().toLowerCase();
         li.style.display = name.includes(filter) ? "" : "none";
       });
     });
   }
 }
 
-// Analyse
+
+
+// Analyse-Funktionen
 async function processInput() {
   const text = document.getElementById("inputText").value.trim();
   if (!text) {

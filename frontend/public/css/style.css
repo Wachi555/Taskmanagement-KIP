@@ -163,14 +163,27 @@ body.no-scroll {
   background-color: #0b5ed7;
 }
 
-.btn-grey {
-  color: #6c757d;
+.btn-icon-only {
+  height: 26px;
+  width: 26px;
+  font-size: 0.85rem;
+  padding: 0.15rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
   background-color: transparent;
+  color: #6c757d;
+  transition: all 0.2s ease-in-out;
 }
-.btn-grey:hover {
-  background-color: #6c757d;
+
+.btn-icon-only:hover {
+  background-color: darkgray;
   color: white;
+  border-color: white;
 }
+
+
 
 
 /* ===== TRIAGE ===== */
@@ -249,3 +262,48 @@ body.no-scroll {
 #sidebar ul.list-group li:hover {
   background-color: #e9ecef;
 }
+
+.list-group-item {
+  padding-top: 0.4rem !important;
+  padding-bottom: 0.4rem !important;
+  display: flex;
+  align-items: center;
+  min-height: 44px; /* einheitlich erzwingen */
+}
+
+
+.toggle-search {
+  border: none;
+  background: none;
+  color: #6c757d;
+  font-size: 1.25rem;
+  padding: 0.25rem;
+  cursor: pointer;
+}
+
+.btn-icon-only:hover {
+  background-color: transparent;
+  border: none;
+  color: inherit;
+}
+
+/* Home-Button: weißer Hintergrund, keine Outline/Box-Shadow im Fokus */
+header .btn-outline-secondary.home-btn {
+  background-color: #fff;
+}
+
+header .btn-outline-secondary.home-btn:focus,
+header .btn-outline-secondary.home-btn:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Hover: leichte Outline */
+header .btn-outline-secondary.home-btn:hover {
+  outline: 1px solid rgba(108,117,125,0.5);
+}
+
+
+
+
+

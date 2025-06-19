@@ -34,7 +34,8 @@ router.get('/dashboard', (req, res) => {
     triage: null,
     exams: [],
     experts: [],
-    levels: [1, 2, 3, 4, 5]
+    levels: [1, 2, 3, 4, 5],
+    showHome: true
   });
 });
 
@@ -50,7 +51,8 @@ router.get('/registration', (req, res) => {
     allPatients,
     waitingPatients,
     activePatients,
-    levels: [1, 2, 3, 4, 5]
+    levels: [1, 2, 3, 4, 5],
+    showHome: true
   });
 });
 
@@ -68,7 +70,9 @@ router.get('/coordination', (req, res) => {
     layout: 'main',
     appName: 'Notaufnahme Universitätsklinikum Regensburg',
     waitingPatients,
-    patients: activePatients
+    patients: activePatients,
+
+  
   });
 });
 

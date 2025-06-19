@@ -6,16 +6,42 @@
 
 <hr class="mb-4" style="border-top: 2px solid #dee2e6;" />
 
-<div class="row bg-light rounded py-4">
+<div class="row bg-light rounded py-4 align-items-start">
 
   <!-- Linke Spalte: Alle Patienten -->
   <div class="col-md-6 border-end pe-4">
-    <h4 class="mb-3">Alle Patienten</h4>
-    <input type="text" id="search-all" class="form-control mb-3" placeholder="Alle Patienten suchen…" />
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h4 class="mb-0">Alle Patienten</h4>
+      <button
+        class="btn btn-icon-only"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#search-all-section"
+        aria-expanded="false"
+        aria-controls="search-all-section"
+      >
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+    <div id="search-all-section" class="collapse mb-3">
+      <input
+        type="text"
+        id="search-all"
+        class="form-control"
+        placeholder="Alle Patienten suchen…"
+      />
+    </div>
     <ul class="list-group">
       {{#each allPatients}}
         <li class="list-group-item d-flex justify-content-between align-items-center">
           <span class="patient-name">{{this.name}}</span>
+          <span class="d-flex align-items-center">
+            {{#if this.triage}}
+              <span class="triage-indicator me-2">
+                <span class="triage-circle level-{{this.triage}} active"></span>
+              </span>
+            {{/if}}
+          </span>
         </li>
       {{/each}}
 
@@ -25,60 +51,104 @@
     </ul>
   </div>
 
-<!-- Rechte Spalte: Wartende & Aktive -->
-<div class="col-md-6" id="pane-main">
+  <!-- Rechte Spalte: Wartende & Aktive -->
+  <div class="col-md-6 ps-4">
 
-  <!-- Wartende Patienten -->
-  <div id="pane-waiting" class="mb-4">
-    <h4 class="mb-2">Wartende Patienten</h4>
-    <input type="text" id="search-waiting" class="form-control mb-3" placeholder="Wartende Patienten suchen…" />
-    <ul class="list-group">
-      {{#each waitingPatients}}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          <span class="patient-name">{{this.name}}</span>
-          <span class="d-flex align-items-center">
-            <span class="triage-indicator me-2">
-              <span class="triage-circle level-{{this.triage}} active"></span>
+    <!-- Wartende Patienten -->
+    <div id="pane-waiting">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h4 class="mb-0">Wartende Patienten</h4>
+        <button
+          class="btn btn-icon-only"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#search-waiting-section"
+          aria-expanded="false"
+          aria-controls="search-waiting-section"
+        >
+          <i class="bi bi-search"></i>
+        </button>
+      </div>
+      <div id="search-waiting-section" class="collapse mb-3">
+        <input
+          type="text"
+          id="search-waiting"
+          class="form-control"
+          placeholder="Wartende Patienten suchen…"
+        />
+      </div>
+      <ul class="list-group">
+        {{#each waitingPatients}}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span class="patient-name">{{this.name}}</span>
+            <span class="d-flex align-items-center">
+              <span class="triage-indicator me-2">
+                <span class="triage-circle level-{{this.triage}} active"></span>
+              </span>
+              <button
+                class="btn btn-icon-only move-to-active"
+                data-name="{{this.name}}"
+                data-triage="{{this.triage}}"
+              >
+                <i class="bi bi-arrow-down-circle"></i>
+              </button>
             </span>
-            <button class="btn btn-icon-only move-to-active"
-                    data-name="{{this.name}}"
-                    data-triage="{{this.triage}}">
-              <i class="bi bi-arrow-down-circle"></i>
-            </button>
-          </span>
-        </li>
-      {{/each}}
+          </li>
+        {{/each}}
 
-      {{#unless waitingPatients.length}}
-        <li class="list-group-item text-muted text-center">Keine wartenden Patienten</li>
-      {{/unless}}
-    </ul>
+        {{#unless waitingPatients.length}}
+          <li class="list-group-item text-muted text-center">Keine wartenden Patienten</li>
+        {{/unless}}
+      </ul>
+    </div>
+
+    <!-- Aktive Patienten -->
+    <div id="pane-active" class="mt-4">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h4 class="mb-0">In Behandlung</h4>
+        <button
+          class="btn btn-icon-only"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#search-active-section"
+          aria-expanded="false"
+          aria-controls="search-active-section"
+        >
+          <i class="bi bi-search"></i>
+        </button>
+      </div>
+      <div id="search-active-section" class="collapse mb-3">
+        <input
+          type="text"
+          id="search-active"
+          class="form-control"
+          placeholder="In Behandlung suchen…"
+        />
+      </div>
+      <ul id="active-patient-list" class="list-group">
+        {{#each activePatients}}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <a
+              href="/patient/{{encodeURIComponent this.name}}"
+              class="text-decoration-none patient-name"
+            >
+              {{this.name}}
+            </a>
+            <span class="d-flex align-items-center">
+              <span class="triage-indicator">
+                <span class="triage-circle level-{{this.triage}} active"></span>
+              </span>
+            </span>
+          </li>
+        {{/each}}
+
+        {{#unless activePatients.length}}
+          <li class="list-group-item text-muted text-center">Keine aktiven Patienten</li>
+        {{/unless}}
+      </ul>
+    </div>
+
   </div>
-
-  <!-- Aktive Patienten -->
-  <div>
-    <h4 class="mb-2">In Behandlung</h4>
-    <input type="text" id="search-active" class="form-control mb-3" placeholder="In Behandlung suchen…" />
-    <ul id="active-patient-list" class="list-group">
-      {{#each activePatients}}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          <a href="/patient/{{encodeURIComponent this.name}}" class="text-decoration-none patient-name">
-            {{this.name}}
-          </a>
-          <span class="triage-indicator">
-            <span class="triage-circle level-{{this.triage}} active"></span>
-          </span>
-        </li>
-      {{/each}}
-
-      {{#unless activePatients.length}}
-        <li class="list-group-item text-muted text-center">Keine aktiven Patienten</li>
-      {{/unless}}
-    </ul>
-  </div>
-
-</div>
->
 </div>
 
 <script src="/js/main.js"></script>
