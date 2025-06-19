@@ -11,7 +11,7 @@
   <!-- Linke Spalte: Alle Patienten -->
   <div class="col-md-6 border-end pe-4">
     <div class="d-flex justify-content-between align-items-center mb-2">
-      <h4 class="mb-0">Alle Patienten</h4>
+      <h4 class="mb-0">Patientenregister</h4>
       <button
         class="btn btn-icon-only"
         type="button"
@@ -35,13 +35,6 @@
       {{#each allPatients}}
         <li class="list-group-item d-flex justify-content-between align-items-center">
           <span class="patient-name">{{this.name}}</span>
-          <span class="d-flex align-items-center">
-            {{#if this.triage}}
-              <span class="triage-indicator me-2">
-                <span class="triage-circle level-{{this.triage}} active"></span>
-              </span>
-            {{/if}}
-          </span>
         </li>
       {{/each}}
 

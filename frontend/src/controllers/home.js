@@ -56,25 +56,27 @@ router.get('/registration', (req, res) => {
   });
 });
 
-// Koordination (einfaches Beispiel)
+// Koordination
+// Koordination
 router.get('/coordination', (req, res) => {
-  const allPatients = store.getAll();
-  const waitingPatients = allPatients
-    .filter(name => mockWaiting.includes(name))
-    .map(name => ({ name }));
+  // hol dir alle mit Name+Triage
+  const allPatients = store.getAllDetailed(); 
 
-  const activePatients = allPatients
-    .filter(name => !mockWaiting.includes(name));
+  // wartende und aktive splitten
+  const waitingPatients = allPatients.filter(p => mockWaiting.includes(p.name));
+  const activePatients  = allPatients.filter(p => !mockWaiting.includes(p.name));
 
-  res.render('registration', {
+  res.render('coordination', {
     layout: 'main',
     appName: 'Notaufnahme Universitätsklinikum Regensburg',
     waitingPatients,
-    patients: activePatients,
-
-  
+    activePatients,
+    showHome: true,
+    showSidebarToggle: false
   });
 });
+
+
 
 // Formular für neuen Patienten
 router.get('/new-patient', (req, res) => {
@@ -122,5 +124,34 @@ router.post('/analyse', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+// in routes/patients.js, deine /patient/:name-Route
+router.get('/patient/:name', (req, res, next) => {
+  const name = decodeURIComponent(req.params.name);
+
+  // Hol dir alle Patienten mit Triage etc.
+  const all = store.getAllDetailed(); // [{ name, triage, … }, …]
+
+  // Such den passenden Patienten
+  const patientData = all.find(p => p.name === name);
+
+  if (!patientData) {
+    return res.status(404).render('404', {
+      layout: 'main',
+      message: 'Patient nicht gefunden'
+    });
+  }
+
+  res.render('patient-input', {
+    layout: 'patient',  // <-- hier angepasst
+    appName: 'Notaufnahme Universitätsklinikum Regensburg',
+    showHome: true,
+    showSidebarToggle: true,
+    data: patientData
+  });
+});
+
+
+
 
 module.exports = router;

@@ -1,49 +1,33 @@
-const express       = require('express');
-const router        = express.Router();
-const { getAll, getDetails } = require('../models/patient_store');
-const symptomStore  = require('../models/symptom_store');
-const historyStore  = require('../models/history_store');
+// frontend/routes/patients.js
 
-router.get('/patient/:name', (req, res) => {
+const express = require('express');
+const router  = express.Router();
+const store   = require('../models/patient_store');
+
+// Detail-Seite für einen einzelnen Patienten
+router.get('/patient/:name', (req, res, next) => {
   const name = decodeURIComponent(req.params.name);
+  console.log('Lookup-Name:', name);
 
-  // Alle Patientennamen abrufen
-  const allNames = getAll();
-  if (!allNames.includes(name)) {
-    return res.status(404).send('Patient nicht gefunden');
+  // Einzelnen Datensatz per findByName holen
+  const patientData = store.findByName(name);
+  console.log('Gefundener Datensatz:', patientData);
+
+  if (!patientData) {
+    // Patient nicht gefunden → 404-Seite
+    return res.status(404).render('404', {
+      layout: 'main',
+      message: 'Patient nicht gefunden'
+    });
   }
 
-  // Alle Detaildaten aus dem Store holen
-  const patientDetails = getDetails(name);
-  if (!patientDetails) {
-    return res.status(404).send('Patient nicht gefunden');
-  }
-
-  // Symptome und Historie
-  const symptoms = symptomStore.getFor(name) || [];
-  const history  = historyStore.getFor(name)  || [];
-
-  // Sidebar-Daten: keine Warteschlange, alle Patienten in Behandlung
-  const waitingPatients = [];
-  const patients = allNames;
-
+  // Rendern der patient-input.hbs mit den Patientendaten
   res.render('patient-input', {
     layout: 'patient',
-
-    showSidebarToggle: true, // ✅ Button im Header anzeigen
-
-    // Sidebar-Context
-    waitingPatients,
-    patients,
-
-    // Detail-Context
-    patient: {
-      name:    patientDetails.name,
-      dob:     patientDetails.dob,
-      gender:  patientDetails.gender
-    },
-    symptoms,
-    history
+    appName: 'Notaufnahme Universitätsklinikum Regensburg',
+    showHome: true,
+    showSidebarToggle: true,
+    data: patientData
   });
 });
 

@@ -1,26 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
-  setupSidebarToggle();
   setupAnalyzeButton();
   setupSidebarSearch();
   setupMoveButtons();
   setupFullViewSearch();
 });
 
-// Sidebar ein-/ausblenden
-function setupSidebarToggle() {
-  const toggleBtn = document.getElementById("toggle-sidebar");
-  const sidebar = document.getElementById("sidebar");
-  if (!toggleBtn || !sidebar) return;
 
-  toggleBtn.addEventListener("click", () => {
-    sidebar.classList.toggle("collapsed");
-    localStorage.setItem("sidebarCollapsed", sidebar.classList.contains("collapsed"));
-  });
 
-  if (localStorage.getItem("sidebarCollapsed") === "true") {
-    sidebar.classList.add("collapsed");
-  }
-}
 
 // Analyse-Button-Setup
 function setupAnalyzeButton() {

@@ -11,8 +11,14 @@
     {{/if}}
 
     {{#if showSidebarToggle}}
-      <button id="toggle-sidebar" class="btn btn-outline-secondary">
-        ☰ Patienten
+      <button
+        class="btn btn-outline-secondary"
+        type="button"
+        data-bs-toggle="offcanvas"
+        data-bs-target="#sidebar"
+        aria-controls="sidebar"
+      >
+        <i class="bi bi-list"></i> Patienten
       </button>
     {{/if}}
   </div>

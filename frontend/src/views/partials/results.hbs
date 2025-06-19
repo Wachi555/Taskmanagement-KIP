@@ -1,29 +1,50 @@
 <div class="output-box">
-  <div class="output-header">
-    <h6>Auswertung</h6>
-    <div id="triageIndicator" class="triage-indicator">
-      {{#each levels}}<div class="triage-circle level-{{this}}"></div>{{/each}}
-    </div>
-  </div>
-
-  <ul id="resultData" class="list-group list-group-flush mb-0">
+  <ul class="list-group list-group-flush mb-0">
+    {{!-- Untersuchungen --}}
     <li class="list-group-item">
-      <strong>Triagestufe:</strong> <span id="triageValue"></span>
+      <div class="d-flex justify-content-between align-items-center">
+        <strong class="me-2">Untersuchungen:</strong>
+        <button
+          id="toggleExams"
+          class="btn btn-sm btn-outline-secondary"
+          aria-expanded="false"
+        >
+          <i class="bi bi-chevron-down"></i>
+        </button>
+      </div>
+      <ul
+        id="examsList"
+        class="list-group list-group-flush mt-2"
+        style="display: none;"
+      >
+        {{#each exams}}
+          <li class="list-group-item">{{this}}</li>
+        {{/each}}
+      </ul>
     </li>
-    
-    <li class="list-group-item exams-container">
-    <div class="d-flex justify-content-between align-items-center">
-      <strong>Untersuchungen:</strong> 
-      <button id="toggleExams" class="btn btn-sm btn-outline-secondary" aria-expanded="false">
-        <i class="bi bi-chevron-down"></i>
-      </button>
-    </div>
-    <ul id="examsList" class="list-group list-group-flush mt-2"></ul>
-  </li>
 
-    
+    {{!-- Experten --}}
     <li class="list-group-item">
-      <strong>Experten:</strong> <span id="expertsValue"></span>
+      <strong class="me-2">Experten:</strong>
+      {{#if experts.length}}
+        {{experts.join ", "}}
+      {{else}}
+        –
+      {{/if}}
     </li>
   </ul>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.getElementById("toggleExams");
+    const list = document.getElementById("examsList");
+    btn?.addEventListener("click", () => {
+      const expanded = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", String(!expanded));
+      list.style.display = expanded ? "none" : "block";
+      btn.querySelector("i").classList.toggle("bi-chevron-down");
+      btn.querySelector("i").classList.toggle("bi-chevron-up");
+    });
+  });
+</script>
