@@ -1,36 +1,124 @@
 {{!-- views/patient-input.hbs --}}
 
-<!-- Patienten-Überschrift -->
-<div class="mb-4">
-  <h2 class="fw-bold">{{data.name}}</h2>
-</div>
-
-<div class="row gx-4 gy-4">
-  <!-- Linke Spalte: Anamnese (½ Breite) -->
-  <div class="col-12 col-md-6 d-flex flex-column" style="height: 100%;">
-    <div class="mb-4 flex-grow-1 overflow-auto" style="min-height: 60vh;">
-      {{> input-area data=data }}
+<div class="container-fluid py-4">
+  <!-- Header mit zwei Buttons: Patientendaten + Historie -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">
+      <span class="fw-bold">{{data.name}}</span>,
+      <span class="fw-normal">{{formatDate data.dob}}</span>
+    </h2>
+    <div>
+      <!-- Patientendaten (lila Button) -->
+      <button class="btn btn-purple me-2"
+              type="button"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#patientDataOffcanvas"
+              aria-controls="patientDataOffcanvas">
+        <i class="bi bi-person-lines-fill"></i> Patientendaten
+      </button>
+      <!-- Historie -->
+      <button class="btn btn-outline-secondary"
+              type="button"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#historyOffcanvas"
+              aria-controls="historyOffcanvas">
+        <i class="bi bi-clock-history"></i> Historie
+      </button>
     </div>
   </div>
 
-  <!-- Rechte Spalte: Patientendaten & Ergebnisse (½ Breite) -->
-  <div class="col-12 col-md-6 d-flex flex-column gap-4">
-    <div class="card">
-      <div class="card-header">
-        <h5 class="mb-0">Patientendaten</h5>
-      </div>
-      <div class="card-body">
-        {{> patient-data data=data }}
+  <div class="row gx-4 gy-4 align-items-stretch">
+    <!-- Linke Spalte: Anamnese -->
+    <div class="col-12 col-md-6 d-flex flex-column h-100">
+      <div class="mb-4 flex-grow-1 overflow-auto" style="min-height: 60vh;">
+        {{> input-area data=data }}
       </div>
     </div>
 
-    <div class="card flex-grow-1">
-      <div class="card-header">
-        <h5 class="mb-0">Ergebnisse</h5>
-      </div>
-      <div class="card-body overflow-auto" style="max-height: 400px;">
-        {{> results }}
+    <!-- Rechte Spalte: Nur Ergebnisse mit Footer -->
+    <div class="col-12 col-md-6 d-flex flex-column h-100">
+      <div class="card flex-grow-1 d-flex flex-column" style="min-height: 60vh;">
+        <div class="card-header">
+          <h5 class="mb-0">Ergebnisse</h5>
+        </div>
+        <div class="card-body flex-grow-1 overflow-auto">
+          {{> results }}
+        </div>
+        <div class="card-footer text-end">
+          <button id="finish-btn"
+                  class="btn btn-success"
+                  onclick="window.location.href='/coordination'">
+            <i class="bi bi-check-lg me-1"></i> Abschließen
+          </button>
+        </div>
       </div>
     </div>
   </div>
+
+  <!-- Offcanvas: Patientendaten -->
+  <div class="offcanvas offcanvas-end"
+       tabindex="-1"
+       id="patientDataOffcanvas"
+       aria-labelledby="patientDataOffcanvasLabel"
+       style="--bs-offcanvas-width: 60vw; max-width: 800px;">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="patientDataOffcanvasLabel">Patientendaten</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Schließen"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="list-group list-group-flush mb-0">
+        <li class="list-group-item">
+          <strong class="me-2">Geburtsdatum:</strong> {{formatDate data.dob}}
+        </li>
+        <li class="list-group-item">
+          <strong class="me-2">Geschlecht:</strong> {{data.gender}}
+        </li>
+        <li class="list-group-item">
+          <strong class="me-2">Adresse:</strong> {{data.adresse}}
+        </li>
+        <li class="list-group-item">
+          <strong class="me-2">Krankenkasse:</strong> {{data.krankenkasse}}
+        </li>
+        <li class="list-group-item">
+          <strong class="me-2">Aktuelle Symptome:</strong>
+          {{#if data.symptoms}}
+            {{#each data.symptoms}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+          {{else}}
+            –
+          {{/if}}
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Offcanvas: Historie -->
+  <div class="offcanvas offcanvas-end"
+       tabindex="-1"
+       id="historyOffcanvas"
+       aria-labelledby="historyOffcanvasLabel"
+       style="--bs-offcanvas-width: 60vw; max-width: 800px;">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="historyOffcanvasLabel">Vergangene Besuche</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Schließen"></button>
+    </div>
+    <div class="offcanvas-body">
+      {{#if data.history.length}}
+        <ul class="list-group list-group-flush mb-0">
+          {{#each data.history}}
+            <li class="list-group-item">
+              <div>
+                <strong>{{formatDate this.date}}</strong>
+                <span class="ms-2">{{this.findings}}</span>
+              </div>
+              <hr class="my-2">
+            </li>
+          {{/each}}
+        </ul>
+      {{else}}
+        <li class="list-group-item text-muted">Keine Einträge in der Historie.</li>
+      {{/if}}
+    </div>
+  </div>
 </div>
+
+<script src="/js/main.js"></script>

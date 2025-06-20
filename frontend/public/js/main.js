@@ -20,10 +20,9 @@ function setupAnalyzeButton() {
   });
 }
 
-// Patienten verschieben (Wartend → In Behandlung)
 function setupMoveButtons() {
   const waitingPane = document.getElementById("pane-waiting");
-  const activeList = document.getElementById("active-patient-list");
+  const activeList  = document.getElementById("active-patient-list");
 
   if (!waitingPane || !activeList) return;
 
@@ -31,29 +30,45 @@ function setupMoveButtons() {
     const btn = e.target.closest(".move-to-active");
     if (!btn) return;
 
-    const name = btn.getAttribute("data-name");
+    const name   = btn.getAttribute("data-name");
     const triage = btn.getAttribute("data-triage");
     const listItem = btn.closest("li");
-
     if (!name || !triage || !listItem) return;
 
+    // entferne "Keine aktiven Patienten"-Hinweis, falls vorhanden
     const hint = activeList.querySelector("li.text-muted");
     if (hint) hint.remove();
 
-    const alreadyExists = [...activeList.querySelectorAll("a")].some(a => a.textContent.trim() === name);
-    if (alreadyExists) return;
+    // Prüfen, ob der Patient schon in der Liste ist
+    const already = [...activeList.querySelectorAll("a")]
+      .some(a => a.textContent.trim() === name);
+    if (already) return;
 
+    // Hier bestimmen wir die Ziel-URL je nach aktuellem Pfad
+    let href;
+    if (window.location.pathname.startsWith("/coordination")) {
+      // Coordination → patient-input
+      href = `/patient/${encodeURIComponent(name)}`;
+    } else {
+      // Registration (oder sonst) → patient-overview
+      href = `/patient/${encodeURIComponent(name)}/overview`;
+    }
+
+    // neues Listenelement bauen
     const newItem = document.createElement("li");
     newItem.className = "list-group-item d-flex justify-content-between align-items-center";
     newItem.innerHTML = `
-      <a href="/patient/${encodeURIComponent(name)}/overview" class="text-decoration-none patient-name">${name}</a>
+      <a href="${href}" class="text-decoration-none patient-name">${name}</a>
       <span class="triage-indicator ms-2">
         <span class="triage-circle level-${triage} active"></span>
       </span>
     `;
     activeList.appendChild(newItem);
+
+    // altes Element aus "Wartend" entfernen
     listItem.remove();
 
+    // Falls danach keine wartenden Patienten mehr da sind, Hinweis einfügen
     const remaining = waitingPane.querySelectorAll("ul.list-group > li:not(.text-muted)");
     if (remaining.length === 0) {
       const noRes = document.createElement("li");
@@ -63,6 +78,7 @@ function setupMoveButtons() {
     }
   });
 }
+
 
 // Sidebar-Suche
 function setupSidebarSearch() {
@@ -222,36 +238,59 @@ function displayTriageLevel(triageLevel) {
 
 function displayExams(exams) {
   const ul = document.getElementById("resultData");
+
+  // Neues Listenelement für Untersuchungen
   const li = document.createElement("li");
   li.className = "list-group-item";
-  li.innerHTML = `
-    <div class="d-flex justify-content-between align-items-center">
-      <strong class="me-2">Untersuchungen:</strong>
-      <button id="toggleExams" class="btn btn-sm btn-outline-secondary" aria-expanded="false">
-        <i class="bi bi-chevron-down"></i>
-      </button>
-    </div>
-    <ul id="examsList" class="list-group list-group-flush mt-2" style="display:none"></ul>
-  `;
+
+  // Label
+  const label = document.createElement("strong");
+  
+  label.textContent = "Untersuchungen:";
+  li.appendChild(label);
+
+  // Liste immer sichtbar, mit Checkboxen
+  const examsList = document.createElement("ul");
+  examsList.className = "list-group list-group-flush mt-2";
+
+  exams.forEach((e, idx) => {
+    const item = document.createElement("li");
+    item.className = "list-group-item d-flex justify-content-between align-items-center";
+
+    // Checkbox + Label
+    const wrapper = document.createElement("div");
+    wrapper.className = "form-check";
+
+    const checkbox = document.createElement("input");
+    checkbox.className = "form-check-input";
+    checkbox.type = "checkbox";
+    // eindeutige ID für Label-Verknüpfung
+    const safeId = `exam-${idx}`;
+    checkbox.id = safeId;
+
+    const chkLabel = document.createElement("label");
+    chkLabel.className = "form-check-label";
+    chkLabel.htmlFor = safeId;
+    chkLabel.textContent = e.name;
+
+    wrapper.appendChild(checkbox);
+    wrapper.appendChild(chkLabel);
+
+    // Priorität als Badge
+    const badge = document.createElement("span");
+    badge.className = "badge bg-secondary";
+    badge.textContent = e.priority;
+
+    item.appendChild(wrapper);
+    item.appendChild(badge);
+
+    examsList.appendChild(item);
+  });
+
+  li.appendChild(examsList);
   ul.appendChild(li);
-
-  const examsList = li.querySelector("#examsList");
-  exams.forEach(e => {
-    const it = document.createElement("li");
-    it.className = "list-group-item d-flex justify-content-between";
-    it.innerHTML = `<span>${e.name}</span><span class="badge bg-secondary">${e.priority}</span>`;
-    examsList.appendChild(it);
-  });
-
-  li.querySelector("#toggleExams").addEventListener("click", () => {
-    const btn = li.querySelector("#toggleExams");
-    const expanded = btn.getAttribute("aria-expanded") === "true";
-    btn.setAttribute("aria-expanded", String(!expanded));
-    examsList.style.display = expanded ? "none" : "block";
-    btn.querySelector("i").classList.toggle("bi-chevron-down");
-    btn.querySelector("i").classList.toggle("bi-chevron-up");
-  });
 }
+
 
 function displayExperts(experts) {
   const li = document.createElement("li");

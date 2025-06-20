@@ -347,6 +347,35 @@ header .btn-outline-secondary.home-btn:hover {
   margin-top: 0.25rem;           /* kleiner vertikaler Ausgleich */
 }
 
+/* Deaktiviert Flex für das Experten-Item */
+.expert-item {
+  display: block !important;
+}
+
+/* Stellt sicher, dass die Liste unter dem Label steht */
+.expert-label-container {
+  display: block;
+}
+
+/* Liste: Abstand und Aufzählungspunkte */
+.expert-list {
+  list-style-type: disc;
+  padding-left: 1.5rem; /* Konsistente Einrückung */
+  margin-top: 0.5rem;   /* Abstand zum Label */
+}
+
+/* eigene lila Button-Farbe */
+.btn-purple {
+  --bs-btn-bg: #6f42c1;
+  --bs-btn-border-color: #6f42c1;
+  --bs-btn-color: #fff;
+}
+.btn-purple:hover,
+.btn-purple:focus {
+  --bs-btn-bg: #5a359a;
+  --bs-btn-border-color: #5a359a;
+}
+
 
 
 

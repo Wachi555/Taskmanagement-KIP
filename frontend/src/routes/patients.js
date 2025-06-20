@@ -21,26 +21,23 @@ router.get('/patient/:name', (req, res, next) => {
     });
   }
 
+  // Patientendaten-Page mitsamt history
   res.render('patient-input', {
     layout: 'patient',
     appName: 'Notaufnahme Universitätsklinikum Regensburg',
     showHome: true,
     showSidebarToggle: true,
     data: patientData,
-    // hier die beiden Arrays aus deinem patientData-Objekt
-    exams:   patientData.examinations,
-    experts: patientData.treatments
+    exams:   patientData.examinations || [],
+    experts: patientData.treatments   || [],
+    history: patientData.history      || []
   });
 });
 
-// frontend/routes/patients.js
-
-// … deine bestehende /patient/:name-Route bleibt für patient-input …
-
-// Neue Overview-Route:
+// Overview-Route für Patienten-Übersicht
 router.get('/patient/:name/overview', (req, res) => {
   const name = decodeURIComponent(req.params.name);
-  const all = store.getAllDetailed();
+  const all  = store.getAllDetailed();
   const patientData = all.find(p => p.name === name);
 
   if (!patientData) {
@@ -51,13 +48,12 @@ router.get('/patient/:name/overview', (req, res) => {
   }
 
   res.render('patient-overview', {
-    layout: 'patient',         // oder 'main', je nachdem welches Layout du willst
+    layout: 'patient',
     appName: 'Notaufnahme Universitätsklinikum Regensburg',
     showHome: true,
     showSidebarToggle: true,
     data: patientData
   });
 });
-
 
 module.exports = router;

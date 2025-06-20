@@ -1,6 +1,6 @@
 // frontend/models/patient_store.js
 
-// Einfache In-Memory-Datenbank mit erweiterten Mock-Daten
+// Einfache In-Memory-Datenbank mit erweiterten Mock-Daten inklusive Historie
 const patients = [
   {
     name: 'Hans Weber',
@@ -10,7 +10,11 @@ const patients = [
     symptoms: ['Kopfschmerzen', 'Schwindel'],
     registrationDate: '2025-06-18',
     adresse: 'Musterstraße 10, 93047 Regensburg',
-    krankenkasse: 'AOK Bayern'
+    krankenkasse: 'AOK Bayern',
+    history: [
+      { date: '2025-06-10', findings: 'Beinbruch' },
+      { date: '2025-03-22', findings: 'Hautausschlag' }
+    ]
   },
   {
     name: 'Uwe Taniz',
@@ -20,7 +24,10 @@ const patients = [
     symptoms: ['Husten', 'Fieber'],
     registrationDate: '2025-06-19',
     adresse: 'Bahnhofstraße 5, 93047 Regensburg',
-    krankenkasse: 'Techniker Krankenkasse'
+    krankenkasse: 'Techniker Krankenkasse',
+    history: [
+      { date: '2025-01-15', findings: 'Schlaganfall' }
+    ]
   },
   {
     name: 'Ute Russ',
@@ -30,7 +37,8 @@ const patients = [
     symptoms: ['Brustschmerzen'],
     registrationDate: '2025-06-17',
     adresse: 'Ringstraße 2, 93047 Regensburg',
-    krankenkasse: 'Barmer'
+    krankenkasse: 'Barmer',
+    history: []
   }
 ];
 
@@ -65,10 +73,11 @@ function add(patientData) {
     triage: patientData.triage ?? null,
     dob: patientData.dob ?? null,
     gender: patientData.gender ?? null,
-    symptoms: patientData.symptoms ?? [],      // <-- Hier werden Symptome initialisiert
+    symptoms: patientData.symptoms ?? [],      
     registrationDate: patientData.registrationDate ?? now,
     adresse: patientData.adresse ?? null,
-    krankenkasse: patientData.krankenkasse ?? null
+    krankenkasse: patientData.krankenkasse ?? null,
+    history: patientData.history ?? []
   };
 
   patients.push(newPatient);
