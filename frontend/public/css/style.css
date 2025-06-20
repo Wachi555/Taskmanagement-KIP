@@ -378,6 +378,10 @@ header .btn-outline-secondary.home-btn:hover {
   color: #fff;
 }
 
+#expertsList {
+  list-style-type: disc;
+}
+
 
 
 

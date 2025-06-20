@@ -235,36 +235,33 @@ function displayTriageLevel(triageLevel) {
   li.innerHTML = `<strong class="me-2">Triagestufe:</strong> ${triageLevel}`;
   document.getElementById("resultData").appendChild(li);
 }
-
 function displayExams(exams) {
   const ul = document.getElementById("resultData");
 
   // Neues Listenelement für Untersuchungen
   const li = document.createElement("li");
-  li.className = "list-group-item";
+  li.className = "list-group-item d-block"; // HIER die Korrektur!
 
-  // Label
+  // Label (Überschrift)
   const label = document.createElement("strong");
-  
+  label.className = "d-block mb-2";
   label.textContent = "Untersuchungen:";
   li.appendChild(label);
 
   // Liste immer sichtbar, mit Checkboxen
   const examsList = document.createElement("ul");
-  examsList.className = "list-group list-group-flush mt-2";
+  examsList.className = "list-group list-group-flush";
 
   exams.forEach((e, idx) => {
     const item = document.createElement("li");
     item.className = "list-group-item d-flex justify-content-between align-items-center";
 
-    // Checkbox + Label
     const wrapper = document.createElement("div");
     wrapper.className = "form-check";
 
     const checkbox = document.createElement("input");
     checkbox.className = "form-check-input";
     checkbox.type = "checkbox";
-    // eindeutige ID für Label-Verknüpfung
     const safeId = `exam-${idx}`;
     checkbox.id = safeId;
 
@@ -276,7 +273,6 @@ function displayExams(exams) {
     wrapper.appendChild(checkbox);
     wrapper.appendChild(chkLabel);
 
-    // Priorität als Badge
     const badge = document.createElement("span");
     badge.className = "badge bg-secondary";
     badge.textContent = e.priority;
@@ -292,13 +288,13 @@ function displayExams(exams) {
 }
 
 
+
 function displayExperts(experts) {
   const li = document.createElement("li");
-  li.className = "list-group-item";
+  li.className = "list-group-item d-block"; // <-- HIER KORREKTUR
 
-  // Label und verschachtelte Liste
   li.innerHTML = `
-    <strong>Experten:</strong>
+    <strong class="d-block mb-2">Experten:</strong>
     <ul class="mt-1 ms-3">
       ${experts.length
         ? experts.map(e => `<li>${e}</li>`).join("")
@@ -309,6 +305,7 @@ function displayExperts(experts) {
 
   document.getElementById("resultData").appendChild(li);
 }
+
 
 
 
