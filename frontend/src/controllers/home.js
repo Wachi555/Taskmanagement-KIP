@@ -152,7 +152,7 @@ router.get('/patient/:name/overview', (req, res) => {
     layout: 'patient',
     appName: 'Notaufnahme Universitätsklinikum Regensburg',
     showHome: true,
-    showSidebarToggle: true,
+    showSidebarToggle: false,
     data: patientData,
     diagnosis:    patientData.diagnosis || [],
     triage:       patientData.triage,
