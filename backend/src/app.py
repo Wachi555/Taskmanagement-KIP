@@ -3,9 +3,14 @@ import json
 import uvicorn
 from common.models import InputModel, OutputModel
 from fastapi import FastAPI
+from fastapi import UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from modules.debug import test_output
 from modules.processing import process_anamnesis
+import os
+import tempfile
+import whisper
+
 
 app = FastAPI()
 

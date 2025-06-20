@@ -1,8 +1,11 @@
+import { setupAudioRecorder } from './audio.js';
+
 document.addEventListener("DOMContentLoaded", () => {
   setupAnalyzeButton();
   setupSidebarSearch();
   setupMoveButtons();
   setupFullViewSearch();
+  setupAudioRecorder();
 });
 
 // Analyse-Button-Setup
