@@ -122,6 +122,17 @@ async def set_patient_triage(patient_id: int, triage_level: int):
     else:
         return {"output": "Failed to update patient triage level", "success": False, "error_code": 500, "error_message": "Database error"}
 
+@app.get("/insert_example_patients", tags=["database"])
+async def insert_example_patients():
+    example_patients = [
+        {"first_name": "Json", "last_name": "Derulo", "date_of_birth": "01.01.0001", "health_insurance": "krasse kasse", "allergies": "", "address": "123 Straße", "triage_level": 2, "symptoms": "Mangelnde Motivation"},
+        {"first_name": "Ute", "last_name": "Russ", "date_of_birth": "20.02.2002", "health_insurance": "volle versicherung", "allergies": "", "address": "OTH Regensburg", "triage_level": 3, "symptoms": "Absolut keine Lust mehr"},
+        {"first_name": "Timo", "last_name": "Blaumann", "date_of_birth": "03.03.2003", "health_insurance": "absolute absicherer", "allergies": "", "address": "Vergessen", "triage_level": 1, "symptoms": "akute Alkoholsucht"},
+    ]
+    for patient in example_patients:
+        db.add_patient(InputPatient(**patient))
+    return {"output": f"{len(example_patients)} example patients inserted successfully", "success": True}
+
 
 if __name__ == "__main__":
     uvicorn.run(app, port=8000, reload=False)
