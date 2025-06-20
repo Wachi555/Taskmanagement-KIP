@@ -6,6 +6,8 @@ const { engine } = require('express-handlebars');
 
 const homeRoutes    = require('./controllers/home');
 const patientRoutes = require('./routes/patients');
+const audioCtrl  = require('./controllers/audio.js');
+
 
 const app = express();
 
@@ -32,6 +34,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use('/', audioCtrl);
 
 // Routen einbinden
 app.use('/', homeRoutes);

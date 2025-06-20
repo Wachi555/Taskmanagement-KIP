@@ -10,14 +10,38 @@
     placeholder="Anamnese eingeben…"
   ></textarea>
 
-  <div class="mb-3">
-    <label for="audioFile" class="form-label">
-      Audio-Datei (Drag & Drop oder Auswahl)
-    </label>
-    <input id="audioFile" type="file" class="form-control" />
+  <div class="mt-3">
+  <div class="btn-group" role="group" aria-label="Audio Controls">
+    <button id="audio-main-btn" class="btn btn-outline-primary">
+      <i class="bi bi-mic-fill"></i> Aufnahme starten
+    </button>
+    <button id="audio-upload-btn" class="btn btn-outline-secondary">
+      <i class="bi bi-upload"></i> Audio hochladen
+    </button>
+    <input id="audioFile" type="file" accept="audio/*" class="d-none" />
+    <button id="audio-pause-btn" class="btn btn-outline-warning d-none">
+      <i class="bi bi-pause-fill"></i> Pause
+    </button>
+    <button id="audio-continue-btn" class="btn btn-outline-primary d-none">
+      <i class="bi bi-play-fill"></i> Fortsetzen
+    </button>
+    <button id="audio-stop-btn" class="btn btn-outline-danger d-none">
+      <i class="bi bi-stop-fill"></i> Stopp
+    </button>
+    <button id="audio-rerecord-btn" class="btn btn-outline-secondary d-none">
+      <i class="bi bi-arrow-counterclockwise"></i> Neu aufnehmen
+    </button>
+    <button id="audio-process-btn" class="btn btn-outline-success d-none">
+      <i class="bi bi-upload"></i> Audio analysieren
+    </button>
   </div>
+  <small class="text-muted d-block mt-1">
+    Sprich deine Eingabe oder lade eine Audiodatei hoch und sende sie zur Analyse.
+    <p id="transcription-output"></p>
+  </small>
+</div>
 
   <button id="process-btn" class="btn btn-primary mt-auto">
-    Verarbeiten
+    Anamnese verarbeiten
   </button>
 </section>
