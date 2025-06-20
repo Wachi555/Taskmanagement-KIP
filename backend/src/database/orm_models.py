@@ -13,6 +13,10 @@ class Patient(Base):
     age = Column(Integer, nullable=False)
     date_of_birth = Column(String, nullable=False)
     is_waiting = Column(Boolean, nullable=False)
+    in_treatment = Column(Boolean, nullable=False)
+    health_insurance = Column(String, nullable=False)
+    allergies = Column(String, nullable=True)  # JSON or comma-separated list
+    
 
 # ========================================================================
 
@@ -26,28 +30,31 @@ class PatientEntry(Base):
     patient_history = Column(String, nullable=False)
     additional_notes = Column(String, nullable=True)
     extracted_contents_json = Column(String, nullable=False)
-
-class Symptom(Base):
-    __tablename__ = 'symptoms'
-
-    id = Column(Integer, primary_key=True)
-    patient_entry_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
-    name = Column(String, nullable=False)
-
-class Medication(Base):
-    __tablename__ = 'medications'
-
-    id = Column(Integer, primary_key=True)
-    patient_entry_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
-    name = Column(String, nullable=False)
-    dosage = Column(String, nullable=False)
+    symptoms = Column(String, nullable=True)  # JSON or comma-separated list
+    medications = Column(String, nullable=True)  # JSON or comma-separated list
     
-class Allergy(Base):
-    __tablename__ = 'allergies'
 
-    id = Column(Integer, primary_key=True)
-    patient_entry_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
-    name = Column(String, nullable=False)
+# class Symptom(Base):
+#     __tablename__ = 'symptoms'
+
+#     id = Column(Integer, primary_key=True)
+#     patient_entry_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
+#     name = Column(String, nullable=False)
+
+# class Medication(Base):
+#     __tablename__ = 'medications'
+
+#     id = Column(Integer, primary_key=True)
+#     patient_entry_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
+#     name = Column(String, nullable=False)
+#     dosage = Column(String, nullable=False)
+    
+# class Allergy(Base):
+#     __tablename__ = 'allergies'
+
+#     id = Column(Integer, primary_key=True)
+#     patient_entry_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
+#     name = Column(String, nullable=False)
     
 # ========================================================================
 
@@ -56,6 +63,7 @@ class Examination(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
+    is_available = Column(Boolean, nullable=False)
 
 class ExaminationToResult(Base):
     __tablename__ = 'examination_to_result'
@@ -72,6 +80,7 @@ class Expert(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
+    is_available = Column(Boolean, nullable=False)
 
 class ExpertToResult(Base):
     __tablename__ = 'expert_to_result'
@@ -81,12 +90,14 @@ class ExpertToResult(Base):
     result_id = Column(Integer, ForeignKey('results.id'), nullable=False)
     reason = Column(String, nullable=False)
 
+# Results table (one for each patient entry -> might get more if feedback is implemented)
 class Result(Base):
     __tablename__ = 'results'
     id = Column(Integer, primary_key=True)
     patient_entry_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
     triage_level = Column(Integer, nullable=False)
 
+# Unique for each result, but one result can have multiple diagnoses
 class Diagnosis(Base):
     __tablename__ = 'diagnoses'
 
