@@ -41,7 +41,9 @@ def add_patient(patient: InputPatient) -> int:
         patient_history="",
         additional_notes="",
         extracted_contents_json="",  # Empty string for now
-        symptoms=patient.symptoms
+        symptoms=patient.symptoms,
+        medications="", # Empty string for now
+        triage_level=patient.triage_level 
     )
 
     if entry_id is None:
@@ -101,6 +103,15 @@ def get_patient_entries(patient_id: int):
         return entries
     else:
         ...
+        
+# Get the latest entry for a patient
+def get_latest_patient_entry(patient_id: int):
+    entries = crud_paitent_entries.get_patient_entries(patient_id)
+    if entries:
+        latest_entry = max(entries, key=lambda entry: entry.entry_date)
+        return latest_entry
+    else:
+        ...
 
 # Get a specific entry for a patient
 def get_patient_entry(entry_id: int):
@@ -111,8 +122,8 @@ def get_patient_entry(entry_id: int):
         ...
 
 # Add an entry for a patient
-def add_patient_entry(patient_id: int, date: str, patient_history: str, additional_notes: str, content_json: str):
-    entry_id = crud_paitent_entries.create_patient_entry(patient_id, date, patient_history, additional_notes, content_json)
+def add_patient_entry(patient_id: int, date: str, patient_history: str, additional_notes: str, symptoms: str, medications: str, content_json: str):
+    entry_id = crud_paitent_entries.create_patient_entry(patient_id, date, patient_history, additional_notes, content_json, symptoms, medications)
     if entry_id:
         return entry_id
     else:
@@ -219,7 +230,7 @@ def remove_diagnosis_from_entry(diagnosis_id: int):
 
 # Get all results for a patient entry
 def get_results_for_entry(entry_id: int):
-    results = crud_results.get_results_for_entry(entry_id)
+    results = crud_results.get_results_by_patient_entry_id(entry_id)
     if results:
         return results
     else:
@@ -259,8 +270,8 @@ def get_all_experts():
         ...
         
 # Add an expert to the database
-def add_expert(expert_data):
-    expert_id = crud_experts.create_expert(expert_data)
+def add_expert(name: str, is_available: bool):
+    expert_id = crud_experts.create_expert(name, is_available)
     if expert_id:
         return expert_id
     else:
@@ -315,8 +326,8 @@ def get_examination_by_id(examination_id: int):
         ...
         
 # Add an examination to the database
-def add_examination(examination_data):
-    examination_id = crud_examinations.create_examination(examination_data)
+def add_examination(name: str, is_available: bool):
+    examination_id = crud_examinations.create_examination(name, is_available)
     if examination_id:
         return examination_id
     else:

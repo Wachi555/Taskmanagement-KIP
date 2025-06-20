@@ -14,14 +14,15 @@ def get_patient_entry(entry_id: int):
     return entry
 
 # TODO: How is the schema supposed to look like for this (parameters)?
-def create_patient_entry(patient_id: int, entry_date: str, patient_history: str, additional_notes: str, extracted_contents_json: str, symptoms: str):
+def create_patient_entry(patient_id: int, entry_date: str, patient_history: str, additional_notes: str, 
+                         extracted_contents_json: str, symptoms: str, medications: str, triage_level: int):
     session = SessionLocal()
     patient = session.query(Patient).filter(Patient.id == patient_id).first()
     if patient:
         new_entry = PatientEntry(
             patient_id=patient_id, entry_date=entry_date, patient_history=patient_history, 
             additional_notes=additional_notes, extracted_contents_json=extracted_contents_json,
-            symptoms=symptoms)
+            symptoms=symptoms, medications=medications, triage_level=triage_level)
         session.add(new_entry)
         session.commit()
         session.refresh(new_entry)

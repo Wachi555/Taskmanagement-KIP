@@ -13,9 +13,9 @@ def get_all_experts():
     session.close()
     return experts
 
-def create_expert(name: str):
+def create_expert(name: str, is_available: bool):
     session = SessionLocal()
-    new_expert = Expert(name=name)
+    new_expert = Expert(name=name, is_available=is_available)
     session.add(new_expert)
     session.commit()
     session.refresh(new_expert)

@@ -17,6 +17,7 @@ class Patient(Base):
     health_insurance = Column(String, nullable=False)
     allergies = Column(String, nullable=True)  # JSON or comma-separated list
     address = Column(String, nullable=True)  # Optional field for patient address
+    last_triage_level = Column(Integer, nullable=True)  # Last triage level assigned to the patient
     
 
 # ========================================================================
@@ -33,6 +34,7 @@ class PatientEntry(Base):
     extracted_contents_json = Column(String, nullable=False) # JSON string containing extracted content
     symptoms = Column(String, nullable=True)  # JSON or comma-separated list
     medications = Column(String, nullable=True)  # JSON or comma-separated list
+    triage_level = Column(Integer, nullable=False)
     
 
 # class Symptom(Base):
@@ -96,7 +98,6 @@ class Result(Base):
     __tablename__ = 'results'
     id = Column(Integer, primary_key=True)
     patient_entry_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
-    triage_level = Column(Integer, nullable=False)
 
 # Unique for each result, but one result can have multiple diagnoses
 class Diagnosis(Base):

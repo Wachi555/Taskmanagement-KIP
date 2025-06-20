@@ -13,9 +13,9 @@ def get_examination_by_id(examination_id: int):
     session.close()
     return examination
 
-def create_examination(name: str):
+def create_examination(name: str, is_available: bool):
     session = SessionLocal()
-    new_examination = Examination(name=name)
+    new_examination = Examination(name=name, is_available=is_available)
     session.add(new_examination)
     session.commit()
     session.refresh(new_examination)
