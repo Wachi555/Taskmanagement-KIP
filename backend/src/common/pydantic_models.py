@@ -26,7 +26,14 @@ class InputPatient(BaseModel):
     first_name: str
     last_name: str
     date_of_birth: str
-    age: int    
+    # age: int    
+    # is_waiting: Optional[bool] = False
+    # in_treatment: Optional[bool] = False
+    health_insurance: str
+    triage_level: int
+    symptoms: str
+    address: str
+
 
 class OutputModel(BaseModel):
     output: LLMResult

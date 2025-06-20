@@ -6,21 +6,48 @@ import database.crud_medications as crud_medications
 import database.crud_diagnoses as crud_diagnoses
 import database.crud_experts as crud_experts
 import database.crud_examinations as crud_examinations
+
 from common.pydantic_models import InputPatient
+
+from datetime import datetime
 
 # --- Patient Management ---
 
-# TODO: What is the logic behind is_waiting? Where will the data come from?
 # Add a patient to the database
-def add_patient(patient: InputPatient, is_waiting: bool = False) -> int:
+def add_patient(patient: InputPatient) -> int:
+
+    age = 0 # TODO: Calculate age from date_of_birth
 
     patient_id = crud_patients.create_patient(
         first_name=patient.first_name,
         last_name=patient.last_name,
-        age=patient.age,
+        age=age,
         date_of_birth=patient.date_of_birth,
-        is_waiting=is_waiting    
+        is_waiting=True,
+        in_treatment=False,  # Default value
+        health_insurance=patient.health_insurance,
+        allergies=None, # Default value, can be updated later
+        address=patient.address
     )
+    
+    # create initial patient entry
+    if patient_id is None:
+        print("Error: Could not create patient.")
+        return None
+    
+    entry_id = crud_paitent_entries.create_patient_entry(
+        patient_id=patient_id,
+        entry_date=datetime.now().date(),  # TODO: Check for correct date format
+        patient_history="",
+        additional_notes="",
+        extracted_contents_json="",  # Empty string for now
+        symptoms=patient.symptoms
+    )
+
+    if entry_id is None:
+        print("Error: Could not create initial patient entry.")
+        return None
+    
     return patient_id 
 
 # Get a patient by ID
@@ -30,6 +57,7 @@ def get_patient(patient_id: int):
         return patient
     else:
         # TODO: Maybe raise an exception or return a specific error message
+        # TODO: The none return has to caught in the frontend
         print(f"Error: Patient with ID {patient_id} not found.")
         return None
 

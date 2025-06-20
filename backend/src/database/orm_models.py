@@ -16,6 +16,7 @@ class Patient(Base):
     in_treatment = Column(Boolean, nullable=False)
     health_insurance = Column(String, nullable=False)
     allergies = Column(String, nullable=True)  # JSON or comma-separated list
+    address = Column(String, nullable=True)  # Optional field for patient address
     
 
 # ========================================================================
@@ -29,7 +30,7 @@ class PatientEntry(Base):
     entry_date = Column(String, nullable=False)
     patient_history = Column(String, nullable=False)
     additional_notes = Column(String, nullable=True)
-    extracted_contents_json = Column(String, nullable=False)
+    extracted_contents_json = Column(String, nullable=False) # JSON string containing extracted content
     symptoms = Column(String, nullable=True)  # JSON or comma-separated list
     medications = Column(String, nullable=True)  # JSON or comma-separated list
     

@@ -56,8 +56,8 @@ async def get_patient(patient_id: int):
         return {"output": "Patient not found", "success": False, "error_code": 404, "error_message": "Patient not found"}
 
 @app.post("/patient", tags=["database"])
-async def insert_patient(input_model: InputPatient, is_waiting: bool = False):
-    patient_id = db.add_patient(input_model, is_waiting)
+async def insert_patient(input_model: InputPatient):
+    patient_id = db.add_patient(input_model)
     if patient_id:
         return {"output": f"Patient with ID {patient_id} inserted successfully", "success": True}
     else:
