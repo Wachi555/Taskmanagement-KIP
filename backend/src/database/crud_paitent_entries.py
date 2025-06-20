@@ -43,3 +43,33 @@ def delete_entry(entry_id: int):
     else:
         session.close()
         return False
+
+def update_patient_entry(
+        entry_id: int, entry_date: str = None, patient_history: str = None, additional_notes: str = None, 
+        extracted_contents_json: str = None, symptoms: str = None, medications: str = None, triage_level: int = None):
+    
+    session = SessionLocal()
+    entry = session.query(PatientEntry).filter(PatientEntry.id == entry_id).first()
+    if entry:
+        if entry_date is not None:
+            entry.entry_date = entry_date
+        if patient_history is not None:
+            entry.patient_history = patient_history
+        if additional_notes is not None:
+            entry.additional_notes = additional_notes
+        if extracted_contents_json is not None:
+            entry.extracted_contents_json = extracted_contents_json
+        if symptoms is not None:
+            entry.symptoms = symptoms
+        if medications is not None:
+            entry.medications = medications
+        if triage_level is not None:
+            entry.triage_level = triage_level
+        
+        session.commit()
+        session.refresh(entry)
+        session.close()
+        return True
+    else:
+        session.close()
+        return False

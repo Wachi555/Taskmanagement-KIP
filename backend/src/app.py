@@ -102,6 +102,25 @@ async def get_patient_entries(patient_id: int):
     else:
         return {"output": "No entries found for this patient", "success": False, "error_code": 404, "error_message": "No entries found"}
 
+@app.get("/patient/update_status/{patient_id}/{status}", tags=["database"], description="Update patient status. Status: 0 = in history, 1 = waiting, 2 = in treatment")
+async def update_patient_status(patient_id: int, status: int):
+    if status not in [0, 1, 2]:
+        return {"output": "Invalid status", "success": False, "error_code": 400, "error_message": "Status must be 0 (in history), 1 (waiting), or 2 (in treatment)"}
+    success = db.update_patient(patient_id, is_waiting=(status == 1), in_treatment=(status == 2))
+    if success:
+        return {"output": f"Patient with ID {patient_id} updated successfully", "success": True}
+    else:
+        return {"output": "Failed to update patient", "success": False, "error_code": 500, "error_message": "Database error"}
+
+@app.get("/patient/{patient_id}/set_triage/{triage_level}", tags=["database"])
+async def set_patient_triage(patient_id: int, triage_level: int):
+    if triage_level < 0 or triage_level > 5:
+        return {"output": "Invalid triage level", "success": False, "error_code": 400, "error_message": "Triage level must be between 0 and 5"}
+    success = db.update_patient(patient_id, triage_level=triage_level)
+    if success:
+        return {"output": f"Patient with ID {patient_id} triage level updated to {triage_level}", "success": True}
+    else:
+        return {"output": "Failed to update patient triage level", "success": False, "error_code": 500, "error_message": "Database error"}
 
 
 if __name__ == "__main__":

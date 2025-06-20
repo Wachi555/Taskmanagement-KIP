@@ -80,15 +80,26 @@ def remove_patient(patient_id: int):
         ...
 
 # Update patient information
-def update_patient(patient_id: int, patient: InputPatient):
+def update_patient(patient_id: int, first_name: str = None, last_name: str = None, age: int = None, date_of_birth: str = None, is_waiting: bool = None,
+                   in_treatment: bool = None, health_insurance: str = None, allergies: str = None, address: str = None, triage_level: int = None):
     updated_patient = crud_patients.update_patient(
         patient_id,
-        first_name=patient.first_name,
-        last_name=patient.last_name,
-        age=patient.age,
-        date_of_birth=patient.date_of_birth,
-        is_waiting=patient.is_waiting
+        first_name=first_name,
+        last_name=last_name,
+        age=age,
+        date_of_birth=date_of_birth,
+        is_waiting=is_waiting,
+        in_treatment=in_treatment,
+        health_insurance=health_insurance,
+        allergies=allergies,
+        address=address,
+        last_triage_level=triage_level  # TODO: This sucks -> move triage back to the patient entry
     )
+    latest_entry = get_latest_patient_entry(patient_id)
+    if latest_entry:
+        latest_entry_id = latest_entry.id
+        crud_paitent_entries.update_patient_entry(latest_entry_id, triage_level=triage_level)
+
     if updated_patient:
         return updated_patient
     else:
@@ -130,8 +141,19 @@ def add_patient_entry(patient_id: int, date: str, patient_history: str, addition
         ...
         
 # Update an entry for a patient
-def update_patient_entry(entry_id: int, entry_data):
-    updated_entry = crud_paitent_entries.update_patient_entry(entry_id, entry_data)
+# Not implemented
+def update_patient_entry(entry_id: int, entry_date: str = None, patient_history: str = None, additional_notes: str = None, 
+        extracted_contents_json: str = None, symptoms: str = None, medications: str = None, triage_level: int = None):
+    updated_entry = crud_paitent_entries.update_patient_entry(
+        entry_id,
+        entry_date=entry_date,
+        patient_history=patient_history,
+        additional_notes=additional_notes,
+        extracted_contents_json=extracted_contents_json,
+        symptoms=symptoms,
+        medications=medications,
+        triage_level=triage_level
+    )
     if updated_entry:
         return updated_entry
     else:

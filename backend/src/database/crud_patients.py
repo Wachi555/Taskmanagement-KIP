@@ -43,7 +43,7 @@ def delete_patient(patient_id: int):
 def update_patient(
         patient_id: int, first_name: str = None, last_name: str = None, age: int = None, date_of_birth: str = None, 
         is_waiting: bool = None, in_treatment: bool = None, health_insurance: str = None, allergies: str = None,
-        address: str = None):
+        address: str = None, last_triage_level: int = None):
 
     session = SessionLocal()
     patient = session.query(Patient).filter(Patient.id == patient_id).first()
@@ -66,6 +66,8 @@ def update_patient(
             patient.allergies = allergies
         if address is not None:
             patient.address = address
+        if last_triage_level is not None:
+            patient.last_triage_level = last_triage_level
         session.commit()
         session.refresh(patient)
         session.close()
