@@ -46,7 +46,7 @@ function setupMoveButtons() {
     const newItem = document.createElement("li");
     newItem.className = "list-group-item d-flex justify-content-between align-items-center";
     newItem.innerHTML = `
-      <a href="/patient/${encodeURIComponent(name)}" class="text-decoration-none patient-name">${name}</a>
+      <a href="/patient/${encodeURIComponent(name)}/overview" class="text-decoration-none patient-name">${name}</a>
       <span class="triage-indicator ms-2">
         <span class="triage-circle level-${triage} active"></span>
       </span>
@@ -256,9 +256,22 @@ function displayExams(exams) {
 function displayExperts(experts) {
   const li = document.createElement("li");
   li.className = "list-group-item";
-  li.innerHTML = `<strong class=\"me-2\">Experten:</strong> ${experts.length ? experts.join(", ") : "–"}`;
+
+  // Label und verschachtelte Liste
+  li.innerHTML = `
+    <strong>Experten:</strong>
+    <ul class="mt-1 ms-3">
+      ${experts.length
+        ? experts.map(e => `<li>${e}</li>`).join("")
+        : "<li>–</li>"
+      }
+    </ul>
+  `;
+
   document.getElementById("resultData").appendChild(li);
 }
+
+
 
 function showLoading(show) {
   const spinner = document.getElementById("loading-spinner");

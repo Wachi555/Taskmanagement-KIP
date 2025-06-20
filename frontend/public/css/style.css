@@ -322,6 +322,32 @@ header .btn-outline-secondary.home-btn:hover {
   border-bottom: 2px solid #0d6efd;
 }
 
+/* 1. Grundlegendes: li-Elemente normal umbrechen */
+.output-box .list-group-item {
+  white-space: normal;           /* Zeilenumbruch bei Leerzeichen erlauben */
+  overflow-wrap: break-word;     /* lange Wörter umbrechen, falls nötig */
+  word-wrap: break-word;         /* Fallback für ältere Browser */
+}
+
+/* 2. Flex-Container umbrechbar machen */
+.output-box .list-group-item.d-flex {
+  flex-wrap: wrap;               /* erlaubt Umbruch der Flex-Items */
+  align-items: flex-start;       /* Badge oben ausrichten */
+}
+
+/* 3. Erstes Span (Text) darf schrumpfen und umgebrochen werden */
+.output-box .list-group-item.d-flex > span:first-child {
+  flex: 1 1 auto;                /* grow=1, shrink=1, basis=auto */
+}
+
+/* 4. Badge bleibt fix breit und rückt etwas ab */
+.output-box .list-group-item.d-flex > span:last-child {
+  flex: 0 0 auto;                /* grow=0, shrink=0, basis=auto */
+  margin-left: 0.5rem;           /* Abstand zum Text */
+  margin-top: 0.25rem;           /* kleiner vertikaler Ausgleich */
+}
+
+
 
 
 

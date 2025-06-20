@@ -33,6 +33,7 @@ router.get('/dashboard', (req, res) => {
     triage: null,
     exams: [],
     experts: [],
+    symptoms: [],
     levels: [1, 2, 3, 4, 5],
     showHome: true
   });
@@ -83,7 +84,7 @@ router.get('/new-patient', (req, res) => {
 router.post('/new-patient', (req, res) => {
   const name = req.body.name?.trim();
   if (name) {
-    store.add(name);
+    store.add({ name, symptoms: [] });
   }
   res.redirect('/registration');
 });
@@ -92,7 +93,7 @@ router.post('/new-patient', (req, res) => {
 router.post('/analyse', async (req, res) => {
   try {
     const inputText = req.body.text;
-    const response = await fetch("http://localhost:8000/process_input", {
+    const response = await fetch('http://localhost:8000/process_input', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: inputText })
@@ -109,7 +110,8 @@ router.post('/analyse', async (req, res) => {
       diagnosis: data.output.diagnosis || [],
       triage: data.output.triage ?? null,
       exams: data.output.examinations || [],    // Array von { name, priority }
-      experts: data.output.treatments || []     // Array von Strings
+      experts: data.output.treatments || [],    // Array von Strings
+      symptoms: data.output.symptoms || []
     };
 
     res.json(result);
@@ -119,17 +121,13 @@ router.post('/analyse', async (req, res) => {
   }
 });
 
-// in routes/patients.js, deine /patient/:name-Route
+// Patienten-Detail-Sichten
+// patient-input (Eingabe)
 router.get('/patient/:name', (req, res, next) => {
   const name = decodeURIComponent(req.params.name);
-  const all = store.getAllDetailed();
-  const patientData = all.find(p => p.name === name);
-
+  const patientData = store.findByName(name);
   if (!patientData) {
-    return res.status(404).render('404', {
-      layout: 'main',
-      message: 'Patient nicht gefunden'
-    });
+    return res.status(404).render('404', { layout: 'main', message: 'Patient nicht gefunden' });
   }
 
   res.render('patient-input', {
@@ -137,7 +135,30 @@ router.get('/patient/:name', (req, res, next) => {
     appName: 'Notaufnahme Universitätsklinikum Regensburg',
     showHome: true,
     showSidebarToggle: true,
-    data: patientData
+    data: patientData,
+    symptoms: patientData.symptoms
+  });
+});
+
+// patient-overview (Übersicht)
+router.get('/patient/:name/overview', (req, res) => {
+  const name = decodeURIComponent(req.params.name);
+  const patientData = store.findByName(name);
+  if (!patientData) {
+    return res.status(404).render('404', { layout: 'main', message: 'Patient nicht gefunden' });
+  }
+
+  res.render('patient-overview', {
+    layout: 'patient',
+    appName: 'Notaufnahme Universitätsklinikum Regensburg',
+    showHome: true,
+    showSidebarToggle: true,
+    data: patientData,
+    diagnosis:    patientData.diagnosis || [],
+    triage:       patientData.triage,
+    exams:        patientData.examinations || [],
+    experts:      patientData.treatments || [],
+    symptoms:     patientData.symptoms
   });
 });
 

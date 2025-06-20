@@ -1,6 +1,6 @@
 // frontend/models/patient_store.js
 
-// Einfache In‐Memory‐Datenbank mit erweiterten Mock‐Daten
+// Einfache In-Memory-Datenbank mit erweiterten Mock-Daten
 const patients = [
   {
     name: 'Hans Weber',
@@ -39,8 +39,9 @@ function getAll() {
   return patients.map(p => p.name);
 }
 
-// Detaillierte Daten (Name, Triage und alle Mock‐Felder)
+// Detaillierte Daten (Name, Triage und alle Mock-Felder)
 function getAllDetailed() {
+  // gibt eine Kopie, damit das Original nicht verändert wird
   return patients.map(p => ({ ...p }));
 }
 
@@ -49,12 +50,13 @@ function findByName(name) {
   return patients.find(p => p.name === name) || null;
 }
 
-// Neuen Patienten hinzufügen (mit Default‐Mock‐Werten)
+// Neuen Patienten hinzufügen (mit Default-Mock-Werten)
 function add(patientData) {
   const name = typeof patientData === 'string'
     ? patientData
     : patientData.name;
 
+  // Keine Duplikate
   if (patients.some(p => p.name === name)) return;
 
   const now = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
@@ -63,7 +65,7 @@ function add(patientData) {
     triage: patientData.triage ?? null,
     dob: patientData.dob ?? null,
     gender: patientData.gender ?? null,
-    symptoms: patientData.symptoms ?? [],
+    symptoms: patientData.symptoms ?? [],      // <-- Hier werden Symptome initialisiert
     registrationDate: patientData.registrationDate ?? now,
     adresse: patientData.adresse ?? null,
     krankenkasse: patientData.krankenkasse ?? null

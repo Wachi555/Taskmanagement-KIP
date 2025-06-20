@@ -33,4 +33,31 @@ router.get('/patient/:name', (req, res, next) => {
   });
 });
 
+// frontend/routes/patients.js
+
+// … deine bestehende /patient/:name-Route bleibt für patient-input …
+
+// Neue Overview-Route:
+router.get('/patient/:name/overview', (req, res) => {
+  const name = decodeURIComponent(req.params.name);
+  const all = store.getAllDetailed();
+  const patientData = all.find(p => p.name === name);
+
+  if (!patientData) {
+    return res.status(404).render('404', {
+      layout: 'main',
+      message: 'Patient nicht gefunden'
+    });
+  }
+
+  res.render('patient-overview', {
+    layout: 'patient',         // oder 'main', je nachdem welches Layout du willst
+    appName: 'Notaufnahme Universitätsklinikum Regensburg',
+    showHome: true,
+    showSidebarToggle: true,
+    data: patientData
+  });
+});
+
+
 module.exports = router;
