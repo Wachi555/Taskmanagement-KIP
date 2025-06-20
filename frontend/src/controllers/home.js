@@ -76,7 +76,7 @@ router.get('/coordination', (req, res) => {
 router.get('/new-patient', (req, res) => {
   res.render('new-patient', {
     layout: 'main',
-    appName: 'Notaufnahme'
+    appName: 'Notaufnahme Universitätsklinikum Regensburg'
   });
 });
 
