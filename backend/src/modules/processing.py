@@ -4,6 +4,14 @@ from interfaces import database as db
 import datetime
 
 
+# just for testing purposes, this function is not used in the actual application
+def process_anamnesis_default(input_text: str) -> str:
+    # Extract text contents and store them in the database
+    contents = extract_contents(input_text)
+    result = generate_anamnesis_response(contents)
+    if result:
+        return result
+
 def process_anamnesis(input_text: str, current_patient_id: int) -> str:
     try:
         # Extract text contents and store them in the database

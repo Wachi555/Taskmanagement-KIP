@@ -6,7 +6,7 @@ from interfaces import database as db
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from modules.debug import test_output
-from modules.processing import process_anamnesis
+from modules.processing import process_anamnesis, process_anamnesis_default
 from database.session import init_db
 
 app = FastAPI()
@@ -28,6 +28,11 @@ async def main():
     return {"message": "Hello World"}
 
 # ==================== Processing routes ========================
+@app.post("/process_input", tags=["processing"])
+async def process_input_default(input_model: InputAnamnesis):
+    response = process_anamnesis_default(input_model.text)
+    return response
+    
 
 @app.post("/process_input/{selected_patient_id}", tags=["processing"])
 async def process_input(input_model: InputAnamnesis, selected_patient_id: int):
