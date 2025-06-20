@@ -5,9 +5,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setupFullViewSearch();
 });
 
-
-
-
 // Analyse-Button-Setup
 function setupAnalyzeButton() {
   const processBtn = document.getElementById("process-btn");
@@ -149,8 +146,6 @@ function setupFullViewSearch() {
   }
 }
 
-
-
 // Analyse-Funktionen
 async function processInput() {
   const text = document.getElementById("inputText").value.trim();
@@ -179,34 +174,41 @@ async function processInput() {
   }
 }
 
-function displayResults(data) {
+function displayResults(result) {
   resetResults();
-  displayPatientData(data.data);
-  displayTriageLevel(data.triage);
-  displayExams(data.exams);
-  displayExperts(data.experts);
+  displayDiagnosis(result.diagnosis);
+  displayTriageLevel(result.triage);
+  displayExams(result.exams);
+  displayExperts(result.experts);
 }
 
 function resetResults() {
-  document.getElementById("patientData").innerHTML = "";
   document.getElementById("resultData").innerHTML = "";
-  document.getElementById("triageIndicator").innerHTML = "";
 }
 
-function displayPatientData(patientData) {
-  const patientUl = document.getElementById("patientData");
-  Object.entries(patientData).forEach(([key, val]) => {
-    const li = document.createElement("li");
-    li.className = "list-group-item";
-    li.innerHTML = `<strong>${key}:</strong> ${val}`;
-    patientUl.appendChild(li);
-  });
+
+function displayDiagnosis(diagnosis) {
+  if (!diagnosis?.length) return;
+  const ul = document.getElementById("resultData");
+
+  // Nur die Namen, kommagetrennt
+  const names = diagnosis.map(d => d.name).join(", ");
+
+  // Baue das LI analog zu displayExperts auf
+  const li = document.createElement("li");
+  li.className = "list-group-item";
+  li.innerHTML = `
+    <strong class="me-2">Mögliche Diagnosen:</strong>
+    ${names}
+  `;
+  ul.appendChild(li);
 }
+
+
 
 function displayTriageLevel(triageLevel) {
   const triageContainer = document.getElementById("triageIndicator");
-  const resultUl = document.getElementById("resultData");
-
+  triageContainer.innerHTML = "";
   const circle = document.createElement("div");
   circle.className = `triage-circle level-${triageLevel} active`;
   circle.title = `Triagestufe ${triageLevel}`;
@@ -214,56 +216,47 @@ function displayTriageLevel(triageLevel) {
 
   const li = document.createElement("li");
   li.className = "list-group-item";
-  li.innerHTML = `<strong>Triagestufe:</strong> ${triageLevel}`;
-  resultUl.appendChild(li);
+  li.innerHTML = `<strong class="me-2">Triagestufe:</strong> ${triageLevel}`;
+  document.getElementById("resultData").appendChild(li);
 }
 
 function displayExams(exams) {
-  const resultUl = document.getElementById("resultData");
+  const ul = document.getElementById("resultData");
   const li = document.createElement("li");
-  li.className = "list-group-item exams-container";
-
+  li.className = "list-group-item";
   li.innerHTML = `
     <div class="d-flex justify-content-between align-items-center">
-      <strong>Untersuchungen:</strong>
+      <strong class="me-2">Untersuchungen:</strong>
       <button id="toggleExams" class="btn btn-sm btn-outline-secondary" aria-expanded="false">
         <i class="bi bi-chevron-down"></i>
       </button>
     </div>
-    <ul id="examsList" class="list-group list-group-flush mt-2"></ul>
+    <ul id="examsList" class="list-group list-group-flush mt-2" style="display:none"></ul>
   `;
-  resultUl.appendChild(li);
+  ul.appendChild(li);
 
   const examsList = li.querySelector("#examsList");
-  exams.forEach((exam, idx) => {
-    const item = document.createElement("li");
-    item.className = "list-group-item d-flex align-items-center";
-    item.innerHTML = `
-      <input class="form-check-input me-2" type="checkbox" id="exam-${idx}" />
-      <label class="form-check-label flex-grow-1" for="exam-${idx}">${exam}</label>
-    `;
-    examsList.appendChild(item);
+  exams.forEach(e => {
+    const it = document.createElement("li");
+    it.className = "list-group-item d-flex justify-content-between";
+    it.innerHTML = `<span>${e.name}</span><span class="badge bg-secondary">${e.priority}</span>`;
+    examsList.appendChild(it);
   });
 
-  setupExamToggle();
-}
-
-function setupExamToggle() {
-  const btn = document.getElementById("toggleExams");
-  const list = document.getElementById("examsList");
-  if (!btn || !list) return;
-
-  btn.addEventListener("click", () => {
+  li.querySelector("#toggleExams").addEventListener("click", () => {
+    const btn = li.querySelector("#toggleExams");
     const expanded = btn.getAttribute("aria-expanded") === "true";
     btn.setAttribute("aria-expanded", String(!expanded));
-    list.classList.toggle("open");
+    examsList.style.display = expanded ? "none" : "block";
+    btn.querySelector("i").classList.toggle("bi-chevron-down");
+    btn.querySelector("i").classList.toggle("bi-chevron-up");
   });
 }
 
 function displayExperts(experts) {
   const li = document.createElement("li");
   li.className = "list-group-item";
-  li.innerHTML = `<strong>Experten:</strong> ${experts.length ? experts.join(", ") : "–"}`;
+  li.innerHTML = `<strong class=\"me-2\">Experten:</strong> ${experts.length ? experts.join(", ") : "–"}`;
   document.getElementById("resultData").appendChild(li);
 }
 

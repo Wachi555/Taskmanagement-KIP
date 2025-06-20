@@ -21,13 +21,15 @@ router.get('/patient/:name', (req, res, next) => {
     });
   }
 
-  // Rendern der patient-input.hbs mit den Patientendaten
   res.render('patient-input', {
     layout: 'patient',
     appName: 'Notaufnahme Universitätsklinikum Regensburg',
     showHome: true,
     showSidebarToggle: true,
-    data: patientData
+    data: patientData,
+    // hier die beiden Arrays aus deinem patientData-Objekt
+    exams:   patientData.examinations,
+    experts: patientData.treatments
   });
 });
 

@@ -21,7 +21,6 @@ router.get('/dashboard', (req, res) => {
   const waitingPatients = allPatients
     .filter(name => mockWaiting.includes(name))
     .map(name => ({ name }));
-
   const activePatients = allPatients
     .filter(name => !mockWaiting.includes(name));
 
@@ -41,7 +40,7 @@ router.get('/dashboard', (req, res) => {
 
 // Registrierung (alle Patienten, Wartende, Aktive)
 router.get('/registration', (req, res) => {
-  const allPatients = store.getAllDetailed(); // [{ name, triage }]
+  const allPatients = store.getAllDetailed();
   const waitingPatients = allPatients.filter(p => mockWaiting.includes(p.name));
   const activePatients = allPatients.filter(p => !mockWaiting.includes(p.name));
 
@@ -57,12 +56,8 @@ router.get('/registration', (req, res) => {
 });
 
 // Koordination
-// Koordination
 router.get('/coordination', (req, res) => {
-  // hol dir alle mit Name+Triage
-  const allPatients = store.getAllDetailed(); 
-
-  // wartende und aktive splitten
+  const allPatients = store.getAllDetailed();
   const waitingPatients = allPatients.filter(p => mockWaiting.includes(p.name));
   const activePatients  = allPatients.filter(p => !mockWaiting.includes(p.name));
 
@@ -76,8 +71,6 @@ router.get('/coordination', (req, res) => {
   });
 });
 
-
-
 // Formular für neuen Patienten
 router.get('/new-patient', (req, res) => {
   res.render('new-patient', {
@@ -90,7 +83,7 @@ router.get('/new-patient', (req, res) => {
 router.post('/new-patient', (req, res) => {
   const name = req.body.name?.trim();
   if (name) {
-    store.add(name); // du brauchst eine add-Funktion im patient_store
+    store.add(name);
   }
   res.redirect('/registration');
 });
@@ -104,18 +97,19 @@ router.post('/analyse', async (req, res) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: inputText })
     });
-
-    if (!response.ok) throw new Error('Failed to fetch data');
-
+    if (!response.ok) throw new Error(`Backend-Fehler: ${response.status}`);
     const data = await response.json();
+
+    // Ergebnis-Objekt, das an das Frontend geht
     const result = {
       data: {
-        Name: 'Patient',
-        Symptome: data.output.symptoms.join(', ')
+        Name: data.output.name || '–',
+        Symptome: (data.output.symptoms || []).join(', ')
       },
-      triage: 3,
-      exams: data.output.examinations.map(e => e.name),
-      experts: data.output.treatments
+      diagnosis: data.output.diagnosis || [],
+      triage: data.output.triage ?? null,
+      exams: data.output.examinations || [],    // Array von { name, priority }
+      experts: data.output.treatments || []     // Array von Strings
     };
 
     res.json(result);
@@ -128,11 +122,7 @@ router.post('/analyse', async (req, res) => {
 // in routes/patients.js, deine /patient/:name-Route
 router.get('/patient/:name', (req, res, next) => {
   const name = decodeURIComponent(req.params.name);
-
-  // Hol dir alle Patienten mit Triage etc.
-  const all = store.getAllDetailed(); // [{ name, triage, … }, …]
-
-  // Such den passenden Patienten
+  const all = store.getAllDetailed();
   const patientData = all.find(p => p.name === name);
 
   if (!patientData) {
@@ -143,15 +133,12 @@ router.get('/patient/:name', (req, res, next) => {
   }
 
   res.render('patient-input', {
-    layout: 'patient',  // <-- hier angepasst
+    layout: 'patient',
     appName: 'Notaufnahme Universitätsklinikum Regensburg',
     showHome: true,
     showSidebarToggle: true,
     data: patientData
   });
 });
-
-
-
 
 module.exports = router;
