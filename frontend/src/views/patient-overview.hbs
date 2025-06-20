@@ -1,0 +1,96 @@
+{{!-- views/patient-overview.hbs --}}
+
+<!-- Patienten-Überschrift mit Name, Zurück-Button und Geburtsdatum -->
+<div class="mb-4 d-flex align-items-center">
+  <a href="/registration" class="btn btn-link text-muted p-0 me-3" title="Zurück">
+    <i class="bi bi-arrow-left-short fs-3"></i>
+  </a>
+  
+  <h2 class="fw-bold mb-0">{{data.name}}</h2>
+</div>
+
+<div class="row gx-4 gy-4">
+  <!-- Einspaltiges Layout auf halber Seitenbreite -->
+  <div class="col-12 col-md-6">
+    <!-- Patientendaten -->
+    <div class="card mb-4 w-100">
+      <div class="card-header">
+        <h5 class="mb-0">Patientendaten</h5>
+      </div>
+      <div class="card-body overflow-auto" style="max-height: 60vh;">
+        <ul class="list-group list-group-flush mb-0">
+          <li class="list-group-item">
+            <strong class="me-3">Geburtsdatum:</strong> {{formatDate data.dob}}
+          </li>
+          <li class="list-group-item">
+            <strong class="me-3">Geschlecht:</strong> {{data.gender}}
+          </li>
+          <li class="list-group-item">
+            <strong class="me-3">Adresse:</strong> {{data.adresse}}
+          </li>
+          <li class="list-group-item">
+            <strong class="me-3">Krankenkasse:</strong> {{data.krankenkasse}}
+          </li>
+          <li class="list-group-item">
+            <strong class="me-3">Aktuelle Symptome:</strong>
+            {{#if symptoms}}
+              {{#each symptoms}}
+                {{this}}{{#unless @last}}, {{/unless}}
+              {{/each}}
+            {{else}}–{{/if}}
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Ergebnisse mit dynamischen Inhalten oder Platzhaltern -->
+    <div class="card w-100">
+      <div class="card-header">
+        <h5 class="mb-0">Ergebnisse</h5>
+      </div>
+      <div class="card-body overflow-auto" style="max-height: 60vh;">
+        <ul class="list-group list-group-flush mb-0">
+          <!-- Diagnosen -->
+          <li class="list-group-item">
+            <strong class="me-3">Mögliche Diagnosen:</strong>
+            {{#if diagnosis}}
+              {{#each diagnosis}}
+                {{this}}{{#unless @last}}, {{/unless}}
+              {{/each}}
+            {{else}}–{{/if}}
+          </li>
+
+          <!-- Triagestufe -->
+          <li class="list-group-item">
+            <strong class="me-3">Triagestufe:</strong>
+            {{#if triage}}{{triage}}{{else}}–{{/if}}
+          </li>
+
+          <!-- Untersuchungen -->
+          <li class="list-group-item">
+            <strong class="me-3">Untersuchungen:</strong>
+            {{#if exams}}
+              <ul class="mt-1 ms-3">
+                {{#each exams}}
+                  <li>{{this.name}} <span class="badge bg-secondary">{{this.priority}}</span></li>
+                {{/each}}
+              </ul>
+            {{else}}–{{/if}}
+          </li>
+
+          <!-- Experten -->
+          <li class="list-group-item">
+            <strong class="me-3">Experten:</strong>
+            {{#if experts}}
+              <ul class="mt-1 ms-3">
+                {{#each experts}}
+                  <li>{{this}}</li>
+                {{/each}}
+              </ul>
+            {{else}}–{{/if}}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

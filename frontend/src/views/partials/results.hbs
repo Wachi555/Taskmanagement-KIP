@@ -1,29 +1,23 @@
 <div class="output-box">
-  <div class="output-header">
-    <h6>Auswertung</h6>
-    <div id="triageIndicator" class="triage-indicator">
-      {{#each levels}}<div class="triage-circle level-{{this}}"></div>{{/each}}
-    </div>
-  </div>
+  <div id="triageIndicator" class="mb-3"></div>
 
   <ul id="resultData" class="list-group list-group-flush mb-0">
     <li class="list-group-item">
-      <strong>Triagestufe:</strong> <span id="triageValue"></span>
+      <strong class="me-3">Mögliche Diagnosen:</strong> –
     </li>
-    
-    <li class="list-group-item exams-container">
-    <div class="d-flex justify-content-between align-items-center">
-      <strong>Untersuchungen:</strong> 
-      <button id="toggleExams" class="btn btn-sm btn-outline-secondary" aria-expanded="false">
-        <i class="bi bi-chevron-down"></i>
-      </button>
-    </div>
-    <ul id="examsList" class="list-group list-group-flush mt-2"></ul>
-  </li>
-
-    
     <li class="list-group-item">
-      <strong>Experten:</strong> <span id="expertsValue"></span>
+      <strong class="me-3">Triagestufe:</strong> –
+    </li>
+    <li class="list-group-item">
+      <strong class="me-3">Untersuchungen:</strong> –
+    </li>
+    <li class="list-group-item d-block"> <!-- HIER liegt die Lösung -->
+      <strong class="d-block mb-2">Experten:</strong>
+      <ul id="expertsList" class="ps-4 mb-0">
+        <li>–</li>
+      </ul>
     </li>
   </ul>
 </div>
+
+<script src="/js/main.js"></script>

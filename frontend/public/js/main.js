@@ -1,39 +1,15 @@
-// public/js/main.js
-
 document.addEventListener("DOMContentLoaded", () => {
-  setupSidebarToggle();
   setupAnalyzeButton();
-  // setupExamToggle wird in displayExams aufgerufen,
-  // sobald der Button im DOM ist.
+  setupSidebarSearch();
+  setupMoveButtons();
+  setupFullViewSearch();
 });
-
-// Sidebar ein-/ausblenden
-function setupSidebarToggle() {
-  const toggleBtn = document.getElementById("toggle-sidebar");
-  const sidebar = document.getElementById("sidebar");
-  
-  if (!toggleBtn || !sidebar) return;
-  
-  // Klick-Handler
-  toggleBtn.addEventListener("click", () => {
-    sidebar.classList.toggle("collapsed");
-    localStorage.setItem(
-      'sidebarCollapsed',
-      sidebar.classList.contains('collapsed')
-    );
-  });
-  
-  // Status beim Laden wiederherstellen
-  if (localStorage.getItem('sidebarCollapsed') === 'true') {
-    sidebar.classList.add('collapsed');
-  }
-}
 
 // Analyse-Button-Setup
 function setupAnalyzeButton() {
   const processBtn = document.getElementById("process-btn");
   if (!processBtn) return;
-  
+
   processBtn.addEventListener("click", async () => {
     try {
       await processInput();
@@ -44,7 +20,149 @@ function setupAnalyzeButton() {
   });
 }
 
-// Hauptanalysefunktion
+function setupMoveButtons() {
+  const waitingPane = document.getElementById("pane-waiting");
+  const activeList  = document.getElementById("active-patient-list");
+
+  if (!waitingPane || !activeList) return;
+
+  waitingPane.addEventListener("click", (e) => {
+    const btn = e.target.closest(".move-to-active");
+    if (!btn) return;
+
+    const name   = btn.getAttribute("data-name");
+    const triage = btn.getAttribute("data-triage");
+    const listItem = btn.closest("li");
+    if (!name || !triage || !listItem) return;
+
+    // entferne "Keine aktiven Patienten"-Hinweis, falls vorhanden
+    const hint = activeList.querySelector("li.text-muted");
+    if (hint) hint.remove();
+
+    // Prüfen, ob der Patient schon in der Liste ist
+    const already = [...activeList.querySelectorAll("a")]
+      .some(a => a.textContent.trim() === name);
+    if (already) return;
+
+    // Hier bestimmen wir die Ziel-URL je nach aktuellem Pfad
+    let href;
+    if (window.location.pathname.startsWith("/coordination")) {
+      // Coordination → patient-input
+      href = `/patient/${encodeURIComponent(name)}`;
+    } else {
+      // Registration (oder sonst) → patient-overview
+      href = `/patient/${encodeURIComponent(name)}/overview`;
+    }
+
+    // neues Listenelement bauen
+    const newItem = document.createElement("li");
+    newItem.className = "list-group-item d-flex justify-content-between align-items-center";
+    newItem.innerHTML = `
+      <a href="${href}" class="text-decoration-none patient-name">${name}</a>
+      <span class="triage-indicator ms-2">
+        <span class="triage-circle level-${triage} active"></span>
+      </span>
+    `;
+    activeList.appendChild(newItem);
+
+    // altes Element aus "Wartend" entfernen
+    listItem.remove();
+
+    // Falls danach keine wartenden Patienten mehr da sind, Hinweis einfügen
+    const remaining = waitingPane.querySelectorAll("ul.list-group > li:not(.text-muted)");
+    if (remaining.length === 0) {
+      const noRes = document.createElement("li");
+      noRes.className = "list-group-item text-muted text-center";
+      noRes.textContent = "Keine wartenden Patienten";
+      waitingPane.querySelector("ul.list-group").appendChild(noRes);
+    }
+  });
+}
+
+
+// Sidebar-Suche
+function setupSidebarSearch() {
+  const searchInput = document.getElementById("sidebar-search");
+  const tabList = document.getElementById("sidebarTabs");
+  if (!searchInput || !tabList) return;
+
+  function filterSidebarList() {
+    const filter = searchInput.value.trim().toLowerCase();
+    const activePane = document.querySelector(".tab-pane.show.active") || document.querySelector(".waiting-patients, .active-patients");
+    if (!activePane) return;
+
+    const listItems = activePane.querySelectorAll("li.list-group-item");
+    let anyVisible = false;
+
+    activePane.querySelectorAll(".no-results").forEach(e => e.remove());
+
+    listItems.forEach(li => {
+      if (li.classList.contains("no-results")) return;
+
+      const nameEl = li.querySelector(".patient-name, a");
+      const text = nameEl ? nameEl.textContent.trim().toLowerCase() : "";
+
+      if (filter === "" || text.includes(filter)) {
+        li.style.display = "";
+        anyVisible = true;
+      } else {
+        li.style.display = "none";
+      }
+    });
+
+    if (!anyVisible) {
+      const noRes = document.createElement("li");
+      noRes.className = "list-group-item text-center text-muted no-results";
+      noRes.textContent = "Keine Patienten gefunden.";
+      activePane.querySelector(".list-group").appendChild(noRes);
+    }
+  }
+
+  searchInput.addEventListener("input", filterSidebarList);
+  tabList.addEventListener("shown.bs.tab", () => {
+    searchInput.value = "";
+    filterSidebarList();
+  });
+}
+
+// Suche im Hauptbereich (inkl. Alle/Wartende/Aktive)
+function setupFullViewSearch() {
+  const all = document.querySelector("#search-all input");
+  const waiting = document.querySelector("#search-waiting input");
+  const active = document.querySelector("#search-active input");
+
+  if (all) {
+    all.addEventListener("input", () => {
+      const filter = all.value.trim().toLowerCase();
+      document.querySelectorAll(".col-md-6.border-end ul.list-group > li").forEach(li => {
+        const name = (li.querySelector(".patient-name") || li).textContent.trim().toLowerCase();
+        li.style.display = name.includes(filter) ? "" : "none";
+      });
+    });
+  }
+
+  if (waiting) {
+    waiting.addEventListener("input", () => {
+      const filter = waiting.value.trim().toLowerCase();
+      document.querySelectorAll("#pane-waiting ul.list-group > li").forEach(li => {
+        const name = (li.querySelector(".patient-name") || li).textContent.trim().toLowerCase();
+        li.style.display = name.includes(filter) ? "" : "none";
+      });
+    });
+  }
+
+  if (active) {
+    active.addEventListener("input", () => {
+      const filter = active.value.trim().toLowerCase();
+      document.querySelectorAll("#active-patient-list > li").forEach(li => {
+        const name = (li.querySelector(".patient-name, a") || li).textContent.trim().toLowerCase();
+        li.style.display = name.includes(filter) ? "" : "none";
+      });
+    });
+  }
+}
+
+// Analyse-Funktionen
 async function processInput() {
   const text = document.getElementById("inputText").value.trim();
   if (!text) {
@@ -59,9 +177,9 @@ async function processInput() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text })
     });
-    if (!response.ok) {
-      throw new Error(`Serverfehler: ${response.status}`);
-    }
+
+    if (!response.ok) throw new Error(`Serverfehler: ${response.status}`);
+
     const data = await response.json();
     displayResults(data);
   } catch (error) {
@@ -72,127 +190,132 @@ async function processInput() {
   }
 }
 
-// Ergebnisse anzeigen
-function displayResults(data) {
+function displayResults(result) {
   resetResults();
-  displayPatientData(data.data);
-  displayTriageLevel(data.triage);
-  displayExams(data.exams);
-  displayExperts(data.experts);
+  displayDiagnosis(result.diagnosis);
+  displayTriageLevel(result.triage);
+  displayExams(result.exams);
+  displayExperts(result.experts);
 }
 
-// Ergebnisse zurücksetzen
 function resetResults() {
-  document.getElementById("patientData").innerHTML = "";
   document.getElementById("resultData").innerHTML = "";
-  document.getElementById("triageIndicator").innerHTML = "";
 }
 
-// Patientendaten anzeigen
-function displayPatientData(patientData) {
-  const patientUl = document.getElementById("patientData");
-  Object.entries(patientData).forEach(([key, val]) => {
-    const li = document.createElement("li");
-    li.className = "list-group-item";
-    li.innerHTML = `<strong>${key}:</strong> ${val}`;
-    patientUl.appendChild(li);
-  });
-}
 
-// Triagestufe anzeigen
-function displayTriageLevel(triageLevel) {
-  const triageContainer = document.getElementById("triageIndicator");
-  const resultUl = document.getElementById("resultData");
+function displayDiagnosis(diagnosis) {
+  if (!diagnosis?.length) return;
+  const ul = document.getElementById("resultData");
 
-  // Kreise
-  [1,2,3,4,5].forEach(level => {
-    const circle = document.createElement("div");
-    circle.className = `triage-circle level-${level} ${
-      level === triageLevel ? 'active' : ''
-    }`;
-    circle.title = `Triagestufe ${level}`;
-    triageContainer.appendChild(circle);
-  });
+  // Nur die Namen, kommagetrennt
+  const names = diagnosis.map(d => d.name).join(", ");
 
-  // Text
+  // Baue das LI analog zu displayExperts auf
   const li = document.createElement("li");
   li.className = "list-group-item";
-  li.innerHTML = `<strong>Triagestufe:</strong> ${triageLevel}`;
-  resultUl.appendChild(li);
+  li.innerHTML = `
+    <strong class="me-2">Mögliche Diagnosen:</strong>
+    ${names}
+  `;
+  ul.appendChild(li);
 }
 
-// Untersuchungen anzeigen
-function displayExams(exams) {
-  const resultUl = document.getElementById("resultData");
+
+
+function displayTriageLevel(triageLevel) {
+  const triageContainer = document.getElementById("triageIndicator");
+  triageContainer.innerHTML = "";
+  const circle = document.createElement("div");
+  circle.className = `triage-circle level-${triageLevel} active`;
+  circle.title = `Triagestufe ${triageLevel}`;
+  triageContainer.appendChild(circle);
+
   const li = document.createElement("li");
-  li.className = "list-group-item exams-container";
+  li.className = "list-group-item";
+  li.innerHTML = `<strong class="me-2">Triagestufe:</strong> ${triageLevel}`;
+  document.getElementById("resultData").appendChild(li);
+}
+function displayExams(exams) {
+  const ul = document.getElementById("resultData");
 
-  li.innerHTML = `
-    <div class="d-flex justify-content-between align-items-center">
-      <strong>Untersuchungen:</strong>
-      <button id="toggleExams"
-              class="btn btn-sm btn-outline-secondary"
-              aria-expanded="false">
-        <i class="bi bi-chevron-down"></i>
-      </button>
-    </div>
-    <ul id="examsList" class="list-group list-group-flush mt-2"></ul>
-  `;
-  resultUl.appendChild(li);
+  // Neues Listenelement für Untersuchungen
+  const li = document.createElement("li");
+  li.className = "list-group-item d-block"; // HIER die Korrektur!
 
-  const examsList = li.querySelector("#examsList");
-  exams.forEach((exam, idx) => {
+  // Label (Überschrift)
+  const label = document.createElement("strong");
+  label.className = "d-block mb-2";
+  label.textContent = "Untersuchungen:";
+  li.appendChild(label);
+
+  // Liste immer sichtbar, mit Checkboxen
+  const examsList = document.createElement("ul");
+  examsList.className = "list-group list-group-flush";
+
+  exams.forEach((e, idx) => {
     const item = document.createElement("li");
-    item.className = "list-group-item d-flex align-items-center";
-    item.innerHTML = `
-      <input class="form-check-input me-2"
-             type="checkbox"
-             id="exam-${idx}" />
-      <label class="form-check-label flex-grow-1"
-             for="exam-${idx}">
-        ${exam}
-      </label>
-    `;
+    item.className = "list-group-item d-flex justify-content-between align-items-center";
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "form-check";
+
+    const checkbox = document.createElement("input");
+    checkbox.className = "form-check-input";
+    checkbox.type = "checkbox";
+    const safeId = `exam-${idx}`;
+    checkbox.id = safeId;
+
+    const chkLabel = document.createElement("label");
+    chkLabel.className = "form-check-label";
+    chkLabel.htmlFor = safeId;
+    chkLabel.textContent = e.name;
+
+    wrapper.appendChild(checkbox);
+    wrapper.appendChild(chkLabel);
+
+    const badge = document.createElement("span");
+    badge.className = "badge bg-secondary";
+    badge.textContent = e.priority;
+
+    item.appendChild(wrapper);
+    item.appendChild(badge);
+
     examsList.appendChild(item);
   });
 
-  // Toggle-Listener erst nach DOM-Befüllung
-  setupExamToggle();
+  li.appendChild(examsList);
+  ul.appendChild(li);
 }
 
-// Toggle-Button für Untersuchungen
-function setupExamToggle() {
-  const btn  = document.getElementById("toggleExams");
-  const list = document.getElementById("examsList");
-  if (!btn || !list) return;
 
-  btn.addEventListener("click", () => {
-    const expanded = btn.getAttribute("aria-expanded") === "true";
-    btn.setAttribute("aria-expanded", String(!expanded));
-    list.classList.toggle("open");
-  });
-}
 
-// Experten anzeigen
 function displayExperts(experts) {
   const li = document.createElement("li");
-  li.className = "list-group-item";
+  li.className = "list-group-item d-block"; // <-- HIER KORREKTUR
+
   li.innerHTML = `
-    <strong>Experten:</strong>
-    ${experts.length ? experts.join(", ") : "–"}
+    <strong class="d-block mb-2">Experten:</strong>
+    <ul class="mt-1 ms-3">
+      ${experts.length
+        ? experts.map(e => `<li>${e}</li>`).join("")
+        : "<li>–</li>"
+      }
+    </ul>
   `;
+
   document.getElementById("resultData").appendChild(li);
 }
 
-// Ladeanzeige
+
+
+
 function showLoading(show) {
-  const spinner    = document.getElementById("loading-spinner");
+  const spinner = document.getElementById("loading-spinner");
   const processBtn = document.getElementById("process-btn");
   if (spinner) spinner.style.display = show ? "inline-block" : "none";
   if (processBtn) processBtn.disabled = show;
 }
 
-// Fehlermeldung anzeigen
 function showError(message) {
   const resultUl = document.getElementById("resultData");
   resultUl.innerHTML = `

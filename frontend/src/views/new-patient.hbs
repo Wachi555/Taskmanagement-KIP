@@ -1,0 +1,72 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+      <div class="card shadow">
+        <div class="card-header text-center bg-primary text-white">
+          <h4>Neuen Patienten anlegen</h4>
+        </div>
+        <div class="card-body">
+          <form action="/new-patient" method="POST">
+            <!-- Name -->
+            <div class="mb-3">
+              <label for="Vorname" class="form-label">Vorame</label>
+              <input type="text" class="form-control" id="vorname" name="firstname" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="Nachname" class="form-label">Nachname</label>
+              <input type="text" class="form-control" id="nachname" name="surname" required>
+            </div>
+
+            <!-- Geburtsdatum -->
+            <div class="mb-3">
+              <label for="birthdate" class="form-label">Geburtsdatum</label>
+              <input type="date" class="form-control" id="birthdate" name="birthdate" required>
+            </div>
+
+            <!-- Symptome -->
+            <div class="mb-3">
+              <label for="symptoms" class="form-label">Symptome</label>
+              <textarea class="form-control" id="symptoms" name="symptoms" rows="3" required></textarea>
+            </div>
+
+            <!-- Triage -->
+            <div class="mb-3">
+              <label for="triage" class="form-label">Triage-Stufe</label>
+              <select class="form-select" id="triage" name="triage" required>
+                <option value="" disabled selected>Bitte auswählen</option>
+                <option value="1">1 – Lebensbedrohlich</option>
+                <option value="2">2 – Sehr dringend</option>
+                <option value="3">3 – Dringend</option>
+                <option value="4">4 – Weniger dringend</option>
+                <option value="5">5 – Nicht dringend</option>
+              </select>
+            </div>
+
+            <!-- Adresse -->
+            <div class="mb-3">
+              <label for="address" class="form-label">Adresse</label>
+              <input type="text" class="form-control" id="address" name="address" required>
+            </div>
+
+            <!-- Krankenkasse -->
+            <div class="mb-4">
+              <label for="insurance" class="form-label">Krankenkasse</label>
+              <input type="text" class="form-control" id="insurance" name="insurance" required>
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex justify-content-between">
+              <a href="/registration" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Zurück
+              </a>
+              <button type="submit" class="btn btn-success">
+                <i class="bi bi-check-circle"></i> Anlegen
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,4 +1,22 @@
 <div class="output-box">
-  <h6>Patientendaten</h6>
-  <ul id="patientData" class="list-group list-group-flush mb-0"> </ul>
+  <ul class="list-group list-group-flush mb-0">
+    <li class="list-group-item">
+      <strong class="me-3">Name:</strong> {{data.name}}
+    </li>
+    <li class="list-group-item">
+      <strong class="me-2">Triagestufe:</strong> {{data.triage}}
+    </li>
+    <li class="list-group-item">
+      <strong class="me-2">Geburtsdatum:</strong> {{data.dob}}
+    </li>
+    <li class="list-group-item">
+      <strong class="me-2">Geschlecht:</strong> {{data.gender}}
+    </li>
+    <li class="list-group-item">
+      <strong class="me-2">Adresse:</strong> {{data.adresse}}
+    </li>
+    <li class="list-group-item">
+      <strong class="me-2">Krankenkasse:</strong> {{data.krankenkasse}}
+    </li>
+  </ul>
 </div>

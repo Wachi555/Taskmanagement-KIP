@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{appName}}</title>
+
+  <!-- Bootstrap & Icons -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    rel="stylesheet"
+  />
+  <link href="/css/style.css" rel="stylesheet" />
+</head>
+
+<body>
+  {{> header}}
+
+  <div id="page-wrapper" class="d-flex">
+    <!-- Offcanvas Sidebar von links -->
+    <div
+      class="offcanvas offcanvas-start"
+      tabindex="-1"
+      id="sidebar"
+      aria-labelledby="sidebarLabel"
+    >
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="sidebarLabel">Patienten</h5>
+        <button
+          type="button"
+          class="btn-close text-reset"
+          data-bs-dismiss="offcanvas"
+          aria-label="Schließen"
+        ></button>
+      </div>
+
+      <div class="offcanvas-body">
+        <!-- Nav-Pills / Tabs -->
+        <ul class="nav nav-pills mb-3" id="sidebarTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link active"
+              id="tab-waiting"
+              data-bs-toggle="tab"
+              data-bs-target="#pane-waiting"
+              type="button"
+              role="tab"
+              aria-controls="pane-waiting"
+              aria-selected="true"
+            >
+              Wartende
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link"
+              id="tab-active"
+              data-bs-toggle="tab"
+              data-bs-target="#pane-active"
+              type="button"
+              role="tab"
+              aria-controls="pane-active"
+              aria-selected="false"
+            >
+              In Behandlung
+            </button>
+          </li>
+        </ul>
+
+        <!-- Suche -->
+        <div class="mb-3">
+          <input
+            type="text"
+            id="sidebar-search"
+            class="form-control"
+            placeholder="Patient suchen…"
+          />
+        </div>
+
+        <!-- Pane-Inhalte -->
+        <div class="tab-content" id="sidebarTabsContent">
+          {{> sidebar}}
+        </div>
+      </div>
+    </div>
+
+    <!-- Hauptinhalt -->
+    <main id="main-content" class="flex-grow-1 overflow-auto">
+      <div class="container-fluid h-100 py-3">
+        {{{body}}}
+      </div>
+    </main>
+  </div>
+
+  <!-- Bootstrap JS + dein main.js -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+  ></script>
+  <script src="/js/main.js"></script>
+</body>
+</html>

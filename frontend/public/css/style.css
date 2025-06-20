@@ -1,241 +1,391 @@
-/* Basis-Reset */
+/* ===== BASIS-RESET & GLOBALE EINSTELLUNGEN ===== */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  font-family: inherit;
 }
 
-/* Vollseiten-Layout */
 html, body {
   height: 100%;
-  font-family: Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  color: #333;
+  overflow-x: hidden;
 }
-body {
-  display: flex;
-  flex-direction: column;
+
+/* ===== ANMELDEMASKE (INDEX.HBS) ===== */
+body.no-scroll {
   overflow: hidden;
 }
 
-/* Wrapper für Sidebar + Main */
+.index-fullscreen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+}
+
+.fixed-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  max-width: 1400px;
+  height: 90%;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #f8f9fa;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.left-image {
+  flex: 1;
+  min-height: 300px;
+}
+
+.left-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.right-selection {
+  flex: 1;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.right-selection h1 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.right-selection .button-group {
+  width: 100%;
+  max-width: 400px;
+}
+
+.right-selection .btn {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  border-radius: 5px;
+}
+
+/* ===== NAVBAR ===== */
+.navbar {
+  min-height: 56px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ===== SIDEBAR & MAIN CONTENT ===== */
 #page-wrapper {
   display: flex;
   height: calc(100vh - 56px);
-  overflow: hidden;
 }
 
-/* SIDEBAR */
 #sidebar {
-  width: 500px;      /* feste Breite in Pixeln */
-  min-width: 400px;  /* Mindestbreite */
-  transition: width 0.3s;
+  width: 400px;
+  min-width: 300px;
   overflow-y: auto;
-  background-color: #f8f9fa;
   border-right: 1px solid #dee2e6;
+  background-color: #f8f9fa;
+  padding: 1rem;
+  transition: all 0.3s ease;
 }
+
 #sidebar.collapsed {
   width: 0;
-  min-width: 0;
-  border-right: none;
+  padding: 0;
+  border: none;
   overflow: hidden;
 }
-#sidebar button#add-patient {
-  display: block;
-  width: 100%;
-  margin: 1rem 0;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  text-align: center;
-}
+
 #sidebar h5 {
-  padding: 1rem 1rem 0.5rem;
-}
-
-/* ––– Patientenliste: nur list-group ––– */
-#sidebar ul.list-group {
-  list-style: none;
+  padding-bottom: 0.5rem;
   margin-bottom: 1rem;
-}
-#sidebar ul.list-group li {
-  padding: 0.5rem 1rem;
-  border-bottom: 1px solid #eee;
-  cursor: pointer;
-}
-#sidebar ul.list-group li:last-child {
-  border-bottom: none;
+  border-bottom: 1px solid #dee2e6;
 }
 
-/* MAIN-CONTENT */
 #main-content {
   flex: 1;
   overflow-y: auto;
-  padding: 1rem;
+  padding: 1.5rem;
+  background-color: #fff;
 }
+
 #scrollable-content {
   display: flex;
-  gap: 1rem;
-  height: 100%;
-}
-
-/* INPUT-BEREICH */
-#input-section {
-  flex: 2;
-  display: flex;
-  flex-direction: column;
-}
-#input-section h5 {
-  margin-bottom: 0.75rem;
-}
-#input-section textarea {
-  flex: 1;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  resize: vertical;
-}
-#input-section .form-label {
-  margin-top: 1rem;
-  margin-bottom: 0.25rem;
-  font-weight: bold;
-}
-#input-section button {
-  margin-top: 1rem;
-  align-self: flex-start;
-}
-
-/* OUTPUT-BEREICH (1/3 Breite) */
-#output-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 1rem;
 }
 
-/* JEDE OUTPUT-BOX */
-.output-box {
-  flex: 1;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-/* Kopfzeile allgemein: wie Patientendaten */
-.output-box > h6 {
-  margin: 0;
-  padding: 0.75rem 1rem;
-  background-color: #f8f9fa;
-  border-top-left-radius: 0.5rem;
-  border-top-right-radius: 0.5rem;
-  border-bottom: 1px solid #ccc;
+/* ===== FORMULARE & INPUTS ===== */
+.form-label {
   font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: block;
 }
 
-/* Wrapper für Titel + Kreise (Auswertung) */
-.output-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
-  background-color: #f8f9fa;
-  padding: 0.75rem 1rem;
-  border-top-left-radius: 0.5rem;
-  border-top-right-radius: 0.5rem;
-  border-bottom: 1px solid #ccc;
-}
-.output-header > h6 {
-  margin: 0;
-  font-weight: bold !important;
-  padding: 0;
-  background: none;
+.form-control,
+.form-select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
 }
 
-/* Inhalt unterhalb der Kopfzeile */
-.output-box > *:not(.output-header):not(h6) {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
-}
-
-/* Triagestufen-Kreise */
-.triage-indicator {
-  display: flex;
-  gap: 0.5rem;
-  margin: 0;
-}
-.triage-circle {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 2px solid #ccc;
+/* ===== BUTTONS ===== */
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
   transition: all 0.2s;
 }
-/* Rahmenfarben */
+
+.btn-primary {
+  background-color: #0d6efd;
+  color: white;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #0b5ed7;
+}
+
+.btn-icon-only {
+  height: 26px;
+  width: 26px;
+  font-size: 0.85rem;
+  padding: 0.15rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: transparent;
+  color: #6c757d;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-icon-only:hover {
+  background-color: darkgray;
+  color: white;
+  border-color: white;
+}
+
+
+
+
+/* ===== TRIAGE ===== */
+.triage-indicator {
+  display: inline-flex;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.triage-circle {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  cursor: pointer;
+}
+
 .triage-circle.level-1 { border-color: #dc3545; }
 .triage-circle.level-2 { border-color: #fd7e14; }
 .triage-circle.level-3 { border-color: #ffc107; }
 .triage-circle.level-4 { border-color: #28a745; }
 .triage-circle.level-5 { border-color: #007bff; }
-/* Ausgefüllte Kreise */
+
 .triage-circle.active.level-1 { background-color: #dc3545; }
 .triage-circle.active.level-2 { background-color: #fd7e14; }
 .triage-circle.active.level-3 { background-color: #ffc107; }
 .triage-circle.active.level-4 { background-color: #28a745; }
 .triage-circle.active.level-5 { background-color: #007bff; }
 
-/* ––– Nav-Pills Override: horizontales Layout & gleichmäßige Breite ––– */
-#sidebar .nav.nav-pills {
-  display: flex !important;
-  width: 100% !important;     /* nimmt volle Sidebar-Breite ein */
-  padding-left: 0;
-  margin-bottom: 1rem;
+.triage-circle.active {
+  border-width: 3px;
 }
 
-#sidebar .nav-pills .nav-item {
-  flex: 1 1 auto;             /* teilt die Breite gleich auf alle Items auf */
+/* ===== RESPONSIVE ===== */
+@media (max-width: 992px) {
+  .fixed-container {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .left-image,
+  .right-selection {
+    width: 100%;
+    height: auto;
+  }
+
+  .left-image {
+    height: 30vh;
+  }
+
+  .right-selection {
+    padding: 1.5rem;
+  }
+
+  #sidebar {
+    width: 100%;
+    position: fixed;
+    z-index: 1000;
+    max-height: 50vh;
+    bottom: 0;
+    left: 0;
+  }
+
+  #main-content {
+    padding-bottom: 2rem;
+  }
 }
 
+#sidebar ul.list-group li {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+#sidebar ul.list-group li:hover {
+  background-color: #e9ecef;
+}
+
+.list-group-item {
+  padding-top: 0.4rem !important;
+  padding-bottom: 0.4rem !important;
+  display: flex;
+  align-items: center;
+  min-height: 44px; /* einheitlich erzwingen */
+}
+
+
+.toggle-search {
+  border: none;
+  background: none;
+  color: #6c757d;
+  font-size: 1.25rem;
+  padding: 0.25rem;
+  cursor: pointer;
+}
+
+.btn-icon-only:hover {
+  background-color: transparent;
+  border: none;
+  color: inherit;
+}
+
+/* Home-Button: weißer Hintergrund, keine Outline/Box-Shadow im Fokus */
+header .btn-outline-secondary.home-btn {
+  background-color: #fff;
+}
+
+header .btn-outline-secondary.home-btn:focus,
+header .btn-outline-secondary.home-btn:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Hover: leichte Outline */
+header .btn-outline-secondary.home-btn:hover {
+  outline: 1px solid rgba(108,117,125,0.5);
+}
+
+/* Offcanvas-Basisbreite */
+.offcanvas-start {
+  width: 280px;
+}
+
+/* Tab-Styling: keine blaue Füllung, sondern Unterstreichung */
 #sidebar .nav-pills .nav-link {
+  background-color: transparent;
+  color: #495057;
+  border-radius: 0;
+  margin-right: 0.5rem;
+}
+
+#sidebar .nav-pills .nav-link.active {
+  background-color: transparent;
+  color: #0d6efd;
+  border-bottom: 2px solid #0d6efd;
+}
+
+/* 1. Grundlegendes: li-Elemente normal umbrechen */
+.output-box .list-group-item {
+  white-space: normal;           /* Zeilenumbruch bei Leerzeichen erlauben */
+  overflow-wrap: break-word;     /* lange Wörter umbrechen, falls nötig */
+  word-wrap: break-word;         /* Fallback für ältere Browser */
+}
+
+/* 2. Flex-Container umbrechbar machen */
+.output-box .list-group-item.d-flex {
+  flex-wrap: wrap;               /* erlaubt Umbruch der Flex-Items */
+  align-items: flex-start;       /* Badge oben ausrichten */
+}
+
+/* 3. Erstes Span (Text) darf schrumpfen und umgebrochen werden */
+.output-box .list-group-item.d-flex > span:first-child {
+  flex: 1 1 auto;                /* grow=1, shrink=1, basis=auto */
+}
+
+/* 4. Badge bleibt fix breit und rückt etwas ab */
+.output-box .list-group-item.d-flex > span:last-child {
+  flex: 0 0 auto;                /* grow=0, shrink=0, basis=auto */
+  margin-left: 0.5rem;           /* Abstand zum Text */
+  margin-top: 0.25rem;           /* kleiner vertikaler Ausgleich */
+}
+
+/* Deaktiviert Flex für das Experten-Item */
+.expert-item {
+  display: block !important;
+}
+
+/* Stellt sicher, dass die Liste unter dem Label steht */
+.expert-label-container {
   display: block;
-  width: 100%;                /* füllt das nav-item komplett aus */
-  text-align: center;
-  box-sizing: border-box;
-  white-space: nowrap;
-  border-radius: 0.25rem;
-  padding: 0.5rem 0;          /* nur vertikales Padding */
 }
 
-/* --- Untersuchungen Toggle Styles --- */
-/* Liste initial verstecken */
-#examsList {
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease, opacity 0.2s ease;
+/* Liste: Abstand und Aufzählungspunkte */
+.expert-list {
+  list-style-type: disc;
+  padding-left: 1.5rem; /* Konsistente Einrückung */
+  margin-top: 0.5rem;   /* Abstand zum Label */
 }
-/* Liste geöffnet */
-#examsList.open {
-  max-height: 500px; /* ausreichend für Einträge */
-  opacity: 1;
+
+/* Eigene lila Button-Farbe */
+.btn-purple {
+  background-color: #6f42c1;
+  border-color: #6f42c1;
+  color: #fff;
 }
-/* Pfeil-Icon Transition & Ausrichtung */
-#toggleExams i {
-  display: inline-block;
-  transition: transform 0.2s ease;
-  /* initial: Pfeil zeigt nach rechts */
-  transform: rotate(-90deg);
+
+.btn-purple:hover,
+.btn-purple:focus {
+  background-color: #5a359a;
+  border-color: #5a359a;
+  color: #fff;
 }
-/* nach dem Öffnen: Pfeil nach unten */
-#toggleExams[aria-expanded="true"] i {
-  transform: rotate(0deg);
+
+#expertsList {
+  list-style-type: disc;
 }
 
 
-/* Ein klein wenig mehr Abstand zwischen Checkbox und Label */
-.exams-container .form-check-input {
-  margin-top: 0; /* vertikal mittig zu Text ausrichten */
-}
-.exams-container .form-check-label {
-  margin-bottom: 0; /* verhindert zusätzliche Zeilenhöhe */
-}
+
+
+
+
+
+
