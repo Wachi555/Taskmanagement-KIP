@@ -1,22 +1,31 @@
 <div class="output-box">
   <ul class="list-group list-group-flush mb-0">
     <li class="list-group-item">
-      <strong class="me-3">Name:</strong> {{data.name}}
+      <strong class="me-3">Name:</strong> {{data.first_name}} {{data.last_name}}
     </li>
     <li class="list-group-item">
-      <strong class="me-2">Triagestufe:</strong> {{data.triage}}
+      <strong class="me-2">Triagestufe:</strong> {{data.last_triage_level}}
     </li>
     <li class="list-group-item">
-      <strong class="me-2">Geburtsdatum:</strong> {{data.dob}}
+      <strong class="me-2">Geburtsdatum:</strong> {{data.date_of_birth}}
     </li>
     <li class="list-group-item">
-      <strong class="me-2">Geschlecht:</strong> {{data.gender}}
+      <strong class="me-2">Alter:</strong> {{data.age}}
     </li>
     <li class="list-group-item">
-      <strong class="me-2">Adresse:</strong> {{data.adresse}}
+      <strong class="me-2">Adresse:</strong> {{data.address}}
     </li>
     <li class="list-group-item">
-      <strong class="me-2">Krankenkasse:</strong> {{data.krankenkasse}}
+      <strong class="me-2">Krankenkasse:</strong> {{data.health_insurance}}
+    </li>
+    {{#if data.allergies}}
+    <li class="list-group-item">
+      <strong class="me-2">Allergien:</strong> {{data.allergies}}
+    </li>
+    {{/if}}
+    <li class="list-group-item">
+      <strong class="me-2">Status:</strong> 
+      {{#if data.in_treatment}}In Behandlung{{else if data.is_waiting}}Wartend{{else}}Entlassen{{/if}}
     </li>
   </ul>
 </div>

@@ -364,17 +364,24 @@ header .btn-outline-secondary.home-btn:hover {
   margin-top: 0.5rem;   /* Abstand zum Label */
 }
 
-/* eigene lila Button-Farbe */
+/* Eigene lila Button-Farbe */
 .btn-purple {
-  --bs-btn-bg: #6f42c1;
-  --bs-btn-border-color: #6f42c1;
-  --bs-btn-color: #fff;
+  background-color: #6f42c1;
+  border-color: #6f42c1;
+  color: #fff;
 }
+
 .btn-purple:hover,
 .btn-purple:focus {
-  --bs-btn-bg: #5a359a;
-  --bs-btn-border-color: #5a359a;
+  background-color: #5a359a;
+  border-color: #5a359a;
+  color: #fff;
 }
+
+#expertsList {
+  list-style-type: disc;
+}
+
 
 
 

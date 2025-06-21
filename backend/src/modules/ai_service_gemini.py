@@ -1,7 +1,7 @@
 import json
 import os
 
-from common.models import OutputContent, EvaluationInput, ExtractedContent
+from common.pydantic_models import LLMResult, EvaluationInput, ExtractedContent
 from dotenv import load_dotenv
 from google import genai
 from modules.prompts import extraction_prompt, evaluation_prompt, build_evaluation_input
@@ -40,7 +40,7 @@ def generate_anamnesis_response(input_contents: EvaluationInput) -> str:
             contents=prompt,
             config={
                 "response_mime_type": "application/json",
-                "response_schema": OutputContent,
+                "response_schema": LLMResult,
             },
         )
         if response.text:

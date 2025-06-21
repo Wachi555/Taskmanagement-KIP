@@ -8,12 +8,29 @@
   <ul class="list-group mb-2">
     {{#each waitingPatients}}
       <li class="list-group-item d-flex justify-content-between align-items-center">
-        <span class="patient-name">{{name}}</span>
-        <button
-          class="btn btn-sm btn-outline-primary move-to-active"
-          data-name="{{name}}"
-          data-triage="{{triage}}"
-        >Verschieben</button>
+        <a
+          href="/patient/{{this.id}}"
+          class="patient-name text-decoration-none"
+        >
+          {{this.name}}
+        </a>
+        <span class="d-flex align-items-center">
+          {{#if this.triage}}
+            <span class="triage-indicator me-2">
+              <span class="triage-circle level-{{this.triage}} active"></span>
+            </span>
+          {{/if}}
+          <!-- Button im Icon-Only-Stil wie in Coordination/Registration -->
+          <button
+            class="btn btn-icon-only move-to-active"
+            type="button"
+            data-id="{{this.id}}"
+            data-name="{{this.name}}"
+            data-triage="{{this.triage}}"
+          >
+            <i class="bi bi-arrow-right-circle"></i>
+          </button>
+        </span>
       </li>
     {{/each}}
     {{#unless waitingPatients.length}}
@@ -35,12 +52,18 @@
     {{#each activePatients}}
       <li class="list-group-item d-flex justify-content-between align-items-center">
         <a
-          href="/patient/{{encodeURIComponent name}}"
+          href="/patient/{{this.id}}"
           class="patient-name text-decoration-none"
         >
-          {{name}}
+          {{this.name}}
         </a>
-        <span class="triage-circle level-{{triage}}"></span>
+        <span class="d-flex align-items-center">
+          {{#if this.triage}}
+            <span class="triage-indicator ms-2">
+              <span class="triage-circle level-{{this.triage}} active"></span>
+            </span>
+          {{/if}}
+        </span>
       </li>
     {{/each}}
     {{#unless activePatients.length}}

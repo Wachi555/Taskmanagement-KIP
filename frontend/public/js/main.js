@@ -1,6 +1,20 @@
 import { setupAudioRecorder } from './audio.js';
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const path = window.location.pathname;
+
+    // Nur Dashboard (oder weitere Full-View-Seiten) per JS rendern:
+    if (path === "/dashboard") {
+      await window.patientStore.loadFromBackend();
+      const patients = window.patientStore.getAllDetailed();
+      renderPatientSidebar(patients);
+    }
+  } catch (err) {
+    console.error("Fehler beim Laden der Patienten:", err);
+  }
+
+  // Diese Setups laufen überall und finden deine <button.move-to-active>
   setupAnalyzeButton();
   setupSidebarSearch();
   setupMoveButtons();
@@ -8,7 +22,13 @@ document.addEventListener("DOMContentLoaded", () => {
   setupAudioRecorder();
 });
 
-// Analyse-Button-Setup
+
+
+function getCurrentPatientId() {
+  const match = window.location.pathname.match(/\/patient\/(\d+)/);
+  return match ? parseInt(match[1], 10) : null;
+}
+
 function setupAnalyzeButton() {
   const processBtn = document.getElementById("process-btn");
   if (!processBtn) return;
@@ -23,67 +43,152 @@ function setupAnalyzeButton() {
   });
 }
 
+async function processInput() {
+  const text = document.getElementById("inputText").value.trim();
+  if (!text) {
+    showError("Bitte geben Sie einen Text ein");
+    return;
+  }
+
+  const patientId = getCurrentPatientId();
+  if (!patientId) {
+    showError("Kein Patient ausgewählt.");
+    return;
+  }
+
+  showLoading(true);
+  try {
+    const result = await window.patientStore.analyze(patientId, text);
+    displayResults(result);
+  } catch (error) {
+    showError("Analyse fehlgeschlagen: " + error.message);
+    throw error;
+  } finally {
+    showLoading(false);
+  }
+}
+function renderPatientSidebar(patients) {
+  const waitingList = document.querySelector("#pane-waiting ul.list-group");
+  const activeList  = document.querySelector("#active-patient-list");
+  if (!waitingList || !activeList) return;
+
+  // Listen leeren
+  waitingList.innerHTML = "";
+  activeList.innerHTML  = "";
+
+  // Platzhalter
+  const noWaiting = document.createElement("li");
+  noWaiting.className = "list-group-item text-muted text-center";
+  noWaiting.textContent = "Keine wartenden Patienten";
+
+  const noActive = document.createElement("li");
+  noActive.className = "list-group-item text-muted text-center";
+  noActive.textContent = "Keine aktiven Patienten";
+
+  let waitingAdded = false;
+  let activeAdded  = false;
+
+  patients.forEach(p => {
+    const fullName = `${p.first_name} ${p.last_name}`;
+    const triage   = p.last_triage_level ?? "-";
+
+    const li = document.createElement("li");
+    li.className = "list-group-item d-flex justify-content-between align-items-center";
+
+    const a = document.createElement("a");
+    // Hier ändern wir den Link auf /patient/:id statt /overview
+    a.href        = `/patient/${p.id}`;
+    a.className   = "text-decoration-none patient-name";
+    a.textContent = fullName;
+
+    const triageSpan = document.createElement("span");
+    triageSpan.className = "triage-indicator ms-2";
+    triageSpan.innerHTML = `<span class="triage-circle level-${triage} active"></span>`;
+
+    li.appendChild(a);
+    li.appendChild(triageSpan);
+
+    if (p.is_waiting) {
+      waitingList.appendChild(li);
+      waitingAdded = true;
+    } else if (p.in_treatment) {
+      activeList.appendChild(li);
+      activeAdded = true;
+    }
+  });
+
+  if (!waitingAdded) waitingList.appendChild(noWaiting);
+  if (!activeAdded)  activeList.appendChild(noActive);
+}
+
+
 function setupMoveButtons() {
   const waitingPane = document.getElementById("pane-waiting");
-  const activeList  = document.getElementById("active-patient-list");
+  const activeList = document.getElementById("active-patient-list");
 
   if (!waitingPane || !activeList) return;
 
-  waitingPane.addEventListener("click", (e) => {
+  waitingPane.addEventListener("click", async (e) => {
     const btn = e.target.closest(".move-to-active");
     if (!btn) return;
 
+    const id     = btn.getAttribute("data-id");
     const name   = btn.getAttribute("data-name");
     const triage = btn.getAttribute("data-triage");
     const listItem = btn.closest("li");
-    if (!name || !triage || !listItem) return;
+    if (!id || !listItem) return;
 
-    // entferne "Keine aktiven Patienten"-Hinweis, falls vorhanden
-    const hint = activeList.querySelector("li.text-muted");
-    if (hint) hint.remove();
+    try {
+      // 1) Backend-Call: Status von wartend (1) → in Behandlung (2)
+      const resp = await fetch(
+        `http://localhost:8000/patient/update_status/${id}/2`,
+        { method: 'GET' }
+      );
+      if (!resp.ok) {
+        const txt = await resp.text();
+        throw new Error(`Status ${resp.status}: ${txt}`);
+      }
 
-    // Prüfen, ob der Patient schon in der Liste ist
-    const already = [...activeList.querySelectorAll("a")]
-      .some(a => a.textContent.trim() === name);
-    if (already) return;
+      // 2) Client-seitig verschieben
+      const hint = activeList.querySelector("li.text-muted");
+      if (hint) hint.remove();
 
-    // Hier bestimmen wir die Ziel-URL je nach aktuellem Pfad
-    let href;
-    if (window.location.pathname.startsWith("/coordination")) {
-      // Coordination → patient-input
-      href = `/patient/${encodeURIComponent(name)}`;
-    } else {
-      // Registration (oder sonst) → patient-overview
-      href = `/patient/${encodeURIComponent(name)}/overview`;
-    }
+      const already = [...activeList.querySelectorAll("a")]
+        .some(a => a.textContent.trim() === name);
+      if (!already) {
+        const href = window.location.pathname.startsWith("/coordination")
+          ? `/patient/${id}`
+          : `/patient/${id}/overview`;
 
-    // neues Listenelement bauen
-    const newItem = document.createElement("li");
-    newItem.className = "list-group-item d-flex justify-content-between align-items-center";
-    newItem.innerHTML = `
-      <a href="${href}" class="text-decoration-none patient-name">${name}</a>
-      <span class="triage-indicator ms-2">
-        <span class="triage-circle level-${triage} active"></span>
-      </span>
-    `;
-    activeList.appendChild(newItem);
+        const newItem = document.createElement("li");
+        newItem.className = "list-group-item d-flex justify-content-between align-items-center";
+        newItem.innerHTML = `
+          <a href="${href}" class="text-decoration-none patient-name">${name}</a>
+          <span class="triage-indicator ms-2">
+            <span class="triage-circle level-${triage} active"></span>
+          </span>
+        `;
+        activeList.appendChild(newItem);
+      }
 
-    // altes Element aus "Wartend" entfernen
-    listItem.remove();
+      // 3) Alt-Item entfernen & evtl. Hinweis wieder anfügen
+      listItem.remove();
+      const remaining = waitingPane.querySelectorAll("ul.list-group > li:not(.text-muted)");
+      if (remaining.length === 0) {
+        const noRes = document.createElement("li");
+        noRes.className = "list-group-item text-muted text-center";
+        noRes.textContent = "Keine wartenden Patienten";
+        waitingPane.querySelector("ul.list-group").appendChild(noRes);
+      }
 
-    // Falls danach keine wartenden Patienten mehr da sind, Hinweis einfügen
-    const remaining = waitingPane.querySelectorAll("ul.list-group > li:not(.text-muted)");
-    if (remaining.length === 0) {
-      const noRes = document.createElement("li");
-      noRes.className = "list-group-item text-muted text-center";
-      noRes.textContent = "Keine wartenden Patienten";
-      waitingPane.querySelector("ul.list-group").appendChild(noRes);
+    } catch (err) {
+      console.error('Fehler beim Verschieben:', err);
+      alert('Patient konnte nicht verschoben werden:\n' + err.message);
     }
   });
 }
 
 
-// Sidebar-Suche
 function setupSidebarSearch() {
   const searchInput = document.getElementById("sidebar-search");
   const tabList = document.getElementById("sidebarTabs");
@@ -128,7 +233,6 @@ function setupSidebarSearch() {
   });
 }
 
-// Suche im Hauptbereich (inkl. Alle/Wartende/Aktive)
 function setupFullViewSearch() {
   const all = document.querySelector("#search-all input");
   const waiting = document.querySelector("#search-waiting input");
@@ -165,34 +269,6 @@ function setupFullViewSearch() {
   }
 }
 
-// Analyse-Funktionen
-async function processInput() {
-  const text = document.getElementById("inputText").value.trim();
-  if (!text) {
-    showError("Bitte geben Sie einen Text ein");
-    return;
-  }
-
-  showLoading(true);
-  try {
-    const response = await fetch("/analyse", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text })
-    });
-
-    if (!response.ok) throw new Error(`Serverfehler: ${response.status}`);
-
-    const data = await response.json();
-    displayResults(data);
-  } catch (error) {
-    showError(error.message);
-    throw error;
-  } finally {
-    showLoading(false);
-  }
-}
-
 function displayResults(result) {
   resetResults();
   displayDiagnosis(result.diagnosis);
@@ -205,25 +281,15 @@ function resetResults() {
   document.getElementById("resultData").innerHTML = "";
 }
 
-
 function displayDiagnosis(diagnosis) {
   if (!diagnosis?.length) return;
   const ul = document.getElementById("resultData");
-
-  // Nur die Namen, kommagetrennt
   const names = diagnosis.map(d => d.name).join(", ");
-
-  // Baue das LI analog zu displayExperts auf
   const li = document.createElement("li");
   li.className = "list-group-item";
-  li.innerHTML = `
-    <strong class="me-2">Mögliche Diagnosen:</strong>
-    ${names}
-  `;
+  li.innerHTML = `<strong class="me-2">Mögliche Diagnosen:</strong> ${names}`;
   ul.appendChild(li);
 }
-
-
 
 function displayTriageLevel(triageLevel) {
   const triageContainer = document.getElementById("triageIndicator");
@@ -241,33 +307,26 @@ function displayTriageLevel(triageLevel) {
 
 function displayExams(exams) {
   const ul = document.getElementById("resultData");
-
-  // Neues Listenelement für Untersuchungen
   const li = document.createElement("li");
-  li.className = "list-group-item";
-
-  // Label
+  li.className = "list-group-item d-block";
   const label = document.createElement("strong");
-  
+  label.className = "d-block mb-2";
   label.textContent = "Untersuchungen:";
   li.appendChild(label);
 
-  // Liste immer sichtbar, mit Checkboxen
   const examsList = document.createElement("ul");
-  examsList.className = "list-group list-group-flush mt-2";
+  examsList.className = "list-group list-group-flush";
 
   exams.forEach((e, idx) => {
     const item = document.createElement("li");
     item.className = "list-group-item d-flex justify-content-between align-items-center";
 
-    // Checkbox + Label
     const wrapper = document.createElement("div");
     wrapper.className = "form-check";
 
     const checkbox = document.createElement("input");
     checkbox.className = "form-check-input";
     checkbox.type = "checkbox";
-    // eindeutige ID für Label-Verknüpfung
     const safeId = `exam-${idx}`;
     checkbox.id = safeId;
 
@@ -279,14 +338,12 @@ function displayExams(exams) {
     wrapper.appendChild(checkbox);
     wrapper.appendChild(chkLabel);
 
-    // Priorität als Badge
     const badge = document.createElement("span");
     badge.className = "badge bg-secondary";
     badge.textContent = e.priority;
 
     item.appendChild(wrapper);
     item.appendChild(badge);
-
     examsList.appendChild(item);
   });
 
@@ -294,26 +351,17 @@ function displayExams(exams) {
   ul.appendChild(li);
 }
 
-
 function displayExperts(experts) {
   const li = document.createElement("li");
-  li.className = "list-group-item";
-
-  // Label und verschachtelte Liste
+  li.className = "list-group-item d-block";
   li.innerHTML = `
-    <strong>Experten:</strong>
+    <strong class="d-block mb-2">Experten:</strong>
     <ul class="mt-1 ms-3">
-      ${experts.length
-        ? experts.map(e => `<li>${e}</li>`).join("")
-        : "<li>–</li>"
-      }
+      ${experts.length ? experts.map(e => `<li>${e}</li>`).join("") : "<li>–</li>"}
     </ul>
   `;
-
   document.getElementById("resultData").appendChild(li);
 }
-
-
 
 function showLoading(show) {
   const spinner = document.getElementById("loading-spinner");
