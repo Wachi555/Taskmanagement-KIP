@@ -57,7 +57,11 @@ def add_patient(patient: InputPatient) -> int:
 # Get a patient by ID
 def get_patient(patient_id: int):
     patient = crud_patients.get_patient_by_id(patient_id)
+    
     if patient:
+        patient_age = calculate_age(patient.date_of_birth)
+        patient.age = patient_age
+        update_patient(patient_id, age=patient_age)  # Update the patient's age in the database
         return patient
     else:
         # TODO: Maybe raise an exception or return a specific error message
@@ -69,6 +73,10 @@ def get_patient(patient_id: int):
 def get_all_patients():
     patients = crud_patients.get_all_patients()
     if patients:
+        for patient in patients:
+            patient_age = calculate_age(patient.date_of_birth)
+            patient.age = patient_age
+            update_patient(patient.id, age=patient_age)
         return patients
     else:
         ...
