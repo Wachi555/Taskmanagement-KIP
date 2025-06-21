@@ -80,7 +80,9 @@
       <!-- Wartende Patienten -->
       <div id="pane-waiting">
         <div class="d-flex justify-content-between align-items-center mb-2">
-          <h4 class="mb-0">Wartende Patienten</h4>
+          <h4 class="mb-0">Wartende Patienten
+          <small class="text-muted">({{waitingPatients.length}})</small>
+          </h4>
           <button
             class="btn btn-icon-only"
             type="button"
@@ -136,7 +138,9 @@
       <!-- Aktive Patienten -->
       <div id="pane-active" class="mt-4">
         <div class="d-flex justify-content-between align-items-center mb-2">
-          <h4 class="mb-0">In Behandlung</h4>
+          <h4 class="mb-0">In Behandlung
+          <small class="text-muted">({{activePatients.length}})</small>
+          </h4>
           <button
             class="btn btn-icon-only"
             type="button"
