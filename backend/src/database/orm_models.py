@@ -98,6 +98,8 @@ class Result(Base):
     __tablename__ = 'results'
     id = Column(Integer, primary_key=True)
     patient_entry_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
+    experts = Column(String, nullable=True)  # JSON or comma-separated list of expert names
+    examinations = Column(String, nullable=True)  # JSON or comma-separated list of examination names
 
 # Unique for each result, but one result can have multiple diagnoses
 class Diagnosis(Base):
