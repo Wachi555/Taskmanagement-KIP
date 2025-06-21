@@ -13,12 +13,10 @@ async function fetchPatientById(id) {
 
 // Detail-Seite für Patienten-Eingabe
 router.get('/patient/:id', async (req, res) => {
-  const id = parseInt(req.params.id);
-
+  const id = parseInt(req.params.id, 10);
   try {
     const result = await fetchPatientById(id);
     const patient = result.patient;
-
     res.render('patient-input', {
       layout: 'patient',
       appName: 'Notaufnahme Universitätsklinikum Regensburg',
@@ -27,40 +25,21 @@ router.get('/patient/:id', async (req, res) => {
       data: patient,
       exams: patient.examinations || [],
       experts: patient.treatments || [],
-      history: patient.history || []
+      history: patient.history || [],
+      errorMessage: null
     });
   } catch (error) {
-    res.status(404).render('404', {
-      layout: 'main',
-      message: 'Patient nicht gefunden'
-    });
-  }
-});
-
-// Patientenübersicht
-router.get('/patient/:id/overview', async (req, res) => {
-  const id = parseInt(req.params.id);
-
-  try {
-    const result = await fetchPatientById(id);
-    const patient = result.patient;
-
-    res.render('patient-overview', {
+    console.error(`Fehler beim Laden des Patienten-Inputs (${id}):`, error);
+    res.render('patient-input', {
       layout: 'patient',
       appName: 'Notaufnahme Universitätsklinikum Regensburg',
       showHome: true,
-      showSidebarToggle: false,
-      data: patient,
-      diagnosis: result.latessult?.diagnosis || [],
-      triage: result.latessult?.triage ?? null,
-      exams: result.latessult?.examinations || [],
-      experts: result.latessult?.treatments || [],
-      symptoms: result.latessult?.symptoms || []
-    });
-  } catch (error) {
-    res.status(404).render('404', {
-      layout: 'main',
-      message: 'Patient nicht gefunden'
+      showSidebarToggle: true,
+      data: {},
+      exams: [],
+      experts: [],
+      history: [],
+      errorMessage: 'Patient nicht gefunden'
     });
   }
 });

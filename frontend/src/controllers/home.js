@@ -14,7 +14,7 @@ async function fetchAllPatients() {
 }
 
 async function fetchPatientById(id) {
-  const res = await fetch(`http://localhost:8000/patients/${id}`);
+  const res = await fetch(`http://localhost:8000/patient/${id}`);
   if (!res.ok) throw new Error("Patient nicht gefunden");
   return await res.json();
 }
@@ -112,8 +112,24 @@ router.get('/registration', async (req, res) => {
 router.get('/coordination', async (req, res) => {
   try {
     const allPatients = await fetchAllPatients();
-    const waitingPatients = allPatients.filter(p => p.is_waiting);
-    const activePatients = allPatients.filter(p => p.in_treatment);
+
+    // Wartende Patienten: id, name, triage
+    const waitingPatients = allPatients
+      .filter(p => p.is_waiting)
+      .map(p => ({
+        id:     p.id,
+        name:   `${p.first_name} ${p.last_name}`,
+        triage: p.last_triage_level
+      }));
+
+    // In Behandlung: id, name, triage
+    const activePatients = allPatients
+      .filter(p => p.in_treatment)
+      .map(p => ({
+        id:     p.id,
+        name:   `${p.first_name} ${p.last_name}`,
+        triage: p.last_triage_level
+      }));
 
     res.render('coordination', {
       layout: 'main',
@@ -124,9 +140,11 @@ router.get('/coordination', async (req, res) => {
       showSidebarToggle: false
     });
   } catch (error) {
+    console.error("Fehler beim Laden der Patienten für Coordination:", error);
     res.status(500).render('500', { message: 'Fehler beim Laden der Patienten' });
   }
 });
+
 
 // Neues Patientenformular
 router.get('/new-patient', (req, res) => {
@@ -297,39 +315,64 @@ router.get('/patient/:id', async (req, res) => {
   }
 });
 
-
-// Patient Overview
+// Patient Overview (Übersicht)
 router.get('/patient/:id/overview', async (req, res) => {
-  const id = parseInt(req.params.id);
-  try {
-    const result = await fetchPatientById(id); // ← das fehlt bei dir gerade!
-    const patient = result.patient;
-    const latestResult = result.latestResult;
+  const id = parseInt(req.params.id, 10);
 
-    res.render('patient-overview', {
+  try {
+    // Daten vom Backend holen
+    const result  = await fetchPatientById(id);
+    const patient = result.patient;
+    const latest  = result.latest_entry || result.latestResult || result.latessult || {};
+
+    const symptoms = (latest.symptoms || '')
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean);
+
+    // Erfolgreiches Rendern
+    return res.render('patient-overview', {
       layout: 'patient',
       appName: 'Notaufnahme Universitätsklinikum Regensburg',
       showHome: true,
       showSidebarToggle: false,
       data: {
-        name: `${patient.first_name} ${patient.last_name}`,
-        dob: patient.date_of_birth,
-        gender: patient.gender || 'unbekannt',
-        adresse: patient.address,
+        name:         `${patient.first_name} ${patient.last_name}`,
+        dob:          patient.date_of_birth,
+        gender:       patient.gender || 'unbekannt',
+        adresse:      patient.address,
         krankenkasse: patient.health_insurance
       },
-      diagnosis: latestResult?.diagnosis || [],
-      triage: latestResult?.triage ?? null,
-      exams: latestResult?.examinations || [],
-      experts: latestResult?.treatments || [],
-      symptoms: (latestResult?.symptoms || '').split(',').map(s => s.trim()).filter(Boolean)
+      diagnosis: latest.diagnosis   || [],
+      triage:    latest.triage      ?? null,
+      exams:     latest.examinations || [],
+      experts:   latest.treatments   || [],
+      symptoms,
+      errorMessage: null
     });
 
   } catch (error) {
-    console.error(error);
-    res.status(404).render('404', { layout: 'main', message: 'Patient nicht gefunden' });
+    console.error(`Fehler beim Laden der Übersicht von Patient ${id}:`, error);
+
+    // ab hier: immer patient-overview rendern – keine 404-Seite
+    return res.render('patient-overview', {
+      layout: 'patient',
+      appName: 'Notaufnahme Universitätsklinikum Regensburg',
+      showHome: true,
+      showSidebarToggle: false,
+      data:      {},
+      diagnosis: [],
+      triage:    null,
+      exams:     [],
+      experts:   [],
+      symptoms:  [],
+      errorMessage: 'Patient nicht gefunden oder fehlerhafte Daten'
+    });
   }
 });
+
+
+
 
 
 module.exports = router;
