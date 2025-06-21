@@ -272,48 +272,81 @@ router.post('/analyse', async (req, res) => {
   }
 });
 
-// Patient Input
+// Patient Input mit Sidebar-Daten
 router.get('/patient/:id', async (req, res) => {
-  const id = parseInt(req.params.id);
+  const id = parseInt(req.params.id, 10);
   try {
-    const result = await fetchPatientById(id);
+    // 1) Patient holen
+    const result  = await fetchPatientById(id);
     const patient = result.patient;
-    const latestEntry = result.latessult; // enthält Symptome, Diagnose etc.
-
-    // Symptome als Array
-    const parsedSymptoms = latestEntry?.symptoms
+    const latestEntry = result.latest_entry || result.latessult || {};
+    const parsedSymptoms = latestEntry.symptoms
       ? latestEntry.symptoms.split(',').map(s => s.trim())
       : [];
 
-    // Historie vorbereiten (z. B. alte Einträge mit Befund + Datum)
-    const transformedHistory = result.history?.map(entry => ({
-      date: entry.entry_date,
-      findings: entry.patient_history
-    })) || [];
+    // 2) Sidebar-Daten wie bei Registration/Coordination
+    const allPatients = await fetchAllPatients();
+    const waitingPatients = allPatients
+      .filter(p => p.is_waiting)
+      .map(p => ({
+        id:     p.id,
+        name:   `${p.first_name} ${p.last_name}`,
+        triage: p.last_triage_level
+      }));
+    const activePatients = allPatients
+      .filter(p => p.in_treatment)
+      .map(p => ({
+        id:     p.id,
+        name:   `${p.first_name} ${p.last_name}`,
+        triage: p.last_triage_level
+      }));
 
+    // 3) Rendern mit Sidebar-Arrays
     res.render('patient-input', {
       layout: 'patient',
       appName: 'Notaufnahme Universitätsklinikum Regensburg',
       showHome: true,
       showSidebarToggle: true,
+
+      // Sidebar
+      waitingPatients,
+      activePatients,
+
+      // Patient-Form-Daten
       data: {
-        name: `${patient.first_name} ${patient.last_name}`,
-        dob: patient.date_of_birth,
-        gender: patient.gender || 'unbekannt', // wenn du kein gender-Feld hast
+        name:    `${patient.first_name} ${patient.last_name}`,
+        dob:     patient.date_of_birth,
+        gender:  patient.gender,
         adresse: patient.address,
         krankenkasse: patient.health_insurance,
         symptoms: parsedSymptoms,
-        history: transformedHistory
-      }
+        history: result.history || []
+      },
+      exams: patient.examinations || [],
+      experts: patient.treatments || []
     });
   } catch (error) {
     console.error("Fehler beim Laden des Patienten:", error);
-    res.status(404).render('404', {
-      layout: 'main',
-      message: 'Patient nicht gefunden'
+    // Auch hier Sidebar-Daten mitgeben, dann nur Leerseiten rendern
+    const allPatients = await fetchAllPatients().catch(() => []);
+    const waitingPatients = allPatients.filter(p => p.is_waiting).map(p=>({ id:p.id, name:`${p.first_name} ${p.last_name}`, triage:p.last_triage_level }));
+    const activePatients = allPatients.filter(p => p.in_treatment).map(p=>({ id:p.id, name:`${p.first_name} ${p.last_name}`, triage:p.last_triage_level }));
+    return res.render('patient-input', {
+      layout: 'patient',
+      appName: 'Notaufnahme Universitätsklinikum Regensburg',
+      showHome: true,
+      showSidebarToggle: true,
+      waitingPatients,
+      activePatients,
+      data:      {},
+      exams:     [],
+      experts:   [],
+      history:   [],
+      errorMessage: 'Patient nicht gefunden'
     });
   }
 });
+
 
 // Patient Overview (Übersicht)
 router.get('/patient/:id/overview', async (req, res) => {
