@@ -1,8 +1,10 @@
 <div class="card mb-3">
   <div class="card-header">Patientendaten</div>
   <ul class="list-group list-group-flush">
-    <li class="list-group-item"><strong>Name:</strong> {{patient.name}}</li>
-    <li class="list-group-item"><strong>Geburtsdatum:</strong> {{patient.dob}}</li>
-    <li class="list-group-item"><strong>Geschlecht:</strong> {{patient.gender}}</li>
+    <li class="list-group-item"><strong>Name:</strong> {{patient.first_name}} {{patient.last_name}}</li>
+    <li class="list-group-item"><strong>Geburtsdatum:</strong> {{patient.date_of_birth}}</li>
+    {{#if patient.gender}}
+      <li class="list-group-item"><strong>Geschlecht:</strong> {{patient.gender}}</li>
+    {{/if}}
   </ul>
 </div>

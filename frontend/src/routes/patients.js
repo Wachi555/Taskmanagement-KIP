@@ -1,59 +1,68 @@
 // frontend/routes/patients.js
 
 const express = require('express');
-const router  = express.Router();
-const store   = require('../models/patient_store');
+const fetch = require('node-fetch').default;
+const router = express.Router();
 
-// Detail-Seite für einen einzelnen Patienten
-router.get('/patient/:name', (req, res, next) => {
-  const name = decodeURIComponent(req.params.name);
-  console.log('Lookup-Name:', name);
+// Einzelnen Patienten vom Backend holen
+async function fetchPatientById(id) {
+  const res = await fetch(`http://localhost:8000/patient/${id}`);
+  if (!res.ok) throw new Error("Patient nicht gefunden");
+  return await res.json();
+}
 
-  // Einzelnen Datensatz per findByName holen
-  const patientData = store.findByName(name);
-  console.log('Gefundener Datensatz:', patientData);
+// Detail-Seite für Patienten-Eingabe
+router.get('/patient/:id', async (req, res) => {
+  const id = parseInt(req.params.id);
 
-  if (!patientData) {
-    // Patient nicht gefunden → 404-Seite
-    return res.status(404).render('404', {
+  try {
+    const result = await fetchPatientById(id);
+    const patient = result.patient;
+
+    res.render('patient-input', {
+      layout: 'patient',
+      appName: 'Notaufnahme Universitätsklinikum Regensburg',
+      showHome: true,
+      showSidebarToggle: true,
+      data: patient,
+      exams: patient.examinations || [],
+      experts: patient.treatments || [],
+      history: patient.history || []
+    });
+  } catch (error) {
+    res.status(404).render('404', {
       layout: 'main',
       message: 'Patient nicht gefunden'
     });
   }
-
-  // Patientendaten-Page mitsamt history
-  res.render('patient-input', {
-    layout: 'patient',
-    appName: 'Notaufnahme Universitätsklinikum Regensburg',
-    showHome: true,
-    showSidebarToggle: true,
-    data: patientData,
-    exams:   patientData.examinations || [],
-    experts: patientData.treatments   || [],
-    history: patientData.history      || []
-  });
 });
 
-// Overview-Route für Patienten-Übersicht
-router.get('/patient/:name/overview', (req, res) => {
-  const name = decodeURIComponent(req.params.name);
-  const all  = store.getAllDetailed();
-  const patientData = all.find(p => p.name === name);
+// Patientenübersicht
+router.get('/patient/:id/overview', async (req, res) => {
+  const id = parseInt(req.params.id);
 
-  if (!patientData) {
-    return res.status(404).render('404', {
+  try {
+    const result = await fetchPatientById(id);
+    const patient = result.patient;
+
+    res.render('patient-overview', {
+      layout: 'patient',
+      appName: 'Notaufnahme Universitätsklinikum Regensburg',
+      showHome: true,
+      showSidebarToggle: false,
+      data: patient,
+      diagnosis: result.latessult?.diagnosis || [],
+      triage: result.latessult?.triage ?? null,
+      exams: result.latessult?.examinations || [],
+      experts: result.latessult?.treatments || [],
+      symptoms: result.latessult?.symptoms || []
+    });
+  } catch (error) {
+    res.status(404).render('404', {
       layout: 'main',
       message: 'Patient nicht gefunden'
     });
   }
-
-  res.render('patient-overview', {
-    layout: 'patient',
-    appName: 'Notaufnahme Universitätsklinikum Regensburg',
-    showHome: true,
-    showSidebarToggle: true,
-    data: patientData
-  });
 });
 
 module.exports = router;
