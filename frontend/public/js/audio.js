@@ -16,9 +16,10 @@ export function setupAudioRecorder() {
   const rerecordBtn = document.getElementById("audio-rerecord-btn");
   const processBtn = document.getElementById("audio-process-btn");
   const transcriptionOutput = document.getElementById("transcription-output");
+  const proccessingBtn = document.getElementById("processing-text-btn");
 
   function setState(state) {
-    [mainBtn, uploadBtn, pauseBtn, continueBtn, stopBtn, rerecordBtn, processBtn].forEach(btn => btn.classList.add("d-none"));
+    [mainBtn, uploadBtn, pauseBtn, continueBtn, stopBtn, rerecordBtn, processBtn, proccessingBtn].forEach(btn => btn.classList.add("d-none"));
     if (state === "idle") {
       mainBtn.classList.remove("d-none");
       uploadBtn.classList.remove("d-none");
@@ -32,7 +33,7 @@ export function setupAudioRecorder() {
       rerecordBtn.classList.remove("d-none");
       processBtn.classList.remove("d-none");
     } else if (state === "processing") {
-      // All buttons hidden during processing
+      proccessingBtn.classList.remove("d-none");
     }
   }
 
