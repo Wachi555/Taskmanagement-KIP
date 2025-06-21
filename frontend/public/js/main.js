@@ -61,16 +61,16 @@ async function processInput() {
     showLoading(false);
   }
 }
-
 function renderPatientSidebar(patients) {
   const waitingList = document.querySelector("#pane-waiting ul.list-group");
-  const activeList = document.querySelector("#active-patient-list");
-
+  const activeList  = document.querySelector("#active-patient-list");
   if (!waitingList || !activeList) return;
 
+  // Listen leeren
   waitingList.innerHTML = "";
-  activeList.innerHTML = "";
+  activeList.innerHTML  = "";
 
+  // Platzhalter
   const noWaiting = document.createElement("li");
   noWaiting.className = "list-group-item text-muted text-center";
   noWaiting.textContent = "Keine wartenden Patienten";
@@ -80,18 +80,19 @@ function renderPatientSidebar(patients) {
   noActive.textContent = "Keine aktiven Patienten";
 
   let waitingAdded = false;
-  let activeAdded = false;
+  let activeAdded  = false;
 
-  patients.forEach((p) => {
+  patients.forEach(p => {
     const fullName = `${p.first_name} ${p.last_name}`;
-    const triage = p.last_triage_level ?? "-";
+    const triage   = p.last_triage_level ?? "-";
 
     const li = document.createElement("li");
     li.className = "list-group-item d-flex justify-content-between align-items-center";
 
     const a = document.createElement("a");
-    a.href = `/patient/${p.id}/overview`;
-    a.className = "text-decoration-none patient-name";
+    // Hier ändern wir den Link auf /patient/:id statt /overview
+    a.href        = `/patient/${p.id}`;
+    a.className   = "text-decoration-none patient-name";
     a.textContent = fullName;
 
     const triageSpan = document.createElement("span");
@@ -111,8 +112,10 @@ function renderPatientSidebar(patients) {
   });
 
   if (!waitingAdded) waitingList.appendChild(noWaiting);
-  if (!activeAdded) activeList.appendChild(noActive);
+  if (!activeAdded)  activeList.appendChild(noActive);
 }
+
+
 function setupMoveButtons() {
   const waitingPane = document.getElementById("pane-waiting");
   const activeList = document.getElementById("active-patient-list");

@@ -25,9 +25,9 @@
     <ul class="list-group">
       {{#each waitingPatients}}
         <li class="list-group-item d-flex justify-content-between align-items-center">
-          <!-- Name jetzt als Link zur Overview -->
+          <!-- Name jetzt als Link zur Patientenseite (ohne /overview) -->
           <a
-            href="/patient/{{this.id}}/overview"
+            href="/patient/{{this.id}}"
             class="text-decoration-none patient-name"
           >
             {{this.name}}
@@ -83,6 +83,7 @@
     <ul id="active-patient-list" class="list-group">
       {{#each activePatients}}
         <li class="list-group-item d-flex justify-content-between align-items-center">
+          <!-- Link führt jetzt auf /patient/{{id}} -->
           <a
             href="/patient/{{this.id}}"
             class="text-decoration-none patient-name"
