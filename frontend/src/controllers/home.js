@@ -23,17 +23,20 @@ async function deletePatientById(id) {
   if (!res.ok) throw new Error(`Löschen fehlgeschlagen (${res.status})`);
 }
 async function updatePatientById(id, payload) {
-  const res = await fetch(`http://localhost:8000/patient/${id}`, {
-    method: 'PATCH',
+  const res = await fetch(`http://localhost:8000/patient/update/${id}`, {
+    method:  'POST',                        // ← hier POST statt PATCH
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
+    body:    JSON.stringify(payload)
   });
   if (!res.ok) {
-    const errorData = await res.json();
-    throw new Error(errorData.detail || `Aktualisierung fehlgeschlagen (${res.status})`);
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || `Aktualisierung fehlgeschlagen (${res.status})`);
   }
-  return await res.json();
+  return res.json();
 }
+
+
+
 
 
 
@@ -395,21 +398,21 @@ router.get('/patient/:id/edit', async (req, res) => {
   }
 });
 
-
-router.patch('/patient/:id', async (req, res) => {
-  const id = Number(req.params.id);
-  
+// server (Port 4000):
+// statt router.patch(...)
+router.post('/patient/update/:id', async (req, res) => {
+  console.log('POST /patient/update/' + req.params.id, 'body=', req.body);
   try {
-    await updatePatientById(id, req.body);
-    res.redirect('/registration');
+    await updatePatientById(Number(req.params.id), req.body);
+    return res.json({ success: true });
   } catch (error) {
-    console.error("Fehler beim Speichern:", error);
-    res.status(500).json({ 
-      success: false,
-      message: error.message
-    });
+    console.error('🚨 Error in POST /patient/update/:id', error);
+    return res.status(500).json({ success: false, message: error.message });
   }
 });
+
+
+
 
 // --- Löschen: Patient entfernen ---
 router.delete('/patient/:id', async (req, res) => {

@@ -117,38 +117,40 @@
 </div>
 
 <script>
-document.getElementById('edit-patient-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  
-  // ID aus dem Formular oder der URL holen
-  const id = {{patient.id}};  // Dies ist der korrekte Weg in Handlebars
-  
-  const formData = {
-    first_name: document.getElementById('first_name').value.trim(),
-    last_name: document.getElementById('last_name').value.trim(),
-    date_of_birth: document.getElementById('date_of_birth').value,
-    address: document.getElementById('address').value.trim(),
-    health_insurance: document.getElementById('health_insurance').value.trim()
-  };
+document
+  .getElementById('edit-patient-form')
+  .addEventListener('submit', async e => {
+    e.preventDefault();
 
-  try {
-    const response = await fetch(`/patient/${id}`, {  // Jetzt wird die korrekte ID verwendet
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData)
-    });
+    const id = {{patient.id}};
+    const formData = {
+      first_name:       document.getElementById('first_name').value.trim(),
+      last_name:        document.getElementById('last_name').value.trim(),
+      date_of_birth:    document.getElementById('date_of_birth').value,
+      address:          document.getElementById('address').value.trim(),
+      health_insurance: document.getElementById('health_insurance').value.trim()
+    };
 
-    if (response.ok) {
-      window.location.href = '/registration';
-    } else {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Fehler beim Speichern');
+    try {
+      const response = await fetch(`/patient/update/${id}`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(formData)
+      });
+
+      // niemals response.text(), sondern JSON parsen
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        // nur hier redirect!
+        window.location.href = '/registration';
+      } else {
+        throw new Error(result.message || 'Speichern fehlgeschlagen');
+      }
+    } catch (err) {
+      alert("Fehler: " + err.message);
+      console.error(err);
     }
-  } catch (err) {
-    alert("Fehler: " + err.message);
-    console.error(err);
-  }
 });
 </script>
+
