@@ -1,7 +1,9 @@
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    // Nur außerhalb von /registration Sidebar aus dem Store neu aufbauen
-    if (!window.location.pathname.startsWith("/registration")) {
+    const path = window.location.pathname;
+
+    // Nur Dashboard (oder weitere Full-View-Seiten) per JS rendern:
+    if (path === "/dashboard") {
       await window.patientStore.loadFromBackend();
       const patients = window.patientStore.getAllDetailed();
       renderPatientSidebar(patients);
@@ -10,12 +12,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Fehler beim Laden der Patienten:", err);
   }
 
-  // Unabhängig von der Route immer einrichten
+  // Diese Setups laufen überall und finden deine <button.move-to-active>
   setupAnalyzeButton();
   setupSidebarSearch();
   setupMoveButtons();
   setupFullViewSearch();
 });
+
 
 
 function getCurrentPatientId() {
