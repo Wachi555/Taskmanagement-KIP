@@ -79,7 +79,10 @@
     const data = {
       first_name: document.getElementById('vorname').value.trim(),
       last_name: document.getElementById('nachname').value.trim(),
-      date_of_birth: document.getElementById('birthdate').value,
+      date_of_birth: (() => {
+        const [year, month, day] = document.getElementById('birthdate').value.split('-');
+        return `${day}.${month}.${year}`;
+      })(),
       symptoms: document.getElementById('symptoms').value.trim(),
       triage_level: parseInt(document.getElementById('triage').value),
       address: document.getElementById('address').value.trim(),
