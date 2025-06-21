@@ -181,6 +181,7 @@ async def update_patient_data(patient_id: int, input_model: InputPatient):
         patient_id,
         first_name=input_model.first_name,
         last_name=input_model.last_name,
+        gender=input_model.gender,
         date_of_birth=input_model.date_of_birth,
         health_insurance=input_model.health_insurance,
         address=input_model.address,
@@ -194,9 +195,9 @@ async def update_patient_data(patient_id: int, input_model: InputPatient):
 @app.get("/insert_example_patients", tags=["database"])
 async def insert_example_patients():
     example_patients = [
-        {"first_name": "Json", "last_name": "Derulo", "date_of_birth": "1999-02-13", "health_insurance": "krasse kasse", "allergies": "", "address": "123 Straße", "triage_level": 2, "symptoms": "Mangelnde Motivation"},
-        {"first_name": "Ute", "last_name": "Russ", "date_of_birth": "2002-02-20", "health_insurance": "volle versicherung", "allergies": "", "address": "OTH Regensburg", "triage_level": 3, "symptoms": "Absolut keine Lust mehr"},
-        {"first_name": "Timo", "last_name": "Blaumann", "date_of_birth": "2003-03-03", "health_insurance": "absolute absicherer", "allergies": "", "address": "Vergessen", "triage_level": 1, "symptoms": "akute Alkoholsucht"},
+        {"first_name": "Json", "last_name": "Derulo", "gender": "männlich", "date_of_birth": "1999-02-13", "health_insurance": "krasse kasse", "allergies": "", "address": "123 Straße", "triage_level": 2, "symptoms": "Mangelnde Motivation"},
+        {"first_name": "Ute", "last_name": "Russ", "gender": "weiblich", "date_of_birth": "2002-02-20", "health_insurance": "volle versicherung", "allergies": "", "address": "OTH Regensburg", "triage_level": 3, "symptoms": "Absolut keine Lust mehr"},
+        {"first_name": "Timo", "last_name": "Blaumann", "gender": "männlich", "date_of_birth": "2003-03-03", "health_insurance": "absolute absicherer", "allergies": "", "address": "Vergessen", "triage_level": 1, "symptoms": "akute Alkoholsucht"},
     ]
     for patient in example_patients:
         db.add_patient(InputPatient(**patient))
