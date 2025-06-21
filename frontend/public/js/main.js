@@ -185,20 +185,37 @@ function renderPatientSidebar(patients) {
   const renderPatient = (p, isWaiting) => {
     const li = document.createElement("li");
     li.className = "list-group-item d-flex justify-content-between align-items-center";
-
-    const a = document.createElement("a");
-    a.href = isWaiting ? `/patient/${p.id}/overview` : `/patient/${p.id}`;
-    a.className = "text-decoration-none patient-name";
-    a.textContent = `${p.first_name} ${p.last_name}`;
-
-    const triageSpan = document.createElement("span");
-    triageSpan.className = "triage-indicator ms-2";
-    triageSpan.innerHTML = `<span class="triage-circle level-${p.last_triage_level ?? '-'} active"></span>`;
-
-    li.appendChild(a);
-    li.appendChild(triageSpan);
+    li.innerHTML = `
+      <a 
+        href="${isWaiting 
+          ? `/patient/${p.id}/overview` 
+          : `/patient/${p.id}`}" 
+        class="text-decoration-none patient-name"
+      >
+        ${p.first_name} ${p.last_name}
+      </a>
+      <span class="d-flex align-items-center">
+        <!-- Triage-Indikator -->
+        <span class="triage-indicator me-2">
+          <span class="triage-circle level-${p.last_triage_level} active"></span>
+        </span>
+        <!-- Move-Button -->
+        ${isWaiting ? `
+          <button
+            class="btn btn-icon-only move-to-active"
+            type="button"
+            data-id="${p.id}"
+            data-name="${p.first_name} ${p.last_name}"
+            data-triage="${p.last_triage_level}"
+          >
+            <i class="bi bi-arrow-right-circle"></i>
+          </button>
+        ` : ``}
+      </span>
+    `;
     return li;
   };
+
 
   // Wartende Patienten
   if (waitingPatients.length > 0) {
