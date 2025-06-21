@@ -174,6 +174,24 @@ async def set_patient_triage(patient_id: int, triage_level: int):
     else:
         return {"output": "Failed to update patient triage level", "success": False, "error_code": 500, "error_message": "Database error"}
 
+# Update patient data
+@app.post("/patient/update/{patient_id}", tags=["database"])
+async def update_patient_data(patient_id: int, input_model: InputPatient):
+    success = db.update_patient(
+        patient_id,
+        first_name=input_model.first_name,
+        last_name=input_model.last_name,
+        date_of_birth=input_model.date_of_birth,
+        health_insurance=input_model.health_insurance,
+        allergies=input_model.allergies,
+        address=input_model.address,
+        triage_level=input_model.triage_level
+    )
+    if success:
+        return {"output": f"Patient with ID {patient_id} updated successfully", "success": True}
+    else:
+        return {"output": "Failed to update patient", "success": False, "error_code": 500, "error_message": "Database error"}
+
 @app.get("/insert_example_patients", tags=["database"])
 async def insert_example_patients():
     example_patients = [
