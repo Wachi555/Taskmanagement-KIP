@@ -2,7 +2,7 @@ from modules.ai_service_gemini import generate_anamnesis_response, extract_conte
 #from modules.ai_service_openai import generate_anamnesis_response, extract_contents
 from interfaces import database as db
 from common.pydantic_models import EvaluationInput
-import datetime
+
 import traceback
 
 

@@ -174,7 +174,6 @@ async def set_patient_triage(patient_id: int, triage_level: int):
     else:
         return {"output": "Failed to update patient triage level", "success": False, "error_code": 500, "error_message": "Database error"}
 
-# Update patient data
 @app.post("/patient/update/{patient_id}", tags=["database"])
 async def update_patient_data(patient_id: int, input_model: UpdatePatient):
     print(f"DEBUG: Updating patient with ID {patient_id} with data: {input_model}", flush=True)

@@ -13,6 +13,16 @@ def get_patient_by_id(patient_id: int):
     session.close()
     return patient
 
+def get_patient_by_name_and_dob(first_name: str, last_name: str, date_of_birth: str):
+    session = SessionLocal()
+    patient = session.query(Patient).filter(
+        Patient.first_name == first_name,
+        Patient.last_name == last_name,
+        Patient.date_of_birth == date_of_birth
+    ).first()
+    session.close()
+    return patient
+
 def create_patient(
         first_name: str, last_name: str, gender: str, age: int, date_of_birth: str, is_waiting: bool, in_treatment: bool, 
         health_insurance: str, allergies: str, address: str):

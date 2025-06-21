@@ -77,6 +77,30 @@ def save_anamnesis_response(patient_id: int, response: LLMResult):
 # Add a patient to the database
 def add_patient(patient: InputPatient) -> int:
 
+    # Check if patient already exists
+    existing_patient = crud_patients.get_patient_by_name_and_dob(patient.first_name, patient.last_name, patient.date_of_birth)
+    print(f"DEBUG: existing_patient: {existing_patient}", flush=True)
+    if existing_patient:
+        # Update the existing patient
+        patient_id = existing_patient.id
+        age = calculate_age(existing_patient.date_of_birth)
+        updated_patient = crud_patients.update_patient(
+            patient_id=patient_id,
+            is_waiting=True,
+            in_treatment=False,
+            age=age,
+            health_insurance=patient.health_insurance,
+            allergies=patient.allergies,
+            address=patient.address,
+            last_triage_level=patient.triage_level,
+        )
+        if updated_patient:
+            print(f"DEBUG: Updated existing patient with ID {patient_id}", flush=True)
+            new_entry_id = crud_paitent_entries.create_patient_entry(
+                
+            )
+            
+
     age = calculate_age(patient.date_of_birth)
 
     patient_id = crud_patients.create_patient(
