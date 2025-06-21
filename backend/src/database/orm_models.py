@@ -10,6 +10,7 @@ class Patient(Base):
     id = Column(Integer, primary_key=True)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
+    gender = Column(String, nullable=False)
     age = Column(Integer, nullable=False)
     date_of_birth = Column(String, nullable=False)
     is_waiting = Column(Boolean, nullable=False)

@@ -33,6 +33,7 @@ class InputPatient(BaseModel):
     first_name: str
     last_name: str
     date_of_birth: str
+    gender: str
     health_insurance: str
     triage_level: int
     symptoms: str

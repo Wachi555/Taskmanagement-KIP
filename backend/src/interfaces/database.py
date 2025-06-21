@@ -17,6 +17,7 @@ from datetime import datetime
 import json
 
 # --- General Database Functions ---
+
 def save_extracted_contents(patient_id: int, contents: ExtractedContent):
     latest_entry = get_latest_patient_entry(patient_id)
     if not latest_entry:
@@ -81,6 +82,7 @@ def add_patient(patient: InputPatient) -> int:
     patient_id = crud_patients.create_patient(
         first_name=patient.first_name,
         last_name=patient.last_name,
+        gender=patient.gender,
         age=age,
         date_of_birth=patient.date_of_birth,
         is_waiting=True,
@@ -149,11 +151,13 @@ def remove_patient(patient_id: int):
 
 # Update patient information
 def update_patient(patient_id: int, first_name: str = None, last_name: str = None, age: int = None, date_of_birth: str = None, is_waiting: bool = None,
-                   in_treatment: bool = None, health_insurance: str = None, allergies: str = None, address: str = None, triage_level: int = None):
+                   in_treatment: bool = None, health_insurance: str = None, allergies: str = None, address: str = None, triage_level: int = None,
+                   gender: str = None):
     updated_patient = crud_patients.update_patient(
         patient_id,
         first_name=first_name,
         last_name=last_name,
+        gender=gender,
         age=age,
         date_of_birth=date_of_birth,
         is_waiting=is_waiting,
