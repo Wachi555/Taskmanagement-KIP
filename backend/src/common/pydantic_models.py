@@ -9,56 +9,56 @@ class Diagnosis(BaseModel):
 
 class Examination(BaseModel):
     name: str
-    priority: Optional[int] = None
+    priority: int = None
 
+class Expert(BaseModel):
+    type: str
+
+# Structured output for the LLM result
 class LLMResult(BaseModel):
     diagnosis: List[Diagnosis]
     examinations: List[Examination]
     treatments: List[str]
-    # symptoms: List[str] # TODO: Why did I put this here? It shouldn't be here, right?
+    experts: List[Expert]
+    # overall_priority: int # TODO: They requested "prioritisation based on current capacity/utilisation of the hospital" -> Doesn't really make sense, bc. either a patient is important or not?
 
 # ==== Input Output from Frontend ====
 
+# Input from frontend for processing the anamnesis text
 class InputAnamnesis(BaseModel):
     text: str
 
+# Patient data from frontend for creating a new patient
 class InputPatient(BaseModel):
     first_name: str
     last_name: str
     date_of_birth: str
-    # age: int    
-    # is_waiting: Optional[bool] = False
-    # in_treatment: Optional[bool] = False
     health_insurance: str
     triage_level: int
     symptoms: str
     address: str
 
-
+# What the frontend receives from the backend after processing the anamnesis text
 class OutputModel(BaseModel):
     output: LLMResult
     success: bool = True
     error: str = None
-    error_code: int = None
+    status_code: int = None
 
 # ===============================================================
 
+# What content the model should extract from the anamnesis text
 class ExtractedContent(BaseModel):
-    # frist_name: str
-    # last_name: str
-    # date_of_birth: str
-    # age: int
-    # symptoms: List[str]
     history: str
     medications: List[str]
     allergies: List[str]
     additional_notes: str
 
+# What the model recieves to evaluate the patient
 class EvaluationInput(BaseModel):
     age: int
     symptoms: List[str]
     history: str
     medications: List[str]
     allergies: List[str]
-    family_history: str
     additional_notes: str
