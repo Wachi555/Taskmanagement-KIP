@@ -118,10 +118,12 @@ async def get_patient(patient_id: int):
         patient.last_triage_level = -1
     patient_result = db.get_results_for_entry(patient_entry.id) if patient_entry else None # TODO: Handle multiple results -> Improve this with "latest_result_id" in patient_entry
     patient_result = patient_result[0] if patient_result else None
+    diagnoses = db.get_diagnoses_for_entry(patient_result.id) if patient_result else []
     result_dict = {
         "patient": patient,
         "latest_entry": patient_entry,
-        "latest_result": patient_result
+        "latest_result": patient_result,
+        "diagnoses": diagnoses
     }
     if patient:
         return result_dict
