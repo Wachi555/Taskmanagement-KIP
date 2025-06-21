@@ -1,17 +1,22 @@
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    await window.patientStore.loadFromBackend();
-    const patients = window.patientStore.getAllDetailed();
-    renderPatientSidebar(patients);
+    // Nur außerhalb von /registration Sidebar aus dem Store neu aufbauen
+    if (!window.location.pathname.startsWith("/registration")) {
+      await window.patientStore.loadFromBackend();
+      const patients = window.patientStore.getAllDetailed();
+      renderPatientSidebar(patients);
+    }
   } catch (err) {
     console.error("Fehler beim Laden der Patienten:", err);
   }
 
+  // Unabhängig von der Route immer einrichten
   setupAnalyzeButton();
   setupSidebarSearch();
   setupMoveButtons();
   setupFullViewSearch();
 });
+
 
 function getCurrentPatientId() {
   const match = window.location.pathname.match(/\/patient\/(\d+)/);

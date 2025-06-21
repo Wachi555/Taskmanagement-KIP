@@ -48,7 +48,7 @@
   <!-- Rechte Spalte: Wartende & Aktive -->
   <div class="col-md-6 ps-4">
 
-    <!-- Wartende Patienten (klickbar) -->
+    <!-- Wartende Patienten (klickbar, verschiebbar) -->
     <div id="pane-waiting">
       <div class="d-flex justify-content-between align-items-center mb-2">
         <h4 class="mb-0">Wartende Patienten</h4>
@@ -74,7 +74,7 @@
       <ul class="list-group">
         {{#each waitingPatients}}
           <li class="list-group-item d-flex justify-content-between align-items-center">
-            <!-- Link zur Overview -->
+            <!-- Link zur Übersicht -->
             <a href="/patient/{{this.id}}/overview" class="text-decoration-none patient-name">
               {{this.name}}
             </a>
@@ -82,6 +82,7 @@
               <span class="triage-indicator me-2">
                 <span class="triage-circle level-{{this.triage}} active"></span>
               </span>
+              <!-- Button zum Verschieben in aktive Liste -->
               <button
                 class="btn btn-icon-only move-to-active"
                 data-id="{{this.id}}"
@@ -126,7 +127,7 @@
       <ul id="active-patient-list" class="list-group">
         {{#each activePatients}}
           <li class="list-group-item d-flex justify-content-between align-items-center">
-            <!-- Link zur Overview -->
+            <!-- Link zur Übersicht -->
             <a href="/patient/{{this.id}}/overview" class="text-decoration-none patient-name">
               {{this.name}}
             </a>
