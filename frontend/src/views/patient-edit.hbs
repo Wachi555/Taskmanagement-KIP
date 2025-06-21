@@ -117,36 +117,38 @@
 </div>
 
 <script>
-  document.getElementById('edit-patient-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const id = {{patient.id}};
+document.getElementById('edit-patient-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  // ID aus dem Formular oder der URL holen
+  const id = {{patient.id}};  // Dies ist der korrekte Weg in Handlebars
+  
+  const formData = {
+    first_name: document.getElementById('first_name').value.trim(),
+    last_name: document.getElementById('last_name').value.trim(),
+    date_of_birth: document.getElementById('date_of_birth').value,
+    address: document.getElementById('address').value.trim(),
+    health_insurance: document.getElementById('health_insurance').value.trim()
+  };
 
-    const formData = {
-      first_name: document.getElementById('first_name').value.trim(),
-      last_name: document.getElementById('last_name').value.trim(),
-      date_of_birth: document.getElementById('date_of_birth').value,
-      address: document.getElementById('address').value.trim(),
-      health_insurance: document.getElementById('health_insurance').value.trim()
-    };
+  try {
+    const response = await fetch(`/patient/${id}`, {  // Jetzt wird die korrekte ID verwendet
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData)
+    });
 
-    try {
-      const response = await fetch(`/patient/${id}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-      });
-
-      if (response.ok) {
-        window.location.href = '/registration';
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Fehler beim Speichern');
-      }
-    } catch (err) {
-      alert("Fehler: " + err.message);
-      console.error(err);
+    if (response.ok) {
+      window.location.href = '/registration';
+    } else {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Fehler beim Speichern');
     }
-  });
+  } catch (err) {
+    alert("Fehler: " + err.message);
+    console.error(err);
+  }
+});
 </script>

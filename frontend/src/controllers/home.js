@@ -22,15 +22,19 @@ async function deletePatientById(id) {
   const res = await fetch(`http://localhost:8000/patient/${id}`, { method: 'DELETE' });
   if (!res.ok) throw new Error(`Löschen fehlgeschlagen (${res.status})`);
 }
-
 async function updatePatientById(id, payload) {
   const res = await fetch(`http://localhost:8000/patient/${id}`, {
-    method:  'PUT',
+    method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify(payload)
+    body: JSON.stringify(payload)
   });
-  if (!res.ok) throw new Error(`Aktualisierung fehlgeschlagen (${res.status})`);
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.detail || `Aktualisierung fehlgeschlagen (${res.status})`);
+  }
+  return await res.json();
 }
+
 
 
 // ============================
@@ -391,107 +395,18 @@ router.get('/patient/:id/edit', async (req, res) => {
   }
 });
 
-// --- Bearbeiten: Änderungen speichern ---
-router.post('/patient/:id', async (req, res) => {
-  const id = Number(req.params.id);
-  const {
-    first_name,
-    last_name,
-    date_of_birth,
-    address,
-    health_insurance
-  } = req.body;
 
+router.patch('/patient/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  
   try {
-    await updatePatientById(id, {
-      first_name,
-      last_name,
-      date_of_birth,
-      address,
-      health_insurance
-      // Behandlungsdaten (Triage, Symptome etc.) bleiben unverändert
-    });
+    await updatePatientById(id, req.body);
     res.redirect('/registration');
   } catch (error) {
-    console.error("Fehler beim Speichern der Änderungen:", error);
-    
-    // Versuchen, den aktuellen Patientendaten zu erhalten
-    let patient;
-    try {
-      const result = await fetchPatientById(id);
-      patient = result.patient;
-    } catch (fetchError) {
-      patient = {
-        id,
-        first_name,
-        last_name,
-        date_of_birth,
-        address,
-        health_insurance
-      };
-    }
-    
-    res.status(500).render('patient-edit', {
-      layout: 'main',
-      appName: 'Notaufnahme Universitätsklinikum Regensburg',
-      patient,
-      levels: [1, 2, 3, 4, 5],
-      showHome: true,
-      errorMessage: 'Änderungen konnten nicht gespeichert werden: ' + error.message
-    });
-  }
-});
-/// --- Bearbeiten: Änderungen speichern ---
-router.post('/patient/:id', async (req, res) => {
-  const id = Number(req.params.id);
-  const {
-    first_name,
-    last_name,
-    date_of_birth,
-    address,
-    health_insurance,
-    triage_level,
-    symptoms
-  } = req.body;
-
-  try {
-    await updatePatientById(id, {
-      first_name,
-      last_name,
-      date_of_birth,
-      address,
-      health_insurance,
-      triage_level: Number(triage_level),
-      symptoms: typeof symptoms === 'string' ? symptoms.split(',').map(s => s.trim()) : symptoms
-    });
-    res.redirect('/registration');
-  } catch (error) {
-    console.error("Fehler beim Speichern der Änderungen:", error);
-    
-    // Versuchen, den aktuellen Patientendaten zu erhalten
-    let patient;
-    try {
-      const result = await fetchPatientById(id);
-      patient = result.patient;
-    } catch (fetchError) {
-      patient = {
-        id,
-        first_name,
-        last_name,
-        date_of_birth,
-        address,
-        health_insurance,
-        last_triage_level: triage_level
-      };
-    }
-    
-    res.status(500).render('patient-edit', {
-      layout: 'main',
-      appName: 'Notaufnahme Universitätsklinikum Regensburg',
-      patient,
-      levels: [1, 2, 3, 4, 5],
-      showHome: true,
-      errorMessage: 'Änderungen konnten nicht gespeichert werden: ' + error.message
+    console.error("Fehler beim Speichern:", error);
+    res.status(500).json({ 
+      success: false,
+      message: error.message
     });
   }
 });
