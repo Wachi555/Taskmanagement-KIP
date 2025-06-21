@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List
 import json
 
 
@@ -11,6 +12,16 @@ def calculate_age(birth_year: str) -> int:
     except ValueError:
         print(f"Invalid date format for birth year: {birth_year}. Expected format is 'yyyy-mm-dd'.")
         return -1
+
+def stitch_together(a: List[str], b: List[str]) -> str:
+    res = ""
+    if a is not None and a != []:
+        res = ", ".join(a)
+    if b is not None and b != []:
+        if res:
+            res += ", "
+        res += ", ".join(b)
+    return res if res else "n/a"
     
 def parse_med_server_json(json_data: str) -> tuple[list[str], list[tuple[str, int]]]:
     """
