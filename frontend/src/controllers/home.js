@@ -18,6 +18,27 @@ async function fetchPatientById(id) {
   if (!res.ok) throw new Error("Patient nicht gefunden");
   return await res.json();
 }
+async function deletePatientById(id) {
+  const res = await fetch(`http://localhost:8000/patient/${id}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error(`Löschen fehlgeschlagen (${res.status})`);
+}
+async function updatePatientById(id, payload) {
+  const res = await fetch(`http://localhost:8000/patient/update/${id}`, {
+    method:  'POST',                        // ← hier POST statt PATCH
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || `Aktualisierung fehlgeschlagen (${res.status})`);
+  }
+  return res.json();
+}
+
+
+
+
+
 
 // ============================
 // ROUTEN
@@ -353,6 +374,58 @@ router.get('/patient/:id', async (req, res) => {
   }
 });
 
+// --- Bearbeiten: Formular anzeigen ---
+// --- Bearbeiten: Formular anzeigen ---
+router.get('/patient/:id/edit', async (req, res) => {
+  const id = Number(req.params.id);
+  try {
+    const result = await fetchPatientById(id);
+    const patient = result.patient || result;
+    
+    res.render('patient-edit', {
+      layout: 'main',
+      appName: 'Notaufnahme Universitätsklinikum Regensburg',
+      patient,
+      levels: [1, 2, 3, 4, 5],
+      showHome: true
+    });
+  } catch (error) {
+    console.error("Fehler beim Laden des Patienten zum Bearbeiten:", error);
+    res.status(404).render('500', { 
+      message: 'Patient nicht gefunden',
+      error: error.message
+    });
+  }
+});
+
+// server (Port 4000):
+// statt router.patch(...)
+router.post('/patient/update/:id', async (req, res) => {
+  console.log('POST /patient/update/' + req.params.id, 'body=', req.body);
+  try {
+    await updatePatientById(Number(req.params.id), req.body);
+    return res.json({ success: true });
+  } catch (error) {
+    console.error('🚨 Error in POST /patient/update/:id', error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+
+
+
+// --- Löschen: Patient entfernen ---
+router.delete('/patient/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  try {
+    await deletePatientById(id);
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Fehler beim Löschen des Patienten:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 
 // Patient Overview (Übersicht)
 router.get('/patient/:id/overview', async (req, res) => {
@@ -409,6 +482,7 @@ router.get('/patient/:id/overview', async (req, res) => {
     });
   }
 });
+
 
 
 

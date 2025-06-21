@@ -1,0 +1,156 @@
+{{!-- views/patient-edit.hbs --}}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+      <div class="card shadow">
+        <div class="card-header text-center bg-primary text-white">
+          <h4>Patient bearbeiten</h4>
+        </div>
+        <div class="card-body">
+          <form id="edit-patient-form">
+            <!-- Vorname -->
+            <div class="mb-3">
+              <label for="first_name" class="form-label">Vorname*</label>
+              <input
+                type="text"
+                class="form-control"
+                id="first_name"
+                name="first_name"
+                required
+                value="{{patient.first_name}}"
+              />
+            </div>
+
+            <!-- Nachname -->
+            <div class="mb-3">
+              <label for="last_name" class="form-label">Nachname*</label>
+              <input
+                type="text"
+                class="form-control"
+                id="last_name"
+                name="last_name"
+                required
+                value="{{patient.last_name}}"
+              />
+            </div>
+
+            <!-- Geburtsdatum -->
+            <div class="mb-3">
+              <label for="date_of_birth" class="form-label">Geburtsdatum*</label>
+              <input
+                type="date"
+                class="form-control"
+                id="date_of_birth"
+                name="date_of_birth"
+                required
+                value="{{patient.date_of_birth}}"
+              />
+            </div>
+
+            <!-- Adresse -->
+            <div class="mb-3">
+              <label for="address" class="form-label">Adresse*</label>
+              <input
+                type="text"
+                class="form-control"
+                id="address"
+                name="address"
+                required
+                value="{{patient.address}}"
+              />
+            </div>
+
+            <!-- Krankenkasse -->
+            <div class="mb-4">
+              <label for="health_insurance" class="form-label">Krankenkasse*</label>
+              <input
+                type="text"
+                class="form-control"
+                id="health_insurance"
+                name="health_insurance"
+                required
+                value="{{patient.health_insurance}}"
+              />
+            </div>
+
+            <!-- Info-Box mit nicht-editierbaren Daten -->
+            <div class="card mb-4 bg-light">
+              <div class="card-body">
+                <h5 class="card-title">Aktuelle Behandlungsdaten</h5>
+                <div class="row">
+                  <div class="col-md-6">
+                    <p><strong>Triage-Stufe:</strong> {{patient.last_triage_level}}</p>
+                    <p><strong>Status:</strong> 
+                      {{#if patient.is_waiting}}Wartend{{/if}}
+                      {{#if patient.in_treatment}}In Behandlung{{/if}}
+                    </p>
+                  </div>
+                  <div class="col-md-6">
+                    {{#if patient.symptoms}}
+                    <p><strong>Symptome:</strong> 
+                      {{#if (isArray patient.symptoms)}}
+                        {{patient.symptoms.join ', '}}
+                      {{else}}
+                        {{patient.symptoms}}
+                      {{/if}}
+                    </p>
+                    {{/if}}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex justify-content-between">
+              <a href="/registration" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Zurück
+              </a>
+              <button type="submit" class="btn btn-success">
+                <i class="bi bi-check-circle"></i> Speichern
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document
+  .getElementById('edit-patient-form')
+  .addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const id = {{patient.id}};
+    const formData = {
+      first_name:       document.getElementById('first_name').value.trim(),
+      last_name:        document.getElementById('last_name').value.trim(),
+      date_of_birth:    document.getElementById('date_of_birth').value,
+      address:          document.getElementById('address').value.trim(),
+      health_insurance: document.getElementById('health_insurance').value.trim()
+    };
+
+    try {
+      const response = await fetch(`/patient/update/${id}`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(formData)
+      });
+
+      // niemals response.text(), sondern JSON parsen
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        // nur hier redirect!
+        window.location.href = '/registration';
+      } else {
+        throw new Error(result.message || 'Speichern fehlgeschlagen');
+      }
+    } catch (err) {
+      alert("Fehler: " + err.message);
+      console.error(err);
+    }
+});
+</script>
+

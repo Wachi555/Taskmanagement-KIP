@@ -6,55 +6,55 @@ const { engine } = require('express-handlebars');
 
 const homeRoutes    = require('./controllers/home');
 const patientRoutes = require('./routes/patients');
-const audioCtrl  = require('./controllers/audio.js');
-
+const audioCtrl     = require('./controllers/audio');
 
 const app = express();
 
-// Handlebars konfigurieren mit allen Helpers
+// 1) Body-Parser für JSON und URL-encoded (Forms)
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+// 2) Handlebars konfigurieren mit allen Helpers
 app.engine('hbs', engine({
   extname:    '.hbs',
   layoutsDir: path.join(__dirname, 'views', 'layouts'),
   partialsDir: path.join(__dirname, 'views', 'partials'),
   helpers: {
     eq: (a, b) => a === b,
-    encodeURI: (s) => encodeURIComponent(s),
-    encodeURIComponent: (s) => encodeURIComponent(s),
-    formatDate: (dateString) => {
+    encodeURI: s => encodeURIComponent(s),
+    encodeURIComponent: s => encodeURIComponent(s),
+    formatDate: dateString => {
       if (!dateString) return '';
       const [year, month, day] = dateString.split('-');
       return `${day}.${month}.${year}`;
     },
-    // Neuer Helper für Triage-Sortierung
-    sortByTriage: function(patients) {
+    sortByTriage: patients => {
       if (!patients) return [];
-      // Sicherstellen, dass wir ein Array haben
-      const patientsArray = Array.isArray(patients) ? patients : Object.values(patients);
-      // Sortieren nach Triage-Level (numerisch)
-      return patientsArray.slice().sort((a, b) => {
-        // Fallback auf 0 wenn triage undefined/null
-        const aTriage = Number(a.triage) || 0;
-        const bTriage = Number(b.triage) || 0;
-        return aTriage - bTriage;
-      });
+      const arr = Array.isArray(patients) ? patients : Object.values(patients);
+      return arr.slice().sort((a, b) => (Number(a.triage) || 0) - (Number(b.triage) || 0));
     }
   }
 }));
-
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Static-Files und Body-Parser
-app.use(express.static(path.join(__dirname, '../public')));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+// 3) Audio-Controller (falls er eigene Routen hat)
 app.use('/', audioCtrl);
 
-// Routen einbinden
+// 4) Haupt-Router
 app.use('/', homeRoutes);
 app.use('/', patientRoutes);
 
+// 5) Statische Dateien (CSS, JS, Bilder)
+app.use(express.static(path.join(__dirname, '../public')));
+
+// 6) 404-Catch-All (muss ganz am Ende stehen)
+app.use((req, res) => {
+  res.status(404).render('404');  // lege in views/404.hbs eine entsprechende Seite an
+});
+
+// Server starten
 const PORT = 4000;
-app.listen(PORT, () =>
-  console.log(`Server läuft auf http://localhost:${PORT}`)
-);
+app.listen(PORT, () => {
+  console.log(`Server läuft auf http://localhost:${PORT}`);
+});
