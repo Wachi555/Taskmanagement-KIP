@@ -183,7 +183,6 @@ async def update_patient_data(patient_id: int, input_model: InputPatient):
         last_name=input_model.last_name,
         date_of_birth=input_model.date_of_birth,
         health_insurance=input_model.health_insurance,
-        allergies=input_model.allergies,
         address=input_model.address,
         triage_level=input_model.triage_level
     )
