@@ -72,7 +72,7 @@ async def get_patient(patient_id: int):
         patient.last_triage_level = patient_entry.triage_level
     else:
         patient.last_triage_level = -1
-    patient_result = db.get_results_for_entry(patient_entry.id) if patient_entry else None # TODO: Handle multiple results
+    patient_result = db.get_results_for_entry(patient_entry.id) if patient_entry else None # TODO: Handle multiple results -> Improve this with "latest_result_id" in patient_entry
     patient_result = patient_result[0] if patient_result else None
     result_dict = {
         "patient": patient,
@@ -131,9 +131,9 @@ async def set_patient_triage(patient_id: int, triage_level: int):
 @app.get("/insert_example_patients", tags=["database"])
 async def insert_example_patients():
     example_patients = [
-        {"first_name": "Json", "last_name": "Derulo", "date_of_birth": "01.01.0001", "health_insurance": "krasse kasse", "allergies": "", "address": "123 Straße", "triage_level": 2, "symptoms": "Mangelnde Motivation"},
-        {"first_name": "Ute", "last_name": "Russ", "date_of_birth": "20.02.2002", "health_insurance": "volle versicherung", "allergies": "", "address": "OTH Regensburg", "triage_level": 3, "symptoms": "Absolut keine Lust mehr"},
-        {"first_name": "Timo", "last_name": "Blaumann", "date_of_birth": "03.03.2003", "health_insurance": "absolute absicherer", "allergies": "", "address": "Vergessen", "triage_level": 1, "symptoms": "akute Alkoholsucht"},
+        {"first_name": "Json", "last_name": "Derulo", "date_of_birth": "1999-02-13", "health_insurance": "krasse kasse", "allergies": "", "address": "123 Straße", "triage_level": 2, "symptoms": "Mangelnde Motivation"},
+        {"first_name": "Ute", "last_name": "Russ", "date_of_birth": "2002-02-20", "health_insurance": "volle versicherung", "allergies": "", "address": "OTH Regensburg", "triage_level": 3, "symptoms": "Absolut keine Lust mehr"},
+        {"first_name": "Timo", "last_name": "Blaumann", "date_of_birth": "2003-03-03", "health_insurance": "absolute absicherer", "allergies": "", "address": "Vergessen", "triage_level": 1, "symptoms": "akute Alkoholsucht"},
     ]
     for patient in example_patients:
         db.add_patient(InputPatient(**patient))
