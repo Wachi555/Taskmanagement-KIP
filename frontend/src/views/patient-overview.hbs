@@ -1,15 +1,19 @@
 {{!-- views/patient-overview.hbs --}}
 
-<!-- Patienten-Überschrift mit Name, Zurück-Button und Geburtsdatum -->
 <div class="mb-4 d-flex align-items-center">
   <a href="/registration" class="btn btn-link text-muted p-0 me-3" title="Zurück">
     <i class="bi bi-arrow-left-short fs-3"></i>
   </a>
   
-  <h2 class="fw-bold mb-0">{{data.name}}</h2>
+  <h2 class="fw-bold mb-0">{{#if data.name}}{{data.name}}{{else}}Patientenübersicht{{/if}}</h2>
 </div>
 
-<div class="row gx-4 gy-4">
+{{!-- Fehlermeldung anzeigen, falls vorhanden --}}
+{{#if errorMessage}}
+  <div class="alert alert-warning mt-3">{{errorMessage}}</div>
+{{/if}}
+
+<div class="row gx-4 gy-4 mt-2">
   <!-- Einspaltiges Layout auf halber Seitenbreite -->
   <div class="col-12 col-md-6">
     <!-- Patientendaten -->
@@ -20,20 +24,20 @@
       <div class="card-body overflow-auto" style="max-height: 60vh;">
         <ul class="list-group list-group-flush mb-0">
           <li class="list-group-item">
-            <strong class="me-3">Geburtsdatum:</strong> {{formatDate data.dob}}
+            <strong class="me-3">Geburtsdatum:</strong> {{#if data.dob}}{{formatDate data.dob}}{{else}}–{{/if}}
           </li>
           <li class="list-group-item">
-            <strong class="me-3">Geschlecht:</strong> {{data.gender}}
+            <strong class="me-3">Geschlecht:</strong> {{#if data.gender}}{{data.gender}}{{else}}–{{/if}}
           </li>
           <li class="list-group-item">
-            <strong class="me-3">Adresse:</strong> {{data.adresse}}
+            <strong class="me-3">Adresse:</strong> {{#if data.adresse}}{{data.adresse}}{{else}}–{{/if}}
           </li>
           <li class="list-group-item">
-            <strong class="me-3">Krankenkasse:</strong> {{data.krankenkasse}}
+            <strong class="me-3">Krankenkasse:</strong> {{#if data.krankenkasse}}{{data.krankenkasse}}{{else}}–{{/if}}
           </li>
           <li class="list-group-item">
             <strong class="me-3">Aktuelle Symptome:</strong>
-            {{#if symptoms}}
+            {{#if symptoms.length}}
               {{#each symptoms}}
                 {{this}}{{#unless @last}}, {{/unless}}
               {{/each}}
@@ -53,7 +57,7 @@
           <!-- Diagnosen -->
           <li class="list-group-item">
             <strong class="me-3">Mögliche Diagnosen:</strong>
-            {{#if diagnosis}}
+            {{#if diagnosis.length}}
               {{#each diagnosis}}
                 {{this}}{{#unless @last}}, {{/unless}}
               {{/each}}
@@ -69,7 +73,7 @@
           <!-- Untersuchungen -->
           <li class="list-group-item">
             <strong class="me-3">Untersuchungen:</strong>
-            {{#if exams}}
+            {{#if exams.length}}
               <ul class="mt-1 ms-3">
                 {{#each exams}}
                   <li>{{this.name}} <span class="badge bg-secondary">{{this.priority}}</span></li>
@@ -81,7 +85,7 @@
           <!-- Experten -->
           <li class="list-group-item">
             <strong class="me-3">Experten:</strong>
-            {{#if experts}}
+            {{#if experts.length}}
               <ul class="mt-1 ms-3">
                 {{#each experts}}
                   <li>{{this}}</li>

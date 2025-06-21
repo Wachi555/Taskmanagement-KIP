@@ -1,91 +1,144 @@
-// frontend/models/patient_store.js
+const BASE_URL = "http://localhost:8000"; // ggf. anpassen bei Deployment
 
-// Einfache In-Memory-Datenbank mit erweiterten Mock-Daten inklusive Historie
-const patients = [
-  {
-    name: 'Hans Weber',
-    triage: 3,
-    dob: '1978-05-12',
-    gender: 'männlich',
-    symptoms: ['Kopfschmerzen', 'Schwindel'],
-    registrationDate: '2025-06-18',
-    adresse: 'Musterstraße 10, 93047 Regensburg',
-    krankenkasse: 'AOK Bayern',
-    history: [
-      { date: '2025-06-10', findings: 'Beinbruch' },
-      { date: '2025-03-22', findings: 'Hautausschlag' }
-    ]
-  },
-  {
-    name: 'Uwe Taniz',
-    triage: 2,
-    dob: '1985-11-03',
-    gender: 'männlich',
-    symptoms: ['Husten', 'Fieber'],
-    registrationDate: '2025-06-19',
-    adresse: 'Bahnhofstraße 5, 93047 Regensburg',
-    krankenkasse: 'Techniker Krankenkasse',
-    history: [
-      { date: '2025-01-15', findings: 'Schlaganfall' }
-    ]
-  },
-  {
-    name: 'Ute Russ',
-    triage: 4,
-    dob: '1990-07-21',
-    gender: 'weiblich',
-    symptoms: ['Brustschmerzen'],
-    registrationDate: '2025-06-17',
-    adresse: 'Ringstraße 2, 93047 Regensburg',
-    krankenkasse: 'Barmer',
-    history: []
-  }
-];
+let patients = []; // In-Memory-Cache
 
-// Nur die Namen (für ältere Views)
-function getAll() {
-  return patients.map(p => p.name);
+// ==============================
+// LADEN
+// ==============================
+
+// Alle Patienten laden und cachen
+async function loadFromBackend() {
+  const res = await fetch(`${BASE_URL}/patients`);
+  if (!res.ok) throw new Error("Fehler beim Laden der Patienten");
+  patients = await res.json();
 }
 
-// Detaillierte Daten (Name, Triage und alle Mock-Felder)
+// Einzelnen Patienten mit Details laden
+async function getPatient(id) {
+  const res = await fetch(`${BASE_URL}/patient/${id}`);
+  if (!res.ok) throw new Error(`Patient ${id} nicht gefunden`);
+  return await res.json(); // enthält: patient, latest_entry, latessult
+}
+
+// Historie für Patient
+async function getPatientEntries(id) {
+  const res = await fetch(`${BASE_URL}/patient/${id}/entries`);
+  if (!res.ok) throw new Error("Fehler beim Laden der Einträge");
+  return await res.json();
+}
+
+// ==============================
+// SPEICHERN / LÖSCHEN
+// ==============================
+
+// Neuen Patienten anlegen
+async function addPatient(data) {
+  const res = await fetch(`${BASE_URL}/patient`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error_message || "Fehler beim Anlegen");
+  return json;
+}
+
+// Patienten löschen
+async function deletePatient(id) {
+  const res = await fetch(`${BASE_URL}/patient/${id}`, {
+    method: "DELETE"
+  });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error_message || "Löschen fehlgeschlagen");
+  return json;
+}
+
+// ==============================
+// STATUS / TRIAGE
+// ==============================
+
+// Triage-Stufe setzen (0–5)
+async function setTriage(id, level) {
+  const res = await fetch(`${BASE_URL}/patient/${id}/set_triage/${level}`);
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error_message || "Triage-Update fehlgeschlagen");
+  return json;
+}
+
+// Patientenstatus setzen
+// status: 0 = Historie, 1 = Wartend, 2 = In Behandlung
+async function setStatus(id, status) {
+  const res = await fetch(`${BASE_URL}/patient/update_status/${id}/${status}`);
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error_message || "Status-Update fehlgeschlagen");
+  return json;
+}
+
+// ==============================
+// ANAMNESE
+// ==============================
+
+// Anamnese verarbeiten (Patient muss existieren)
+async function analyze(id, text) {
+  const res = await fetch(`${BASE_URL}/process_input/${id}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text })
+  });
+
+  const json = await res.json();
+  return json.output;
+}
+
+// Debug-Version (ohne Patient)
+async function analyzeDebug(text) {
+  const res = await fetch(`${BASE_URL}/process_input_debug`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text })
+  });
+
+  const json = await res.json();
+  return json.output;
+}
+
+// ==============================
+// HELPER
+// ==============================
+
+function getAll() {
+  return patients.map(p => `${p.first_name} ${p.last_name}`);
+}
+
 function getAllDetailed() {
-  // gibt eine Kopie, damit das Original nicht verändert wird
   return patients.map(p => ({ ...p }));
 }
 
-// Einzelnen Patienten suchen (mit allen Feldern)
 function findByName(name) {
-  return patients.find(p => p.name === name) || null;
+  return patients.find(p => `${p.first_name} ${p.last_name}` === name) || null;
 }
 
-// Neuen Patienten hinzufügen (mit Default-Mock-Werten)
-function add(patientData) {
-  const name = typeof patientData === 'string'
-    ? patientData
-    : patientData.name;
-
-  // Keine Duplikate
-  if (patients.some(p => p.name === name)) return;
-
-  const now = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-  const newPatient = {
-    name,
-    triage: patientData.triage ?? null,
-    dob: patientData.dob ?? null,
-    gender: patientData.gender ?? null,
-    symptoms: patientData.symptoms ?? [],      
-    registrationDate: patientData.registrationDate ?? now,
-    adresse: patientData.adresse ?? null,
-    krankenkasse: patientData.krankenkasse ?? null,
-    history: patientData.history ?? []
-  };
-
-  patients.push(newPatient);
+function findById(id) {
+  return patients.find(p => p.id === id) || null;
 }
 
-module.exports = {
+// ==============================
+// EXPORT
+// ==============================
+
+window.patientStore = {
+  loadFromBackend,
+  getPatient,
+  getPatientEntries,
+  addPatient,
+  deletePatient,
+  setTriage,
+  setStatus,
+  analyze,
+  analyzeDebug,
   getAll,
   getAllDetailed,
   findByName,
-  add
+  findById
 };

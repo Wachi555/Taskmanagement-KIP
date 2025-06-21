@@ -25,7 +25,13 @@
     <ul class="list-group">
       {{#each waitingPatients}}
         <li class="list-group-item d-flex justify-content-between align-items-center">
-          <span class="patient-name">{{this.name}}</span>
+          <!-- Name jetzt als Link zur Overview -->
+          <a
+            href="/patient/{{this.id}}/overview"
+            class="text-decoration-none patient-name"
+          >
+            {{this.name}}
+          </a>
           <span class="d-flex align-items-center">
             {{#if this.triage}}
               <span class="triage-indicator me-2">
@@ -34,6 +40,7 @@
             {{/if}}
             <button
               class="btn btn-icon-only move-to-active"
+              data-id="{{this.id}}"
               data-name="{{this.name}}"
               data-triage="{{this.triage}}"
             >
@@ -77,7 +84,7 @@
       {{#each activePatients}}
         <li class="list-group-item d-flex justify-content-between align-items-center">
           <a
-            href="/patient/{{encodeURIComponent this.name}}"
+            href="/patient/{{this.id}}/overview"
             class="text-decoration-none patient-name"
           >
             {{this.name}}
