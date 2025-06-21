@@ -1,9 +1,9 @@
 from database.session import SessionLocal
 from database.orm_models import Result
 
-def create_result(patient_entry_id: int, experts: str, examinations: str):
+def create_result(patient_entry_id: int, experts: str, examinations: str, treatments: str):
     session = SessionLocal()
-    new_result = Result(patient_entry_id=patient_entry_id, experts=experts, examinations=examinations)
+    new_result = Result(patient_entry_id=patient_entry_id, experts=experts, examinations=examinations, treatments=treatments)
     session.add(new_result)
     session.commit()
     session.refresh(new_result)

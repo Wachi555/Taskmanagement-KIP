@@ -1,7 +1,7 @@
 import json
 
 import uvicorn
-from common.pydantic_models import InputAnamnesis, InputPatient, OutputModel
+from common.pydantic_models import InputAnamnesis, InputPatient, OutputModel, LLMResult
 from interfaces import database as db
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -41,8 +41,33 @@ async def process_input_default(input_model: InputAnamnesis):
 
 @app.post("/process_input/{selected_patient_id}", tags=["processing"])
 async def process_input(input_model: InputAnamnesis, selected_patient_id: int):
-    response = process_anamnesis(input_model.text, selected_patient_id)
-    return OutputModel(output=response)
+    success = process_anamnesis(input_model.text, selected_patient_id)
+    if not success:
+        return {"output": "Failed to process input", "success": False, "error_code": 500, "error_message": "Processing error"}
+
+    patient_entry = db.get_latest_patient_entry(selected_patient_id)
+    result = db.get_results_for_entry(patient_entry.id) if patient_entry else None
+    result = result[0] if result else None
+
+    diagnoses = db.get_diagnoses_for_entry(result.id) if result else []
+    examinations = result.examinations if result else []
+    experts = result.experts if result else []
+    treatments = result.treatments if result else []
+
+    # Debug print
+    print(f"DEBUG: patient entry: {patient_entry}")
+    print(f"DEBUG: diagnoses: {diagnoses}")
+    print(f"DEBUG: examinations: {examinations}")
+    print(f"DEBUG: experts: {experts}")
+    print(f"DEBUG: treatments: {treatments}")
+
+    response = {
+        "diagnoses": [ {"name": d.name, "reason": d.reason, "confidence": d.confidence} for d in diagnoses ],
+        "examinations": [ {"name": e['name'], "priority": e['priority']} for e in examinations ],
+        "treatments": treatments,
+        "experts": experts
+    }
+    return OutputModel(output=response) # !!!! Hier weiter: Ouput muss jetzt aus db kommen, nicht mehr aus dem AI-Service
 
 
 @app.post("/process_input_debug", tags=["processing"])

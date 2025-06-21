@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Dict, Optional
 
 from pydantic import BaseModel
 
@@ -40,7 +40,7 @@ class InputPatient(BaseModel):
 
 # What the frontend receives from the backend after processing the anamnesis text
 class OutputModel(BaseModel):
-    output: LLMResult
+    output: Dict
     success: bool = True
     error: str = None
     status_code: int = None

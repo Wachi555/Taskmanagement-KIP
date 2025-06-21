@@ -1,9 +1,9 @@
 from database.session import SessionLocal
 from database.orm_models import Diagnosis
 
-def get_diagnoses_for_entry(entry_id: int):
+def get_diagnoses_for_entry(result_id: int):
     session = SessionLocal()
-    diagnoses = session.query(Diagnosis).filter(Diagnosis.patient_entry_id == entry_id).all()
+    diagnoses = session.query(Diagnosis).filter(Diagnosis.result_id == result_id).all()
     session.close()
     return diagnoses
 

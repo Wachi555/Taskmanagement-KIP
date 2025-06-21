@@ -36,9 +36,9 @@ def process_anamnesis(input_text: str, current_patient_id: int) -> str:
         print(f"Response form extract_contents: {contents}", flush=True)
         print(f"Response from generate_anamnesis_response: {result}", flush=True)
         if result:
-            return result
+            return True
         raise ValueError("No response text found.")
     except Exception as e:
         print(f"Error: {e}")
         print(traceback.format_exc())
-        return "An error occurred while processing your request."
+        return False

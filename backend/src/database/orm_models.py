@@ -100,6 +100,7 @@ class Result(Base):
     patient_entry_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
     experts = Column(String, nullable=True)  # JSON or comma-separated list of expert names
     examinations = Column(String, nullable=True)  # JSON or comma-separated list of examination names
+    treatments = Column(String, nullable=True)  # JSON or comma-separated list of treatment names
 
 # Unique for each result, but one result can have multiple diagnoses
 class Diagnosis(Base):

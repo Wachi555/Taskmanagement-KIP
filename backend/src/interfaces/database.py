@@ -14,6 +14,8 @@ from modules.helpers import calculate_age, stitch_together
 
 from datetime import datetime
 
+import json
+
 # --- General Database Functions ---
 def save_extracted_contents(patient_id: int, contents: ExtractedContent):
     latest_entry = get_latest_patient_entry(patient_id)
@@ -50,14 +52,16 @@ def save_anamnesis_response(patient_id: int, response: LLMResult):
         return None 
     
     # Create new result in database:
+    # TODO: Remove this when Openai is used again
     response.experts = [Expert(type="Allgemeinmedizin"), Expert(type="Dermatologie")]
     response.examinations = [Examination(name="Hautuntersuchung", priority=1), Examination(name="Blutuntersuchung", priority=2)]
     response.diagnoses = [Diagnosis(name="Hautausschlag", reason="Allergische Reaktion", confidence=0.85),]
     response.treatments = ["Antihistaminikum", "Kühlen der betroffenen Stelle"]
     print(f"DEBUG: type: {type(response)}, resp: {response}", flush=True)
     experts_string_list = [expert.type for expert in response.experts]
-    examinations_string_list = [examination.name for examination in response.examinations if examination]
-    result_id = crud_results.create_result(latest_entry.id, ", ".join(experts_string_list), ", ".join(examinations_string_list))
+    examinations_dict_list = [{"name": examination.name, "priority": examination.priority} for examination in response.examinations if examination]
+    examinations_string_list = [json.dumps(examination) for examination in examinations_dict_list if examination]
+    result_id = crud_results.create_result(latest_entry.id, ", ".join(experts_string_list), "; ".join(examinations_string_list), treatments=", ".join(response.treatments))
     if not result_id:
         print(f"Error: Could not create result for patient with ID {patient_id}.")
         return None
@@ -317,6 +321,11 @@ def remove_diagnosis_from_entry(diagnosis_id: int):
 # Get all results for a patient entry
 def get_results_for_entry(entry_id: int):
     results = crud_results.get_results_by_patient_entry_id(entry_id)
+    for result in results:
+        exams = result.examinations 
+        print(f"DEBUG: result.examinations: {exams}", flush=True)
+        exams = [json.loads(exam.strip()) for exam in exams.split("; ") if exam] if exams else []
+        result.examinations = exams
     if results:
         return results
     else:
