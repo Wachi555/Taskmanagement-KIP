@@ -1,7 +1,7 @@
 import json
 
 import uvicorn
-from common.pydantic_models import InputAnamnesis, InputPatient, OutputModel, LLMResult
+from common.pydantic_models import InputAnamnesis, InputPatient, OutputModel, LLMResult, UpdatePatient
 from interfaces import database as db
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -176,16 +176,17 @@ async def set_patient_triage(patient_id: int, triage_level: int):
 
 # Update patient data
 @app.post("/patient/update/{patient_id}", tags=["database"])
-async def update_patient_data(patient_id: int, input_model: InputPatient):
+async def update_patient_data(patient_id: int, input_model: UpdatePatient):
+    print(f"DEBUG: Updating patient with ID {patient_id} with data: {input_model}", flush=True)
     success = db.update_patient(
         patient_id,
         first_name=input_model.first_name,
         last_name=input_model.last_name,
-        gender=input_model.gender,
+        # gender=input_model.gender,
         date_of_birth=input_model.date_of_birth,
         health_insurance=input_model.health_insurance,
         address=input_model.address,
-        triage_level=input_model.triage_level
+        # triage_level=input_model.triage_level
     )
     if success:
         return {"output": f"Patient with ID {patient_id} updated successfully", "success": True}

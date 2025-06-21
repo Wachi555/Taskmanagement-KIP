@@ -39,6 +39,14 @@ class InputPatient(BaseModel):
     symptoms: str
     address: str
 
+class UpdatePatient(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    date_of_birth: Optional[str] = None
+    address: Optional[str] = None
+    # gender: Optional[str] = None
+    health_insurance: Optional[str] = None
+
 # What the frontend receives from the backend after processing the anamnesis text
 class OutputModel(BaseModel):
     output: Dict
