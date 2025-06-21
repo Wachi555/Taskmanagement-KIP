@@ -18,6 +18,20 @@ async function fetchPatientById(id) {
   if (!res.ok) throw new Error("Patient nicht gefunden");
   return await res.json();
 }
+async function deletePatientById(id) {
+  const res = await fetch(`http://localhost:8000/patient/${id}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error(`Löschen fehlgeschlagen (${res.status})`);
+}
+
+async function updatePatientById(id, payload) {
+  const res = await fetch(`http://localhost:8000/patient/${id}`, {
+    method:  'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload)
+  });
+  if (!res.ok) throw new Error(`Aktualisierung fehlgeschlagen (${res.status})`);
+}
+
 
 // ============================
 // ROUTEN
@@ -353,6 +367,147 @@ router.get('/patient/:id', async (req, res) => {
   }
 });
 
+// --- Bearbeiten: Formular anzeigen ---
+// --- Bearbeiten: Formular anzeigen ---
+router.get('/patient/:id/edit', async (req, res) => {
+  const id = Number(req.params.id);
+  try {
+    const result = await fetchPatientById(id);
+    const patient = result.patient || result;
+    
+    res.render('patient-edit', {
+      layout: 'main',
+      appName: 'Notaufnahme Universitätsklinikum Regensburg',
+      patient,
+      levels: [1, 2, 3, 4, 5],
+      showHome: true
+    });
+  } catch (error) {
+    console.error("Fehler beim Laden des Patienten zum Bearbeiten:", error);
+    res.status(404).render('500', { 
+      message: 'Patient nicht gefunden',
+      error: error.message
+    });
+  }
+});
+
+// --- Bearbeiten: Änderungen speichern ---
+router.post('/patient/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  const {
+    first_name,
+    last_name,
+    date_of_birth,
+    address,
+    health_insurance
+  } = req.body;
+
+  try {
+    await updatePatientById(id, {
+      first_name,
+      last_name,
+      date_of_birth,
+      address,
+      health_insurance
+      // Behandlungsdaten (Triage, Symptome etc.) bleiben unverändert
+    });
+    res.redirect('/registration');
+  } catch (error) {
+    console.error("Fehler beim Speichern der Änderungen:", error);
+    
+    // Versuchen, den aktuellen Patientendaten zu erhalten
+    let patient;
+    try {
+      const result = await fetchPatientById(id);
+      patient = result.patient;
+    } catch (fetchError) {
+      patient = {
+        id,
+        first_name,
+        last_name,
+        date_of_birth,
+        address,
+        health_insurance
+      };
+    }
+    
+    res.status(500).render('patient-edit', {
+      layout: 'main',
+      appName: 'Notaufnahme Universitätsklinikum Regensburg',
+      patient,
+      levels: [1, 2, 3, 4, 5],
+      showHome: true,
+      errorMessage: 'Änderungen konnten nicht gespeichert werden: ' + error.message
+    });
+  }
+});
+/// --- Bearbeiten: Änderungen speichern ---
+router.post('/patient/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  const {
+    first_name,
+    last_name,
+    date_of_birth,
+    address,
+    health_insurance,
+    triage_level,
+    symptoms
+  } = req.body;
+
+  try {
+    await updatePatientById(id, {
+      first_name,
+      last_name,
+      date_of_birth,
+      address,
+      health_insurance,
+      triage_level: Number(triage_level),
+      symptoms: typeof symptoms === 'string' ? symptoms.split(',').map(s => s.trim()) : symptoms
+    });
+    res.redirect('/registration');
+  } catch (error) {
+    console.error("Fehler beim Speichern der Änderungen:", error);
+    
+    // Versuchen, den aktuellen Patientendaten zu erhalten
+    let patient;
+    try {
+      const result = await fetchPatientById(id);
+      patient = result.patient;
+    } catch (fetchError) {
+      patient = {
+        id,
+        first_name,
+        last_name,
+        date_of_birth,
+        address,
+        health_insurance,
+        last_triage_level: triage_level
+      };
+    }
+    
+    res.status(500).render('patient-edit', {
+      layout: 'main',
+      appName: 'Notaufnahme Universitätsklinikum Regensburg',
+      patient,
+      levels: [1, 2, 3, 4, 5],
+      showHome: true,
+      errorMessage: 'Änderungen konnten nicht gespeichert werden: ' + error.message
+    });
+  }
+});
+
+// --- Löschen: Patient entfernen ---
+router.delete('/patient/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  try {
+    await deletePatientById(id);
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Fehler beim Löschen des Patienten:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 
 // Patient Overview (Übersicht)
 router.get('/patient/:id/overview', async (req, res) => {
@@ -409,6 +564,7 @@ router.get('/patient/:id/overview', async (req, res) => {
     });
   }
 });
+
 
 
 

@@ -20,7 +20,29 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupMoveButtons();
   setupFullViewSearch();
   setupAudioRecorder();
+  setupDeleteButtons();
 });
+
+function setupDeleteButtons() {
+  document
+    .getElementById('all-patient-list')
+    .addEventListener('click', async e => {
+      const btn = e.target.closest('.delete-patient');
+      if (!btn) return;
+      const id = btn.dataset.id;
+      if (!confirm('Soll dieser Patient wirklich gelöscht werden?')) return;
+
+      try {
+        const resp = await fetch(`/patient/${id}`, { method: 'DELETE' });
+        if (!resp.ok) throw new Error(await resp.text());
+        // Zeile entfernen
+        btn.closest('li.list-group-item').remove();
+      } catch (err) {
+        console.error('Löschen fehlgeschlagen', err);
+        alert('Fehler beim Löschen: ' + err.message);
+      }
+    });
+}
 
 function setupFullViewSearch() {
   // Suchfunktion für "Alle Patienten"
@@ -312,23 +334,47 @@ function setupSidebarSearch() {
 
 function displayResults(result) {
   resetResults();
-  displayDiagnosis(result.diagnosis);
+  displayDiagnosis(result.diagnoses);
   displayTriageLevel(result.triage);
-  displayExams(result.exams);
+  displayExams(result.examinations);
+  displayTreatments(result.treatments);
   displayExperts(result.experts);
+
 }
 
 function resetResults() {
   document.getElementById("resultData").innerHTML = "";
 }
 
-function displayDiagnosis(diagnosis) {
-  if (!diagnosis?.length) return;
+function displayTreatments(treatments) {
+  const li = document.getElementById("treatmentsItem");
+  if (!li) return;
+
+  // Wenn kein Array oder leer, setze auf Strich
+  if (!Array.isArray(treatments) || treatments.length === 0) {
+    li.innerHTML = `<strong class="me-3">Behandlungen:</strong> –`;
+    return;
+  }
+
+  // Ansonsten Komma-getrennt auflisten
+  const text = treatments.join(", ");
+  li.innerHTML = `<strong class="me-3">Behandlungen:</strong> ${text}`;
+}
+
+
+function displayDiagnosis(diagnoses) {
   const ul = document.getElementById("resultData");
-  const names = diagnosis.map(d => d.name).join(", ");
+  // Immer einen LI erzeugen – mit Liste oder Strich
   const li = document.createElement("li");
   li.className = "list-group-item";
-  li.innerHTML = `<strong class="me-2">Mögliche Diagnosen:</strong> ${names}`;
+
+  if (!Array.isArray(diagnoses) || diagnoses.length === 0) {
+    li.innerHTML = `<strong class="me-2">Mögliche Diagnosen:</strong> –`;
+  } else {
+    const names = diagnoses.map(d => d.name).join(", ");
+    li.innerHTML = `<strong class="me-2">Mögliche Diagnosen:</strong> ${names}`;
+  }
+
   ul.appendChild(li);
 }
 
@@ -393,16 +439,22 @@ function displayExams(exams) {
 }
 
 function displayExperts(experts) {
+  // Wir fügen das Experten-LI ganz ans Ende, deshalb kein getElementById
+  const ul = document.getElementById("resultData");
   const li = document.createElement("li");
-  li.className = "list-group-item d-block";
-  li.innerHTML = `
-    <strong class="d-block mb-2">Experten:</strong>
-    <ul class="mt-1 ms-3">
-      ${experts.length ? experts.map(e => `<li>${e}</li>`).join("") : "<li>–</li>"}
-    </ul>
-  `;
-  document.getElementById("resultData").appendChild(li);
+  li.className = "list-group-item";
+
+  if (!Array.isArray(experts) || experts.length === 0) {
+    li.innerHTML = `<strong class="me-3">Experten:</strong> –`;
+  } else {
+    // Extrahiere die Typen und joine sie
+    const types = experts.map(e => e.type);
+    li.innerHTML = `<strong class="me-3">Experten:</strong> ${types.join(", ")}`;
+  }
+
+  ul.appendChild(li);
 }
+
 
 function showLoading(show) {
   const spinner = document.getElementById("loading-spinner");

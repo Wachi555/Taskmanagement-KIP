@@ -8,7 +8,7 @@
 
 <div class="row bg-light rounded py-4 align-items-start">
 
-  <!-- Linke Spalte: Alle Patienten (nicht klickbar) -->
+  <!-- Linke Spalte: Alle Patienten -->
   <div class="col-md-6 border-end pe-4">
     <div class="d-flex justify-content-between align-items-center mb-2">
       <h4 class="mb-0">Patientenregister</h4>
@@ -31,16 +31,37 @@
         placeholder="Alle Patienten suchen…"
       />
     </div>
-    <ul class="list-group">
+
+    <ul id="all-patient-list" class="list-group">
       {{#each allPatients}}
         <li class="list-group-item d-flex justify-content-between align-items-center">
-          <!-- nicht klickbar -->
           <span class="patient-name">{{this.first_name}} {{this.last_name}}</span>
+          <span class="d-flex">
+            <!-- Bearbeiten -->
+            <a
+              href="/patient/{{this.id}}/edit"
+              class="btn btn-sm btn-outline-secondary me-2"
+              title="Patient bearbeiten"
+            >
+              <i class="bi bi-pencil"></i>
+            </a>
+            <!-- Löschen -->
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-danger delete-patient"
+              data-id="{{this.id}}"
+              title="Patient löschen"
+            >
+              <i class="bi bi-trash"></i>
+            </button>
+          </span>
         </li>
       {{/each}}
 
       {{#unless allPatients.length}}
-        <li class="list-group-item text-muted text-center">Keine Patienten vorhanden</li>
+        <li class="list-group-item text-muted text-center">
+          Keine Patienten vorhanden
+        </li>
       {{/unless}}
     </ul>
   </div>
@@ -48,7 +69,7 @@
   <!-- Rechte Spalte: Wartende & Aktive -->
   <div class="col-md-6 ps-4">
 
-    <!-- Wartende Patienten (klickbar, verschiebbar) -->
+    <!-- Wartende Patienten -->
     <div id="pane-waiting">
       <div class="d-flex justify-content-between align-items-center mb-2">
         <h4 class="mb-0">Wartende Patienten</h4>
@@ -71,18 +92,19 @@
           placeholder="Wartende Patienten suchen…"
         />
       </div>
-      <ul class="list-group">
+      <ul id="waiting-patient-list" class="list-group">
         {{#each waitingPatients}}
           <li class="list-group-item d-flex justify-content-between align-items-center">
-            <!-- Link zur Übersicht -->
-            <a href="/patient/{{this.id}}/overview" class="text-decoration-none patient-name">
+            <a
+              href="/patient/{{this.id}}/overview"
+              class="text-decoration-none patient-name"
+            >
               {{this.name}}
             </a>
             <span class="d-flex align-items-center">
               <span class="triage-indicator me-2">
                 <span class="triage-circle level-{{this.triage}} active"></span>
               </span>
-              <!-- Button zum Verschieben in aktive Liste -->
               <button
                 class="btn btn-icon-only move-to-active"
                 data-id="{{this.id}}"
@@ -96,12 +118,14 @@
         {{/each}}
 
         {{#unless waitingPatients.length}}
-          <li class="list-group-item text-muted text-center">Keine wartenden Patienten</li>
+          <li class="list-group-item text-muted text-center">
+            Keine wartenden Patienten
+          </li>
         {{/unless}}
       </ul>
     </div>
 
-    <!-- Aktive Patienten (klickbar) -->
+    <!-- Aktive Patienten -->
     <div id="pane-active" class="mt-4">
       <div class="d-flex justify-content-between align-items-center mb-2">
         <h4 class="mb-0">In Behandlung</h4>
@@ -127,8 +151,10 @@
       <ul id="active-patient-list" class="list-group">
         {{#each activePatients}}
           <li class="list-group-item d-flex justify-content-between align-items-center">
-            <!-- Link zur Übersicht -->
-            <a href="/patient/{{this.id}}/overview" class="text-decoration-none patient-name">
+            <a
+              href="/patient/{{this.id}}/overview"
+              class="text-decoration-none patient-name"
+            >
               {{this.name}}
             </a>
             <span class="d-flex align-items-center">
@@ -140,7 +166,9 @@
         {{/each}}
 
         {{#unless activePatients.length}}
-          <li class="list-group-item text-muted text-center">Keine aktiven Patienten</li>
+          <li class="list-group-item text-muted text-center">
+            Keine aktiven Patienten
+          </li>
         {{/unless}}
       </ul>
     </div>
