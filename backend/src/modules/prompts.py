@@ -36,12 +36,11 @@ def build_evaluation_input(input_contents: EvaluationInput) -> str:
         # f"Allergies: {', '.join(input_contents['allergies'])}\n"
         # f"Family History: {input_contents['family_history']}\n"
         # f"Additional Notes: {input_contents['additional_notes']}"
-        f"Age: {input_contents.age}\n"
-        f"Symptoms: {', '.join(input_contents.symptoms)}\n"
+        # f"Age: {input_contents.age}\n"
+        # f"Symptoms: {', '.join(input_contents.symptoms)}\n"
         f"History: {input_contents.history}\n"
         f"Medications: {', '.join(input_contents.medications)}\n"
         f"Allergies: {', '.join(input_contents.allergies)}\n"
-        f"Family History: {input_contents.family_history}\n"
         f"Additional Notes: {input_contents.additional_notes}"
     )
     return patient_info

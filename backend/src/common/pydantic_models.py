@@ -44,11 +44,11 @@ class OutputModel(BaseModel):
 # ===============================================================
 
 class ExtractedContent(BaseModel):
-    frist_name: str
-    last_name: str
-    date_of_birth: str
-    age: int
-    symptoms: List[str]
+    # frist_name: str
+    # last_name: str
+    # date_of_birth: str
+    # age: int
+    # symptoms: List[str]
     history: str
     medications: List[str]
     allergies: List[str]

@@ -31,6 +31,7 @@ async def main():
 @app.post("/process_input", tags=["processing"])
 async def process_input_default(input_model: InputAnamnesis):
     response = process_anamnesis_default(input_model.text)
+    print(f"Response from process_anamnesis_default: {response}")
     return response
     
 
