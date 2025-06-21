@@ -64,14 +64,15 @@ async function processInput() {
     showLoading(false);
   }
 }
+
 function renderPatientSidebar(patients) {
   const waitingList = document.querySelector("#pane-waiting ul.list-group");
-  const activeList  = document.querySelector("#active-patient-list");
+  const activeList = document.querySelector("#active-patient-list");
   if (!waitingList || !activeList) return;
 
   // Listen leeren
   waitingList.innerHTML = "";
-  activeList.innerHTML  = "";
+  activeList.innerHTML = "";
 
   // Platzhalter
   const noWaiting = document.createElement("li");
@@ -82,42 +83,54 @@ function renderPatientSidebar(patients) {
   noActive.className = "list-group-item text-muted text-center";
   noActive.textContent = "Keine aktiven Patienten";
 
-  let waitingAdded = false;
-  let activeAdded  = false;
+  // 1. Patienten in zwei Gruppen aufteilen
+  const waitingPatients = patients.filter(p => p.is_waiting);
+  const activePatients = patients.filter(p => p.in_treatment);
 
-  patients.forEach(p => {
-    const fullName = `${p.first_name} ${p.last_name}`;
-    const triage   = p.last_triage_level ?? "-";
+  // 2. Sortierfunktion (identisch zur Serverseitigen)
+  const sortByTriage = (a, b) => {
+    const triageA = a.last_triage_level ?? 5; // Fallback für undefined
+    const triageB = b.last_triage_level ?? 5;
+    return triageA - triageB; // Aufsteigend: 1 (höchste Prio) zuerst
+  };
 
+  // 3. Gruppen sortieren
+  waitingPatients.sort(sortByTriage);
+  activePatients.sort(sortByTriage);
+
+  // 4. Patienten rendern
+  const renderPatient = (p, isWaiting) => {
     const li = document.createElement("li");
     li.className = "list-group-item d-flex justify-content-between align-items-center";
 
     const a = document.createElement("a");
-    // Hier ändern wir den Link auf /patient/:id statt /overview
-    a.href        = `/patient/${p.id}`;
-    a.className   = "text-decoration-none patient-name";
-    a.textContent = fullName;
+    a.href = isWaiting ? `/patient/${p.id}/overview` : `/patient/${p.id}`;
+    a.className = "text-decoration-none patient-name";
+    a.textContent = `${p.first_name} ${p.last_name}`;
 
     const triageSpan = document.createElement("span");
     triageSpan.className = "triage-indicator ms-2";
-    triageSpan.innerHTML = `<span class="triage-circle level-${triage} active"></span>`;
+    triageSpan.innerHTML = `<span class="triage-circle level-${p.last_triage_level ?? '-'} active"></span>`;
 
     li.appendChild(a);
     li.appendChild(triageSpan);
+    return li;
+  };
 
-    if (p.is_waiting) {
-      waitingList.appendChild(li);
-      waitingAdded = true;
-    } else if (p.in_treatment) {
-      activeList.appendChild(li);
-      activeAdded = true;
-    }
-  });
+  // Wartende Patienten
+  if (waitingPatients.length > 0) {
+    waitingPatients.forEach(p => waitingList.appendChild(renderPatient(p, true)));
+  } else {
+    waitingList.appendChild(noWaiting);
+  }
 
-  if (!waitingAdded) waitingList.appendChild(noWaiting);
-  if (!activeAdded)  activeList.appendChild(noActive);
+  // Aktive Patienten
+  if (activePatients.length > 0) {
+    activePatients.forEach(p => activeList.appendChild(renderPatient(p, false)));
+  } else {
+    activeList.appendChild(noActive);
+  }
 }
-
 
 function setupMoveButtons() {
   const waitingPane = document.getElementById("pane-waiting");

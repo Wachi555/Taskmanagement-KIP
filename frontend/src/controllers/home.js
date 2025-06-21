@@ -62,23 +62,26 @@ router.get('/registration', async (req, res) => {
   try {
     const allPatients = await fetchAllPatients();
 
-    // Wartende Patienten: nur die benötigten Felder extrahieren
+     // Wartende Patienten: filtern, mappen und nach triage aufsteigend sortieren
     const waitingPatients = allPatients
       .filter(p => p.is_waiting)
       .map(p => ({
         id:     p.id,
         name:   `${p.first_name} ${p.last_name}`,
         triage: p.last_triage_level
-      }));
+      }))
+      .sort((a, b) => a.triage - b.triage);   // 1 vor 2, 2 vor 3, …
 
-    // Aktive Patienten: analog
+    // Aktive Patienten: filtern, mappen und nach triage aufsteigend sortieren
     const activePatients = allPatients
       .filter(p => p.in_treatment)
       .map(p => ({
         id:     p.id,
         name:   `${p.first_name} ${p.last_name}`,
         triage: p.last_triage_level
-      }));
+      }))
+      .sort((a, b) => a.triage - b.triage);
+
 
     res.render('registration', {
       layout: 'main',
@@ -113,23 +116,26 @@ router.get('/coordination', async (req, res) => {
   try {
     const allPatients = await fetchAllPatients();
 
-    // Wartende Patienten: id, name, triage
+    // Wartende Patienten: filtern, mappen und nach triage aufsteigend sortieren
     const waitingPatients = allPatients
       .filter(p => p.is_waiting)
       .map(p => ({
         id:     p.id,
         name:   `${p.first_name} ${p.last_name}`,
         triage: p.last_triage_level
-      }));
+      }))
+      .sort((a, b) => a.triage - b.triage);   // 1 vor 2, 2 vor 3, …
 
-    // In Behandlung: id, name, triage
+    // Aktive Patienten: filtern, mappen und nach triage aufsteigend sortieren
     const activePatients = allPatients
       .filter(p => p.in_treatment)
       .map(p => ({
         id:     p.id,
         name:   `${p.first_name} ${p.last_name}`,
         triage: p.last_triage_level
-      }));
+      }))
+      .sort((a, b) => a.triage - b.triage);
+
 
     res.render('coordination', {
       layout: 'main',
