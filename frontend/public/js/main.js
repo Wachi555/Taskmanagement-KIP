@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const path = window.location.pathname;
 
     // Nur Dashboard (oder weitere Full-View-Seiten) per JS rendern:
-    if (path === "/dashboard") {
+    if (path === "/dashboard" || path.startsWith("/patient/")) {
       await window.patientStore.loadFromBackend();
       const patients = window.patientStore.getAllDetailed();
       renderPatientSidebar(patients);
@@ -21,6 +21,64 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupFullViewSearch();
   setupAudioRecorder();
 });
+
+function setupFullViewSearch() {
+  // Suchfunktion für "Alle Patienten"
+  const searchAll = document.getElementById('search-all');
+  if (searchAll) {
+    searchAll.addEventListener('input', () => {
+      filterPatientList(searchAll.value, '.col-md-6.border-end .list-group-item:not(.text-muted)');
+    });
+  }
+
+  // Suchfunktion für "Wartende Patienten"
+  const searchWaiting = document.getElementById('search-waiting');
+  if (searchWaiting) {
+    searchWaiting.addEventListener('input', () => {
+      filterPatientList(searchWaiting.value, '#pane-waiting .list-group-item:not(.text-muted)');
+    });
+  }
+
+  // Suchfunktion für "Aktive Patienten"
+  const searchActive = document.getElementById('search-active');
+  if (searchActive) {
+    searchActive.addEventListener('input', () => {
+      filterPatientList(searchActive.value, '#pane-active .list-group-item:not(.text-muted)');
+    });
+  }
+}
+
+function filterPatientList(searchTerm, itemSelector) {
+  const term = searchTerm.toLowerCase();
+  const items = document.querySelectorAll(itemSelector);
+
+  let anyVisible = false;
+  items.forEach(item => {
+    const nameElement = item.querySelector('.patient-name');
+    const name = nameElement?.textContent.toLowerCase() || '';
+    
+    if (term && !name.includes(term)) {
+      item.style.display = 'none';
+    } else {
+      item.style.display = '';
+      anyVisible = true;
+    }
+  });
+
+  // Falls keine Ergebnisse: "Keine Patienten gefunden" anzeigen
+  const container = items[0]?.closest('.list-group');
+  if (!container) return;
+
+  const existingNoResults = container.querySelector('.no-results');
+  if (!anyVisible && !existingNoResults) {
+    const noResults = document.createElement('li');
+    noResults.className = 'list-group-item text-muted text-center no-results';
+    noResults.textContent = 'Keine Patienten gefunden';
+    container.appendChild(noResults);
+  } else if (anyVisible && existingNoResults) {
+    existingNoResults.remove();
+  }
+}
 
 
 
@@ -201,86 +259,56 @@ function setupMoveButtons() {
   });
 }
 
-
 function setupSidebarSearch() {
   const searchInput = document.getElementById("sidebar-search");
-  const tabList = document.getElementById("sidebarTabs");
-  if (!searchInput || !tabList) return;
+  const tabList     = document.getElementById("sidebarTabs");
+  if (!searchInput) return;
 
-  function filterSidebarList() {
-    const filter = searchInput.value.trim().toLowerCase();
-    const activePane = document.querySelector(".tab-pane.show.active") || document.querySelector(".waiting-patients, .active-patients");
+  const filterSidebar = () => {
+    const query = searchInput.value.trim().toLowerCase();
+    // nur das aktive Tab-Pane greifen
+    const activePane = document.querySelector(
+      "#sidebarTabsContent .tab-pane.active"
+    );
     if (!activePane) return;
 
-    const listItems = activePane.querySelectorAll("li.list-group-item");
+    const ul = activePane.querySelector("ul.list-group");
+    if (!ul) return;
+
+    // alte No-Results entfernen
+    ul.querySelectorAll(".no-results").forEach(el => el.remove());
+
+    // alle echten Patient-li sammeln
+    const items = Array.from(ul.children)
+      .filter(li => li.classList.contains("list-group-item"));
+
     let anyVisible = false;
-
-    activePane.querySelectorAll(".no-results").forEach(e => e.remove());
-
-    listItems.forEach(li => {
-      if (li.classList.contains("no-results")) return;
-
-      const nameEl = li.querySelector(".patient-name, a");
-      const text = nameEl ? nameEl.textContent.trim().toLowerCase() : "";
-
-      if (filter === "" || text.includes(filter)) {
+    items.forEach(li => {
+      const a    = li.querySelector("a.patient-name");
+      const name = (a?.textContent || "").trim().toLowerCase();
+      if (query && !name.includes(query)) {
+        li.style.display = "none";
+      } else {
         li.style.display = "";
         anyVisible = true;
-      } else {
-        li.style.display = "none";
       }
     });
 
+    // wenn nichts sichtbar ist, eine entsprechende Zeile anhängen
     if (!anyVisible) {
       const noRes = document.createElement("li");
       noRes.className = "list-group-item text-center text-muted no-results";
       noRes.textContent = "Keine Patienten gefunden.";
-      activePane.querySelector(".list-group").appendChild(noRes);
+      ul.appendChild(noRes);
     }
-  }
+  };
 
-  searchInput.addEventListener("input", filterSidebarList);
-  tabList.addEventListener("shown.bs.tab", () => {
-    searchInput.value = "";
-    filterSidebarList();
-  });
+  // bei jeder Eingabe filtern
+  searchInput.addEventListener("input", filterSidebar);
+  // beim Tab-Wechsel auch filtern (Suche bleibt im Feld erhalten)
+  tabList?.addEventListener("shown.bs.tab", filterSidebar);
 }
 
-function setupFullViewSearch() {
-  const all = document.querySelector("#search-all input");
-  const waiting = document.querySelector("#search-waiting input");
-  const active = document.querySelector("#search-active input");
-
-  if (all) {
-    all.addEventListener("input", () => {
-      const filter = all.value.trim().toLowerCase();
-      document.querySelectorAll(".col-md-6.border-end ul.list-group > li").forEach(li => {
-        const name = (li.querySelector(".patient-name") || li).textContent.trim().toLowerCase();
-        li.style.display = name.includes(filter) ? "" : "none";
-      });
-    });
-  }
-
-  if (waiting) {
-    waiting.addEventListener("input", () => {
-      const filter = waiting.value.trim().toLowerCase();
-      document.querySelectorAll("#pane-waiting ul.list-group > li").forEach(li => {
-        const name = (li.querySelector(".patient-name") || li).textContent.trim().toLowerCase();
-        li.style.display = name.includes(filter) ? "" : "none";
-      });
-    });
-  }
-
-  if (active) {
-    active.addEventListener("input", () => {
-      const filter = active.value.trim().toLowerCase();
-      document.querySelectorAll("#active-patient-list > li").forEach(li => {
-        const name = (li.querySelector(".patient-name, a") || li).textContent.trim().toLowerCase();
-        li.style.display = name.includes(filter) ? "" : "none";
-      });
-    });
-  }
-}
 
 function displayResults(result) {
   resetResults();
