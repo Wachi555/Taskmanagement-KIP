@@ -7,9 +7,9 @@ def get_diagnoses_for_entry(entry_id: int):
     session.close()
     return diagnoses
 
-def create_diagnosis(entry_id: int, name: str, reason: str, confidence: float):
+def create_diagnosis(result_id: int, name: str, reason: str, confidence: float):
     session = SessionLocal()
-    new_diagnosis = Diagnosis(patient_entry_id=entry_id, name=name, reason=reason, confidence=confidence)
+    new_diagnosis = Diagnosis(result_id=result_id, name=name, reason=reason, confidence=confidence)
     session.add(new_diagnosis)
     session.commit()
     session.refresh(new_diagnosis)

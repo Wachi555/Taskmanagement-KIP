@@ -9,14 +9,14 @@ class Diagnosis(BaseModel):
 
 class Examination(BaseModel):
     name: str
-    priority: int = None
+    priority: int
 
 class Expert(BaseModel):
     type: str
 
 # Structured output for the LLM result
 class LLMResult(BaseModel):
-    diagnosis: List[Diagnosis]
+    diagnoses: List[Diagnosis]
     examinations: List[Examination]
     treatments: List[str]
     experts: List[Expert]

@@ -7,11 +7,65 @@ import database.crud_diagnoses as crud_diagnoses
 import database.crud_experts as crud_experts
 import database.crud_examinations as crud_examinations
 
-from common.pydantic_models import InputPatient
+from common.pydantic_models import InputPatient, LLMResult, ExtractedContent
+from common.pydantic_models import Diagnosis, Expert, Examination # TODO: Remove, just for debugging
 
-from modules.helpers import calculate_age
+from modules.helpers import calculate_age, stitch_together
 
 from datetime import datetime
+
+# --- General Database Functions ---
+def save_extracted_contents(patient_id: int, contents: ExtractedContent):
+    latest_entry = get_latest_patient_entry(patient_id)
+    if not latest_entry:
+        print(f"Error: No entries found for patient with ID {patient_id}. Cannot save extracted contents.")
+        return None
+    entry_id = latest_entry.id
+    # TODO: Wann hier neuen entry erstellen? bzw. überhaupt hier ? oder wo sonst?
+    crud_paitent_entries.update_patient_entry(
+        entry_id,
+        extracted_contents_json=contents.model_dump_json(),
+        patient_history=stitch_together(latest_entry.patient_history, contents.history),
+        additional_notes=stitch_together(latest_entry.additional_notes, contents.additional_notes),
+        medications=stitch_together(latest_entry.medications, contents.medications),
+    )
+    
+    patient = get_patient(patient_id)
+    if not patient:
+        print(f"Error: Patient with ID {patient_id} not found. Cannot update allergies.")
+        return None
+    crud_patients.update_patient(
+        patient_id,
+        allergies=stitch_together(patient.allergies, contents.allergies),
+    )
+
+def save_anamnesis_response(patient_id: int, response: LLMResult):
+    patient = get_patient(patient_id)
+    if not patient:
+        print(f"Error: Patient with ID {patient_id} not found.")
+        return None
+    latest_entry = get_latest_patient_entry(patient_id)
+    if not latest_entry:
+        print(f"Error: No entries found for patient with ID {patient_id}.")
+        return None 
+    
+    # Create new result in database:
+    response.experts = [Expert(type="Allgemeinmedizin"), Expert(type="Dermatologie")]
+    response.examinations = [Examination(name="Hautuntersuchung", priority=1), Examination(name="Blutuntersuchung", priority=2)]
+    response.diagnoses = [Diagnosis(name="Hautausschlag", reason="Allergische Reaktion", confidence=0.85),]
+    response.treatments = ["Antihistaminikum", "Kühlen der betroffenen Stelle"]
+    print(f"DEBUG: type: {type(response)}, resp: {response}", flush=True)
+    experts_string_list = [expert.type for expert in response.experts]
+    examinations_string_list = [examination.name for examination in response.examinations if examination]
+    result_id = crud_results.create_result(latest_entry.id, ", ".join(experts_string_list), ", ".join(examinations_string_list))
+    if not result_id:
+        print(f"Error: Could not create result for patient with ID {patient_id}.")
+        return None
+    
+    # Create diagnoses for the result
+    for diagnosis in response.diagnoses:
+        crud_diagnoses.create_diagnosis(result_id, diagnosis.name, diagnosis.reason, diagnosis.confidence)
+
 
 # --- Patient Management ---
 

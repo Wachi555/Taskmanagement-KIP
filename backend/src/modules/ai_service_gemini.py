@@ -44,7 +44,7 @@ def generate_anamnesis_response(input_contents: EvaluationInput) -> str:
             },
         )
         if response.text:
-            return json.loads(response.text)
+            return LLMResult.model_validate_json(response.text)
         raise ValueError("No response text found.")
     except Exception as e:
         print(f"Error while trying to generate a response for the anamnesis: {e}")

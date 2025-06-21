@@ -96,7 +96,7 @@ async def get_patient(patient_id: int):
     result_dict = {
         "patient": patient,
         "latest_entry": patient_entry,
-        "latessult": patient_result
+        "latest_result": patient_result
     }
     if patient:
         return result_dict

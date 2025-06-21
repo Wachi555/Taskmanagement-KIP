@@ -1,7 +1,9 @@
 # from modules.ai_service_gemini import generate_anamnesis_response, extract_contents
 from modules.ai_service_openai import generate_anamnesis_response, extract_contents
 from interfaces import database as db
+from common.pydantic_models import EvaluationInput
 import datetime
+import traceback
 
 
 # just for testing purposes, this function is not used in the actual application
@@ -16,26 +18,27 @@ def process_anamnesis(input_text: str, current_patient_id: int) -> str:
     try:
         # Extract text contents and store them in the database
         contents = extract_contents(input_text)
-        # current_date = datetime.datetime.now().strftime("%d-%m-%Y")
-        # entry_id = db.add_patient_entry(current_patient_id, current_date, contents.history, contents.additional_notes, contents.model_dump_json())
-
-        # symptoms = contents.symptoms
-        # medications = contents.medications
-        # allergies = contents.allergies
-        # for symptom in symptoms:
-            # db.add_symptom_to_entry(entry_id, symptom, current_date)
-        # for medication in medications:
-            # db.add_medication_to_entry(entry_id, medication, "N/A") # Dosage not implemented yet
+        db.save_extracted_contents(current_patient_id, contents)
         
         # Process the extracted contents
-        result = generate_anamnesis_response(contents)
-        diagnosis = result.diagnosis
-        examinations = result.examinations
-        treatments = result.treatments
-        # TODO: Save result in database
+        patient = db.get_patient(current_patient_id)
+        latest_entry = db.get_latest_patient_entry(current_patient_id)
+        eval_input = EvaluationInput(
+            age=patient.age,
+            symptoms=latest_entry.symptoms.split(", ") if latest_entry.symptoms else [],
+            history=latest_entry.patient_history if latest_entry.patient_history else "",
+            medications=latest_entry.medications.split(", ") if latest_entry.medications else [],
+            allergies=patient.allergies.split(", ") if patient.allergies else [],
+            additional_notes=latest_entry.additional_notes if latest_entry.additional_notes else ""
+        )
+        result = generate_anamnesis_response(eval_input)
+        db.save_anamnesis_response(current_patient_id, result)
+        print(f"Response form extract_contents: {contents}", flush=True)
+        print(f"Response from generate_anamnesis_response: {result}", flush=True)
         if result:
             return result
         raise ValueError("No response text found.")
     except Exception as e:
         print(f"Error: {e}")
+        print(traceback.format_exc())
         return "An error occurred while processing your request."
