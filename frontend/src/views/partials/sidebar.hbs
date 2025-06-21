@@ -6,24 +6,37 @@
   aria-labelledby="tab-waiting"
 >
   <ul class="list-group mb-2">
-    {{#each waitingPatients}}
+    {{#each (sortByTriage waitingPatients)}}
       <li class="list-group-item d-flex justify-content-between align-items-center">
-        <span class="patient-name">{{this.name}}</span>
-        <button
-          class="btn btn-sm btn-outline-primary move-to-active"
-          data-name="{{this.name}}"
-          data-triage="{{this.triage}}"
-          data-id="{{this.id}}"
+        <a
+          href="/patient/{{this.id}}"
+          class="patient-name text-decoration-none"
         >
-          Verschieben
-        </button>
+          {{this.name}}
+        </a>
+        <span class="d-flex align-items-center">
+          {{#if this.triage}}
+            <span class="triage-indicator me-2">
+              <span class="triage-circle level-{{this.triage}} active"></span>
+            </span>
+          {{/if}}
+          <!-- Button im Icon-Only-Stil wie in Coordination/Registration -->
+          <button
+            class="btn btn-icon-only move-to-active"
+            type="button"
+            data-id="{{this.id}}"
+            data-name="{{this.name}}"
+            data-triage="{{this.triage}}"
+          >
+            <i class="bi bi-arrow-right-circle"></i>
+          </button>
+        </span>
       </li>
-    {{/each}}
-    {{#unless waitingPatients.length}}
+    {{else}}
       <li class="list-group-item text-center text-muted">
         Keine wartenden Patienten
       </li>
-    {{/unless}}
+    {{/each}}
   </ul>
 </div>
 
@@ -35,21 +48,26 @@
   aria-labelledby="tab-active"
 >
   <ul id="active-patient-list" class="list-group mb-2">
-    {{#each activePatients}}
+    {{#each (sortByTriage activePatients)}}
       <li class="list-group-item d-flex justify-content-between align-items-center">
         <a
-          href="/patient/{{this.id}}/overview"
+          href="/patient/{{this.id}}"
           class="patient-name text-decoration-none"
         >
           {{this.name}}
         </a>
-        <span class="triage-circle level-{{this.triage}}"></span>
+        <span class="d-flex align-items-center">
+          {{#if this.triage}}
+            <span class="triage-indicator ms-2">
+              <span class="triage-circle level-{{this.triage}} active"></span>
+            </span>
+          {{/if}}
+        </span>
       </li>
-    {{/each}}
-    {{#unless activePatients.length}}
+    {{else}}
       <li class="list-group-item text-center text-muted">
         Keine Patienten in Behandlung
       </li>
-    {{/unless}}
+    {{/each}}
   </ul>
 </div>

@@ -5,9 +5,13 @@ from common.pydantic_models import InputAnamnesis, InputPatient, OutputModel
 from interfaces import database as db
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import UploadFile, File
 from modules.debug import test_output
 from modules.processing import process_anamnesis, process_anamnesis_default
 from database.session import init_db
+import whisper
+import tempfile
+import os
 
 app = FastAPI()
 init_db()
@@ -45,6 +49,21 @@ async def process_input(input_model: InputAnamnesis, selected_patient_id: int):
 async def process_input_debug(input_model: InputAnamnesis):
     return OutputModel(output=json.loads(test_output))
 
+# ==================== STT routes =============================
+
+model = whisper.load_model("base") # Options: tiny, base, small, medium, large
+
+@app.post("/transcribe")
+async def transcribe(file: UploadFile = File(...)):
+    # Get the original extension (e.g. .mp3, .wav, .webm)
+    _, ext = os.path.splitext(file.filename)
+    if not ext:
+        ext = ".webm"  # fallback
+    with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as temp_audio:
+        temp_audio.write(await file.read())
+        temp_audio.flush()
+        result = model.transcribe(temp_audio.name)
+    return {"transcription": result["text"]}
 # ==================== Database routes ==========================
 
 # Returns all patients

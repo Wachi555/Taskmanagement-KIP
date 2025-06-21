@@ -1,7 +1,11 @@
+import { setupAudioRecorder } from './audio.js';
+
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    // Nur außerhalb von /registration Sidebar aus dem Store neu aufbauen
-    if (!window.location.pathname.startsWith("/registration")) {
+    const path = window.location.pathname;
+
+    // Nur Dashboard (oder weitere Full-View-Seiten) per JS rendern:
+    if (path === "/dashboard") {
       await window.patientStore.loadFromBackend();
       const patients = window.patientStore.getAllDetailed();
       renderPatientSidebar(patients);
@@ -10,12 +14,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Fehler beim Laden der Patienten:", err);
   }
 
-  // Unabhängig von der Route immer einrichten
+  // Diese Setups laufen überall und finden deine <button.move-to-active>
   setupAnalyzeButton();
   setupSidebarSearch();
   setupMoveButtons();
   setupFullViewSearch();
+  setupAudioRecorder();
 });
+
 
 
 function getCurrentPatientId() {
@@ -65,12 +71,13 @@ async function processInput() {
 function renderPatientSidebar(patients) {
   const waitingList = document.querySelector("#pane-waiting ul.list-group");
   const activeList = document.querySelector("#active-patient-list");
-
   if (!waitingList || !activeList) return;
 
+  // Listen leeren
   waitingList.innerHTML = "";
   activeList.innerHTML = "";
 
+  // Platzhalter
   const noWaiting = document.createElement("li");
   noWaiting.className = "list-group-item text-muted text-center";
   noWaiting.textContent = "Keine wartenden Patienten";
@@ -79,40 +86,55 @@ function renderPatientSidebar(patients) {
   noActive.className = "list-group-item text-muted text-center";
   noActive.textContent = "Keine aktiven Patienten";
 
-  let waitingAdded = false;
-  let activeAdded = false;
+  // 1. Patienten in zwei Gruppen aufteilen
+  const waitingPatients = patients.filter(p => p.is_waiting);
+  const activePatients = patients.filter(p => p.in_treatment);
 
-  patients.forEach((p) => {
-    const fullName = `${p.first_name} ${p.last_name}`;
-    const triage = p.last_triage_level ?? "-";
+  // 2. Sortierfunktion (identisch zur Serverseitigen)
+  const sortByTriage = (a, b) => {
+    const triageA = a.last_triage_level ?? 5; // Fallback für undefined
+    const triageB = b.last_triage_level ?? 5;
+    return triageA - triageB; // Aufsteigend: 1 (höchste Prio) zuerst
+  };
 
+  // 3. Gruppen sortieren
+  waitingPatients.sort(sortByTriage);
+  activePatients.sort(sortByTriage);
+
+  // 4. Patienten rendern
+  const renderPatient = (p, isWaiting) => {
     const li = document.createElement("li");
     li.className = "list-group-item d-flex justify-content-between align-items-center";
 
     const a = document.createElement("a");
-    a.href = `/patient/${p.id}/overview`;
+    a.href = isWaiting ? `/patient/${p.id}/overview` : `/patient/${p.id}`;
     a.className = "text-decoration-none patient-name";
-    a.textContent = fullName;
+    a.textContent = `${p.first_name} ${p.last_name}`;
 
     const triageSpan = document.createElement("span");
     triageSpan.className = "triage-indicator ms-2";
-    triageSpan.innerHTML = `<span class="triage-circle level-${triage} active"></span>`;
+    triageSpan.innerHTML = `<span class="triage-circle level-${p.last_triage_level ?? '-'} active"></span>`;
 
     li.appendChild(a);
     li.appendChild(triageSpan);
+    return li;
+  };
 
-    if (p.is_waiting) {
-      waitingList.appendChild(li);
-      waitingAdded = true;
-    } else if (p.in_treatment) {
-      activeList.appendChild(li);
-      activeAdded = true;
-    }
-  });
+  // Wartende Patienten
+  if (waitingPatients.length > 0) {
+    waitingPatients.forEach(p => waitingList.appendChild(renderPatient(p, true)));
+  } else {
+    waitingList.appendChild(noWaiting);
+  }
 
-  if (!waitingAdded) waitingList.appendChild(noWaiting);
-  if (!activeAdded) activeList.appendChild(noActive);
+  // Aktive Patienten
+  if (activePatients.length > 0) {
+    activePatients.forEach(p => activeList.appendChild(renderPatient(p, false)));
+  } else {
+    activeList.appendChild(noActive);
+  }
 }
+
 function setupMoveButtons() {
   const waitingPane = document.getElementById("pane-waiting");
   const activeList = document.getElementById("active-patient-list");
