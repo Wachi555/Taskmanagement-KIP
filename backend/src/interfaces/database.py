@@ -9,6 +9,8 @@ import database.crud_examinations as crud_examinations
 
 from common.pydantic_models import InputPatient
 
+from modules.helpers import calculate_age
+
 from datetime import datetime
 
 # --- Patient Management ---
@@ -16,7 +18,7 @@ from datetime import datetime
 # Add a patient to the database
 def add_patient(patient: InputPatient) -> int:
 
-    age = 0 # TODO: Calculate age from date_of_birth
+    age = calculate_age(patient.date_of_birth)
 
     patient_id = crud_patients.create_patient(
         first_name=patient.first_name,
