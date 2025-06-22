@@ -1,5 +1,6 @@
-from database.session import SessionLocal
 from database.orm_models import Patient
+from database.session import SessionLocal
+
 
 def get_all_patients():
     session = SessionLocal()
@@ -7,36 +8,61 @@ def get_all_patients():
     session.close()
     return patients
 
+
 def get_patient_by_id(patient_id: int):
     session = SessionLocal()
     patient = session.query(Patient).filter(Patient.id == patient_id).first()
     session.close()
     return patient
 
+
 def get_patient_by_name_and_dob(first_name: str, last_name: str, date_of_birth: str):
     session = SessionLocal()
-    patient = session.query(Patient).filter(
-        Patient.first_name == first_name,
-        Patient.last_name == last_name,
-        Patient.date_of_birth == date_of_birth
-    ).first()
+    patient = (
+        session.query(Patient)
+        .filter(
+            Patient.first_name == first_name,
+            Patient.last_name == last_name,
+            Patient.date_of_birth == date_of_birth,
+        )
+        .first()
+    )
     session.close()
     return patient
 
+
 def create_patient(
-        first_name: str, last_name: str, gender: str, age: int, date_of_birth: str, is_waiting: bool, in_treatment: bool, 
-        health_insurance: str, allergies: str, address: str):
+    first_name: str,
+    last_name: str,
+    gender: str,
+    age: int,
+    date_of_birth: str,
+    is_waiting: bool,
+    in_treatment: bool,
+    health_insurance: str,
+    allergies: str,
+    address: str,
+):
 
     session = SessionLocal()
     new_patient = Patient(
-        first_name=first_name, last_name=last_name, gender=gender, age=age, date_of_birth=date_of_birth, is_waiting=is_waiting,
-        in_treatment=in_treatment, health_insurance=health_insurance, allergies=allergies, address=address
+        first_name=first_name,
+        last_name=last_name,
+        gender=gender,
+        age=age,
+        date_of_birth=date_of_birth,
+        is_waiting=is_waiting,
+        in_treatment=in_treatment,
+        health_insurance=health_insurance,
+        allergies=allergies,
+        address=address,
     )
     session.add(new_patient)
     session.commit()
     session.refresh(new_patient)
     session.close()
     return new_patient.id
+
 
 def delete_patient(patient_id: int):
     session = SessionLocal()
@@ -50,10 +76,21 @@ def delete_patient(patient_id: int):
         session.close()
         return False
 
+
 def update_patient(
-        patient_id: int, first_name: str = None, last_name: str = None, age: int = None, date_of_birth: str = None, 
-        is_waiting: bool = None, in_treatment: bool = None, health_insurance: str = None, allergies: str = None,
-        address: str = None, last_triage_level: int = None, gender: str = None):
+    patient_id: int,
+    first_name: str | None = None,
+    last_name: str | None = None,
+    age: int | None = None,
+    date_of_birth: str | None = None,
+    is_waiting: bool | None = None,
+    in_treatment: bool | None = None,
+    health_insurance: str | None = None,
+    allergies: str | None = None,
+    address: str | None = None,
+    last_triage_level: int | None = None,
+    gender: str | None = None,
+):
 
     session = SessionLocal()
     patient = session.query(Patient).filter(Patient.id == patient_id).first()

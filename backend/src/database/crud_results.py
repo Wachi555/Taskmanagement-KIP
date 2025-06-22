@@ -1,14 +1,23 @@
-from database.session import SessionLocal
 from database.orm_models import Result
+from database.session import SessionLocal
 
-def create_result(patient_entry_id: int, experts: str, examinations: str, treatments: str):
+
+def create_result(
+    patient_entry_id: int, experts: str, examinations: str, treatments: str
+):
     session = SessionLocal()
-    new_result = Result(patient_entry_id=patient_entry_id, experts=experts, examinations=examinations, treatments=treatments)
+    new_result = Result(
+        patient_entry_id=patient_entry_id,
+        experts=experts,
+        examinations=examinations,
+        treatments=treatments,
+    )
     session.add(new_result)
     session.commit()
     session.refresh(new_result)
     session.close()
     return new_result.id
+
 
 def get_result_by_id(result_id: int):
     session = SessionLocal()
@@ -16,11 +25,15 @@ def get_result_by_id(result_id: int):
     session.close()
     return result
 
+
 def get_results_by_patient_entry_id(patient_entry_id: int):
     session = SessionLocal()
-    results = session.query(Result).filter(Result.patient_entry_id == patient_entry_id).all()
+    results = (
+        session.query(Result).filter(Result.patient_entry_id == patient_entry_id).all()
+    )
     session.close()
     return results
+
 
 def update_result(result_id: int, triage_level: int):
     session = SessionLocal()
@@ -34,7 +47,8 @@ def update_result(result_id: int, triage_level: int):
     else:
         session.close()
         return None
-    
+
+
 def delete_result(result_id: int):
     session = SessionLocal()
     result = session.query(Result).filter(Result.id == result_id).first()

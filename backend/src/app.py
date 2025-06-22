@@ -1,17 +1,22 @@
 import json
+import os
+import tempfile
 
 import uvicorn
-from common.pydantic_models import InputAnamnesis, InputPatient, OutputModel, LLMResult, UpdatePatient
-from interfaces import database as db
-from fastapi import FastAPI
+import whisper
+from common.pydantic_models import (
+    InputAnamnesis,
+    InputPatient,
+    LLMResult,
+    OutputModel,
+    UpdatePatient,
+)
+from database.session import init_db
+from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import UploadFile, File
+from interfaces import database as db
 from modules.debug import test_output
 from modules.processing import process_anamnesis, process_anamnesis_default
-from database.session import init_db
-import whisper
-import tempfile
-import os
 
 app = FastAPI()
 init_db()
@@ -31,19 +36,25 @@ app.add_middleware(
 async def main():
     return {"message": "Hello World"}
 
+
 # ==================== Processing routes ========================
 @app.post("/process_input", tags=["processing"])
 async def process_input_default(input_model: InputAnamnesis):
     response = process_anamnesis_default(input_model.text)
     print(f"Response from process_anamnesis_default: {response}")
     return response
-    
+
 
 @app.post("/process_input/{selected_patient_id}", tags=["processing"])
 async def process_input(input_model: InputAnamnesis, selected_patient_id: int):
     success = process_anamnesis(input_model.text, selected_patient_id)
     if not success:
-        return {"output": "Failed to process input", "success": False, "error_code": 500, "error_message": "Processing error"}
+        return {
+            "output": "Failed to process input",
+            "success": False,
+            "error_code": 500,
+            "error_message": "Processing error",
+        }
 
     patient_entry = db.get_latest_patient_entry(selected_patient_id)
     result = db.get_results_for_entry(patient_entry.id) if patient_entry else None
@@ -62,21 +73,29 @@ async def process_input(input_model: InputAnamnesis, selected_patient_id: int):
     print(f"DEBUG: treatments: {treatments}")
 
     response = {
-        "diagnoses": [ {"name": d.name, "reason": d.reason, "confidence": d.confidence} for d in diagnoses ],
-        "examinations": [ {"name": e['name'], "priority": e['priority']} for e in examinations ],
+        "diagnoses": [
+            {"name": d.name, "reason": d.reason, "confidence": d.confidence}
+            for d in diagnoses
+        ],
+        "examinations": [
+            {"name": e["name"], "priority": e["priority"]} for e in examinations
+        ],
         "treatments": treatments,
-        "experts": experts
+        "experts": experts,
     }
-    return OutputModel(output=response) # !!!! Hier weiter: Ouput muss jetzt aus db kommen, nicht mehr aus dem AI-Service
+    return OutputModel(
+        output=response
+    )  # !!!! Hier weiter: Ouput muss jetzt aus db kommen, nicht mehr aus dem AI-Service
 
 
 @app.post("/process_input_debug", tags=["processing"])
 async def process_input_debug(input_model: InputAnamnesis):
     return OutputModel(output=json.loads(test_output))
 
-# ==================== STT routes =============================
 
-model = whisper.load_model("base") # Options: tiny, base, small, medium, large
+# ==================== STT routes =============================
+model = whisper.load_model("base")  # Options: tiny, base, small, medium, large
+
 
 @app.post("/transcribe")
 async def transcribe(file: UploadFile = File(...)):
@@ -89,8 +108,9 @@ async def transcribe(file: UploadFile = File(...)):
         temp_audio.flush()
         result = model.transcribe(temp_audio.name)
     return {"transcription": result["text"]}
-# ==================== Database routes ==========================
 
+
+# ==================== Database routes ==========================
 # Returns all patients
 @app.get("/patients", tags=["database"])
 async def get_patients():
@@ -108,6 +128,7 @@ async def get_patients():
 
     return patients
 
+
 @app.get("/patient/{patient_id}", tags=["database"])
 async def get_patient(patient_id: int):
     patient = db.get_patient(patient_id)
@@ -116,35 +137,61 @@ async def get_patient(patient_id: int):
         patient.last_triage_level = patient_entry.triage_level
     else:
         patient.last_triage_level = -1
-    patient_result = db.get_results_for_entry(patient_entry.id) if patient_entry else None # TODO: Handle multiple results -> Improve this with "latest_result_id" in patient_entry
+    patient_result = (
+        db.get_results_for_entry(patient_entry.id) if patient_entry else None
+    )  # TODO: Handle multiple results -> Improve this with "latest_result_id" in patient_entry
     patient_result = patient_result[0] if patient_result else None
     diagnoses = db.get_diagnoses_for_entry(patient_result.id) if patient_result else []
     result_dict = {
         "patient": patient,
         "latest_entry": patient_entry,
         "latest_result": patient_result,
-        "diagnoses": diagnoses
+        "diagnoses": diagnoses,
     }
     if patient:
         return result_dict
     else:
-        return {"output": "Patient not found", "success": False, "error_code": 404, "error_message": "Patient not found"}
+        return {
+            "output": "Patient not found",
+            "success": False,
+            "error_code": 404,
+            "error_message": "Patient not found",
+        }
+
 
 @app.post("/patient", tags=["database"])
 async def insert_patient(input_model: InputPatient):
     patient_id = db.add_patient(input_model)
     if patient_id:
-        return {"output": f"Patient with ID {patient_id} inserted successfully", "success": True}
+        return {
+            "output": f"Patient with ID {patient_id} inserted successfully",
+            "success": True,
+        }
     else:
-        return {"output": "Failed to insert patient", "success": False, "error_code": 500, "error_message": "Database error"}
+        return {
+            "output": "Failed to insert patient",
+            "success": False,
+            "error_code": 500,
+            "error_message": "Database error",
+        }
+
 
 @app.delete("/patient/{patient_id}", tags=["database"])
 async def delete_patient(patient_id: int):
     success = db.remove_patient(patient_id)
     if success:
-        return {"output": f"Patient with ID {patient_id} deleted successfully", "success": True}
+        return {
+            "output": f"Patient with ID {patient_id} deleted successfully",
+            "success": True,
+        }
     else:
-        return {"output": "Failed to delete patient", "success": False, "error_code": 500, "error_message": "Database error"}
+        return {
+            "output": "Failed to delete patient",
+            "success": False,
+            "error_code": 500,
+            "error_message": "Database error",
+        }
+
 
 @app.get("/patient/{patient_id}/entries", tags=["database"])
 async def get_patient_entries(patient_id: int):
@@ -152,32 +199,75 @@ async def get_patient_entries(patient_id: int):
     if entries:
         return entries
     else:
-        return {"output": "No entries found for this patient", "success": False, "error_code": 404, "error_message": "No entries found"}
+        return {
+            "output": "No entries found for this patient",
+            "success": False,
+            "error_code": 404,
+            "error_message": "No entries found",
+        }
 
-@app.get("/patient/update_status/{patient_id}/{status}", tags=["database"], description="Update patient status. Status: 0 = in history, 1 = waiting, 2 = in treatment")
+
+@app.get(
+    "/patient/update_status/{patient_id}/{status}",
+    tags=["database"],
+    description="Update patient status. Status: 0 = in history, 1 = waiting, 2 = in treatment",
+)
 async def update_patient_status(patient_id: int, status: int):
     if status not in [0, 1, 2]:
-        return {"output": "Invalid status", "success": False, "error_code": 400, "error_message": "Status must be 0 (in history), 1 (waiting), or 2 (in treatment)"}
-    success = db.update_patient(patient_id, is_waiting=(status == 1), in_treatment=(status == 2))
+        return {
+            "output": "Invalid status",
+            "success": False,
+            "error_code": 400,
+            "error_message": "Status must be 0 (in history), 1 (waiting), or 2 (in treatment)",
+        }
+    success = db.update_patient(
+        patient_id, is_waiting=(status == 1), in_treatment=(status == 2)
+    )
     if success:
-        return {"output": f"Patient with ID {patient_id} updated successfully", "success": True}
+        return {
+            "output": f"Patient with ID {patient_id} updated successfully",
+            "success": True,
+        }
     else:
-        return {"output": "Failed to update patient", "success": False, "error_code": 500, "error_message": "Database error"}
+        return {
+            "output": "Failed to update patient",
+            "success": False,
+            "error_code": 500,
+            "error_message": "Database error",
+        }
+
 
 @app.get("/patient/{patient_id}/set_triage/{triage_level}", tags=["database"])
 async def set_patient_triage(patient_id: int, triage_level: int):
     if triage_level < 0 or triage_level > 5:
-        return {"output": "Invalid triage level", "success": False, "error_code": 400, "error_message": "Triage level must be between 0 and 5"}
+        return {
+            "output": "Invalid triage level",
+            "success": False,
+            "error_code": 400,
+            "error_message": "Triage level must be between 0 and 5",
+        }
     success = db.update_patient(patient_id, triage_level=triage_level)
     if success:
-        return {"output": f"Patient with ID {patient_id} triage level updated to {triage_level}", "success": True}
+        return {
+            "output": f"Patient with ID {patient_id} triage level updated to {triage_level}",
+            "success": True,
+        }
     else:
-        return {"output": "Failed to update patient triage level", "success": False, "error_code": 500, "error_message": "Database error"}
+        return {
+            "output": "Failed to update patient triage level",
+            "success": False,
+            "error_code": 500,
+            "error_message": "Database error",
+        }
+
 
 # Update patient data
 @app.post("/patient/update/{patient_id}", tags=["database"])
 async def update_patient_data(patient_id: int, input_model: UpdatePatient):
-    print(f"DEBUG: Updating patient with ID {patient_id} with data: {input_model}", flush=True)
+    print(
+        f"DEBUG: Updating patient with ID {patient_id} with data: {input_model}",
+        flush=True,
+    )
     success = db.update_patient(
         patient_id,
         first_name=input_model.first_name,
@@ -189,20 +279,62 @@ async def update_patient_data(patient_id: int, input_model: UpdatePatient):
         # triage_level=input_model.triage_level
     )
     if success:
-        return {"output": f"Patient with ID {patient_id} updated successfully", "success": True}
+        return {
+            "output": f"Patient with ID {patient_id} updated successfully",
+            "success": True,
+        }
     else:
-        return {"output": "Failed to update patient", "success": False, "error_code": 500, "error_message": "Database error"}
+        return {
+            "output": "Failed to update patient",
+            "success": False,
+            "error_code": 500,
+            "error_message": "Database error",
+        }
+
 
 @app.get("/insert_example_patients", tags=["database"])
 async def insert_example_patients():
     example_patients = [
-        {"first_name": "Json", "last_name": "Derulo", "gender": "männlich", "date_of_birth": "1999-02-13", "health_insurance": "krasse kasse", "allergies": "", "address": "123 Straße", "triage_level": 2, "symptoms": "Mangelnde Motivation"},
-        {"first_name": "Ute", "last_name": "Russ", "gender": "weiblich", "date_of_birth": "2002-02-20", "health_insurance": "volle versicherung", "allergies": "", "address": "OTH Regensburg", "triage_level": 3, "symptoms": "Absolut keine Lust mehr"},
-        {"first_name": "Timo", "last_name": "Blaumann", "gender": "männlich", "date_of_birth": "2003-03-03", "health_insurance": "absolute absicherer", "allergies": "", "address": "Vergessen", "triage_level": 1, "symptoms": "akute Alkoholsucht"},
+        {
+            "first_name": "Json",
+            "last_name": "Derulo",
+            "gender": "männlich",
+            "date_of_birth": "1999-02-13",
+            "health_insurance": "krasse kasse",
+            "allergies": "",
+            "address": "123 Straße",
+            "triage_level": 2,
+            "symptoms": "Mangelnde Motivation",
+        },
+        {
+            "first_name": "Ute",
+            "last_name": "Russ",
+            "gender": "weiblich",
+            "date_of_birth": "2002-02-20",
+            "health_insurance": "volle versicherung",
+            "allergies": "",
+            "address": "OTH Regensburg",
+            "triage_level": 3,
+            "symptoms": "Absolut keine Lust mehr",
+        },
+        {
+            "first_name": "Timo",
+            "last_name": "Blaumann",
+            "gender": "männlich",
+            "date_of_birth": "2003-03-03",
+            "health_insurance": "absolute absicherer",
+            "allergies": "",
+            "address": "Vergessen",
+            "triage_level": 1,
+            "symptoms": "akute Alkoholsucht",
+        },
     ]
     for patient in example_patients:
         db.add_patient(InputPatient(**patient))
-    return {"output": f"{len(example_patients)} example patients inserted successfully", "success": True}
+    return {
+        "output": f"{len(example_patients)} example patients inserted successfully",
+        "success": True,
+    }
 
 
 if __name__ == "__main__":

@@ -1,18 +1,22 @@
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel
+
 
 class Diagnosis(BaseModel):
     name: str
     reason: Optional[str] = None
     confidence: Optional[float] = None
 
+
 class Examination(BaseModel):
     name: str
     priority: int
 
+
 class Expert(BaseModel):
     type: str
+
 
 # Structured output for the LLM result
 class LLMResult(BaseModel):
@@ -22,11 +26,12 @@ class LLMResult(BaseModel):
     experts: List[Expert]
     # overall_priority: int # TODO: They requested "prioritisation based on current capacity/utilisation of the hospital" -> Doesn't really make sense, bc. either a patient is important or not?
 
-# ==== Input Output from Frontend ====
 
+# ==== Input Output from Frontend ====
 # Input from frontend for processing the anamnesis text
 class InputAnamnesis(BaseModel):
     text: str
+
 
 # Patient data from frontend for creating a new patient
 class InputPatient(BaseModel):
@@ -39,6 +44,7 @@ class InputPatient(BaseModel):
     symptoms: str
     address: str
 
+
 class UpdatePatient(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
@@ -47,21 +53,23 @@ class UpdatePatient(BaseModel):
     # gender: Optional[str] = None
     health_insurance: Optional[str] = None
 
+
 # What the frontend receives from the backend after processing the anamnesis text
 class OutputModel(BaseModel):
     output: Dict
     success: bool = True
-    error: str = None
-    status_code: int = None
+    error: str | None = None
+    status_code: int | None = None
+
 
 # ===============================================================
-
 # What content the model should extract from the anamnesis text
 class ExtractedContent(BaseModel):
     history: str
     medications: List[str]
     allergies: List[str]
     additional_notes: str
+
 
 # What the model recieves to evaluate the patient
 class EvaluationInput(BaseModel):

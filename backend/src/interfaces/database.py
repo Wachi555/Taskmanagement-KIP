@@ -1,45 +1,55 @@
-import database.crud_patients as crud_patients
-import database.crud_paitent_entries as crud_paitent_entries
-import database.crud_results as crud_results
-import database.crud_symptoms as crud_symptoms
-import database.crud_medications as crud_medications
-import database.crud_diagnoses as crud_diagnoses
-import database.crud_experts as crud_experts
-import database.crud_examinations as crud_examinations
-
-from common.pydantic_models import InputPatient, LLMResult, ExtractedContent
-from common.pydantic_models import Diagnosis, Expert, Examination # TODO: Remove, just for debugging
-
-from modules.helpers import calculate_age, stitch_together
-
+import json
 from datetime import datetime
 
-import json
+import database.crud_diagnoses as crud_diagnoses
+import database.crud_examinations as crud_examinations
+import database.crud_experts as crud_experts
+import database.crud_medications as crud_medications
+import database.crud_paitent_entries as crud_paitent_entries
+import database.crud_patients as crud_patients
+import database.crud_results as crud_results
+import database.crud_symptoms as crud_symptoms
+from common.pydantic_models import (  # TODO: Remove, just for debugging
+    Diagnosis,
+    Examination,
+    Expert,
+    ExtractedContent,
+    InputPatient,
+    LLMResult,
+)
+from modules.helpers import calculate_age, stitch_together
+
 
 # --- General Database Functions ---
-
 def save_extracted_contents(patient_id: int, contents: ExtractedContent):
     latest_entry = get_latest_patient_entry(patient_id)
     if not latest_entry:
-        print(f"Error: No entries found for patient with ID {patient_id}. Cannot save extracted contents.")
+        print(
+            f"Error: No entries found for patient with ID {patient_id}. Cannot save extracted contents."
+        )
         return None
     entry_id = latest_entry.id
     crud_paitent_entries.update_patient_entry(
         entry_id,
         extracted_contents_json=contents.model_dump_json(),
         patient_history=stitch_together(latest_entry.patient_history, contents.history),
-        additional_notes=stitch_together(latest_entry.additional_notes, contents.additional_notes),
+        additional_notes=stitch_together(
+            latest_entry.additional_notes, contents.additional_notes
+        ),
         medications=stitch_together(latest_entry.medications, contents.medications),
     )
-    
+
     patient = get_patient(patient_id)
     if not patient:
-        print(f"Error: Patient with ID {patient_id} not found. Cannot update allergies.")
+        print(
+            f"Error: Patient with ID {patient_id} not found. Cannot update allergies."
+        )
         return None
     crud_patients.update_patient(
         patient_id,
         allergies=stitch_together(patient.allergies, contents.allergies),
     )
+
 
 def save_anamnesis_response(patient_id: int, response: LLMResult):
     patient = get_patient(patient_id)
@@ -49,35 +59,54 @@ def save_anamnesis_response(patient_id: int, response: LLMResult):
     latest_entry = get_latest_patient_entry(patient_id)
     if not latest_entry:
         print(f"Error: No entries found for patient with ID {patient_id}.")
-        return None 
-    
+        return None
+
     # Create new result in database:
     # TODO: Remove this when Openai is used again
     response.experts = [Expert(type="Allgemeinmedizin"), Expert(type="Dermatologie")]
-    response.examinations = [Examination(name="Hautuntersuchung", priority=1), Examination(name="Blutuntersuchung", priority=2)]
-    response.diagnoses = [Diagnosis(name="Hautausschlag", reason="Allergische Reaktion", confidence=0.85),]
+    response.examinations = [
+        Examination(name="Hautuntersuchung", priority=1),
+        Examination(name="Blutuntersuchung", priority=2),
+    ]
+    response.diagnoses = [
+        Diagnosis(name="Hautausschlag", reason="Allergische Reaktion", confidence=0.85),
+    ]
     response.treatments = ["Antihistaminikum", "Kühlen der betroffenen Stelle"]
     print(f"DEBUG: type: {type(response)}, resp: {response}", flush=True)
     experts_string_list = [expert.type for expert in response.experts]
-    examinations_dict_list = [{"name": examination.name, "priority": examination.priority} for examination in response.examinations if examination]
-    examinations_string_list = [json.dumps(examination) for examination in examinations_dict_list if examination]
-    result_id = crud_results.create_result(latest_entry.id, ", ".join(experts_string_list), "; ".join(examinations_string_list), treatments=", ".join(response.treatments))
+    examinations_dict_list = [
+        {"name": examination.name, "priority": examination.priority}
+        for examination in response.examinations
+        if examination
+    ]
+    examinations_string_list = [
+        json.dumps(examination) for examination in examinations_dict_list if examination
+    ]
+    result_id = crud_results.create_result(
+        latest_entry.id,
+        ", ".join(experts_string_list),
+        "; ".join(examinations_string_list),
+        treatments=", ".join(response.treatments),
+    )
     if not result_id:
         print(f"Error: Could not create result for patient with ID {patient_id}.")
         return None
-    
+
     # Create diagnoses for the result
     for diagnosis in response.diagnoses:
-        crud_diagnoses.create_diagnosis(result_id, diagnosis.name, diagnosis.reason, diagnosis.confidence)
+        crud_diagnoses.create_diagnosis(
+            result_id, diagnosis.name, diagnosis.reason, diagnosis.confidence
+        )
 
 
 # --- Patient Management ---
-
 # Add a patient to the database
 def add_patient(patient: InputPatient) -> int:
 
     # Check if patient already exists
-    existing_patient = crud_patients.get_patient_by_name_and_dob(patient.first_name, patient.last_name, patient.date_of_birth)
+    existing_patient = crud_patients.get_patient_by_name_and_dob(
+        patient.first_name, patient.last_name, patient.date_of_birth
+    )
     print(f"DEBUG: existing_patient: {existing_patient}", flush=True)
     if existing_patient:
         # Update the existing patient
@@ -95,10 +124,7 @@ def add_patient(patient: InputPatient) -> int:
         )
         if updated_patient:
             print(f"DEBUG: Updated existing patient with ID {patient_id}", flush=True)
-            new_entry_id = crud_paitent_entries.create_patient_entry(
-                
-            )
-            
+            new_entry_id = crud_paitent_entries.create_patient_entry()
 
     age = calculate_age(patient.date_of_birth)
 
@@ -111,15 +137,15 @@ def add_patient(patient: InputPatient) -> int:
         is_waiting=True,
         in_treatment=False,  # Default value
         health_insurance=patient.health_insurance,
-        allergies=None, # Default value, can be updated later
-        address=patient.address
+        allergies=None,  # Default value, can be updated later
+        address=patient.address,
     )
-    
+
     # create initial patient entry
     if patient_id is None:
         print("Error: Could not create patient.")
         return None
-    
+
     entry_id = crud_paitent_entries.create_patient_entry(
         patient_id=patient_id,
         entry_date=datetime.now().date(),  # TODO: Check for correct date format
@@ -127,30 +153,34 @@ def add_patient(patient: InputPatient) -> int:
         additional_notes="",
         extracted_contents_json="",  # Empty string for now
         symptoms=patient.symptoms,
-        medications="", # Empty string for now
-        triage_level=patient.triage_level 
+        medications="",  # Empty string for now
+        triage_level=patient.triage_level,
     )
 
     if entry_id is None:
         print("Error: Could not create initial patient entry.")
         return None
-    
-    return patient_id 
+
+    return patient_id
+
 
 # Get a patient by ID
 def get_patient(patient_id: int):
     patient = crud_patients.get_patient_by_id(patient_id)
-    
+
     if patient:
         patient_age = calculate_age(patient.date_of_birth)
         patient.age = patient_age
-        update_patient(patient_id, age=patient_age)  # Update the patient's age in the database
+        update_patient(
+            patient_id, age=patient_age
+        )  # Update the patient's age in the database
         return patient
     else:
         # TODO: Maybe raise an exception or return a specific error message
         # TODO: The none return has to caught in the frontend
         print(f"Error: Patient with ID {patient_id} not found.")
         return None
+
 
 # Get all patients
 def get_all_patients():
@@ -164,6 +194,7 @@ def get_all_patients():
     else:
         ...
 
+
 # Remove patient from the database
 def remove_patient(patient_id: int):
     success = crud_patients.delete_patient(patient_id)
@@ -172,10 +203,22 @@ def remove_patient(patient_id: int):
     else:
         ...
 
+
 # Update patient information
-def update_patient(patient_id: int, first_name: str = None, last_name: str = None, age: int = None, date_of_birth: str = None, is_waiting: bool = None,
-                   in_treatment: bool = None, health_insurance: str = None, allergies: str = None, address: str = None, triage_level: int = None,
-                   gender: str = None):
+def update_patient(
+    patient_id: int,
+    first_name: str | None = None,
+    last_name: str | None = None,
+    age: int | None = None,
+    date_of_birth: str | None = None,
+    is_waiting: bool | None = None,
+    in_treatment: bool | None = None,
+    health_insurance: str | None = None,
+    allergies: str | None = None,
+    address: str | None = None,
+    triage_level: int | None = None,
+    gender: str | None = None,
+):
     updated_patient = crud_patients.update_patient(
         patient_id,
         first_name=first_name,
@@ -188,20 +231,22 @@ def update_patient(patient_id: int, first_name: str = None, last_name: str = Non
         health_insurance=health_insurance,
         allergies=allergies,
         address=address,
-        last_triage_level=triage_level  # TODO: This sucks -> move triage back to the patient entry
+        last_triage_level=triage_level,  # TODO: This sucks -> move triage back to the patient entry
     )
     latest_entry = get_latest_patient_entry(patient_id)
     if latest_entry:
         latest_entry_id = latest_entry.id
-        crud_paitent_entries.update_patient_entry(latest_entry_id, triage_level=triage_level)
+        crud_paitent_entries.update_patient_entry(
+            latest_entry_id, triage_level=triage_level
+        )
 
     if updated_patient:
         return updated_patient
     else:
         ...
 
-# --- Patient Entry Management ---
 
+# --- Patient Entry Management ---
 # Get all entries for a patient
 def get_patient_entries(patient_id: int):
     entries = crud_paitent_entries.get_patient_entries(patient_id)
@@ -209,7 +254,8 @@ def get_patient_entries(patient_id: int):
         return entries
     else:
         ...
-        
+
+
 # Get the latest entry for a patient
 def get_latest_patient_entry(patient_id: int):
     entries = crud_paitent_entries.get_patient_entries(patient_id)
@@ -219,6 +265,7 @@ def get_latest_patient_entry(patient_id: int):
     else:
         ...
 
+
 # Get a specific entry for a patient
 def get_patient_entry(entry_id: int):
     entry = crud_paitent_entries.get_patient_entry(entry_id)
@@ -227,18 +274,44 @@ def get_patient_entry(entry_id: int):
     else:
         ...
 
-# Add an entry for a patient
-def add_patient_entry(patient_id: int, date: str, patient_history: str, additional_notes: str, symptoms: str, medications: str, content_json: str):
-    entry_id = crud_paitent_entries.create_patient_entry(patient_id, date, patient_history, additional_notes, content_json, symptoms, medications)
-    if entry_id:
-        return entry_id
-    else:
-        ...
-        
+
+# # Add an entry for a patient
+# def add_patient_entry(
+#     patient_id: int,
+#     date: str,
+#     patient_history: str,
+#     additional_notes: str,
+#     symptoms: str,
+#     medications: str,
+#     content_json: str,
+# ):
+#     entry_id = crud_paitent_entries.create_patient_entry(
+#         patient_id,
+#         date,
+#         patient_history,
+#         additional_notes,
+#         content_json,
+#         symptoms,
+#         medications,
+#     )
+#     if entry_id:
+#         return entry_id
+#     else:
+#         ...
+
+
 # Update an entry for a patient
 # Not implemented
-def update_patient_entry(entry_id: int, entry_date: str = None, patient_history: str = None, additional_notes: str = None, 
-        extracted_contents_json: str = None, symptoms: str = None, medications: str = None, triage_level: int = None):
+def update_patient_entry(
+    entry_id: int,
+    entry_date: str | None = None,
+    patient_history: str | None = None,
+    additional_notes: str | None = None,
+    extracted_contents_json: str | None = None,
+    symptoms: str | None = None,
+    medications: str | None = None,
+    triage_level: int | None = None,
+):
     updated_entry = crud_paitent_entries.update_patient_entry(
         entry_id,
         entry_date=entry_date,
@@ -247,13 +320,14 @@ def update_patient_entry(entry_id: int, entry_date: str = None, patient_history:
         extracted_contents_json=extracted_contents_json,
         symptoms=symptoms,
         medications=medications,
-        triage_level=triage_level
+        triage_level=triage_level,
     )
     if updated_entry:
         return updated_entry
     else:
         ...
-        
+
+
 # Remove an entry for a patient
 def remove_patient_entry(entry_id: int):
     success = crud_paitent_entries.delete_patient_entry(entry_id)
@@ -261,9 +335,9 @@ def remove_patient_entry(entry_id: int):
         return True
     else:
         ...
-        
-# --- Symptom Management ---
 
+
+# --- Symptom Management ---
 # Get all symptoms for a patient entry
 def get_symptoms_for_entry(entry_id: int):
     symptoms = crud_symptoms.get_symptoms_for_entry(entry_id)
@@ -271,6 +345,7 @@ def get_symptoms_for_entry(entry_id: int):
         return symptoms
     else:
         ...
+
 
 # Add a symptom to a patient entry
 def add_symptom_to_entry(entry_id: int, symptom_data):
@@ -280,6 +355,7 @@ def add_symptom_to_entry(entry_id: int, symptom_data):
     else:
         ...
 
+
 # Remove a symptom from a patient entry
 def remove_symptom_from_entry(symptom_id: int):
     success = crud_symptoms.delete_symptom(symptom_id)
@@ -288,8 +364,8 @@ def remove_symptom_from_entry(symptom_id: int):
     else:
         ...
 
-# --- Medication Management ---
 
+# --- Medication Management ---
 # Get all medications for a patient entry
 def get_medications_for_entry(entry_id: int):
     medications = crud_medications.get_medications_for_entry(entry_id)
@@ -297,7 +373,8 @@ def get_medications_for_entry(entry_id: int):
         return medications
     else:
         ...
-        
+
+
 # Add a medication to a patient entry
 def add_medication_to_entry(entry_id: int, name: str, dosage: str):
     medication_id = crud_medications.create_medication(entry_id, name, dosage)
@@ -305,7 +382,8 @@ def add_medication_to_entry(entry_id: int, name: str, dosage: str):
         return medication_id
     else:
         ...
-        
+
+
 # Remove a medication from a patient entry
 def remove_medication_from_entry(medication_id: int):
     success = crud_medications.delete_medication(medication_id)
@@ -313,9 +391,9 @@ def remove_medication_from_entry(medication_id: int):
         return True
     else:
         ...
-        
-# --- Diagnosis Management ---
 
+
+# --- Diagnosis Management ---
 # Get all diagnoses for a patient entry
 def get_diagnoses_for_entry(entry_id: int):
     diagnoses = crud_diagnoses.get_diagnoses_for_entry(entry_id)
@@ -323,7 +401,8 @@ def get_diagnoses_for_entry(entry_id: int):
         return diagnoses
     else:
         ...
-        
+
+
 # Add a diagnosis to a patient entry
 def add_diagnosis_to_entry(entry_id: int, diagnosis_data):
     diagnosis_id = crud_diagnoses.create_diagnosis(entry_id, diagnosis_data)
@@ -332,6 +411,7 @@ def add_diagnosis_to_entry(entry_id: int, diagnosis_data):
     else:
         ...
 
+
 # Remove a diagnosis from a patient entry
 def remove_diagnosis_from_entry(diagnosis_id: int):
     success = crud_diagnoses.delete_diagnosis(diagnosis_id)
@@ -339,22 +419,27 @@ def remove_diagnosis_from_entry(diagnosis_id: int):
         return True
     else:
         ...
-        
-# --- Result Management ---
 
+
+# --- Result Management ---
 # Get all results for a patient entry
 def get_results_for_entry(entry_id: int):
     results = crud_results.get_results_by_patient_entry_id(entry_id)
     for result in results:
-        exams = result.examinations 
+        exams = result.examinations
         print(f"DEBUG: result.examinations: {exams}", flush=True)
-        exams = [json.loads(exam.strip()) for exam in exams.split("; ") if exam] if exams else []
+        exams = (
+            [json.loads(exam.strip()) for exam in exams.split("; ") if exam]
+            if exams
+            else []
+        )
         result.examinations = exams
     if results:
         return results
     else:
         ...
-        
+
+
 # Add a result to a patient entry
 def add_result_to_entry(entry_id: int, result_data):
     result_id = crud_results.create_result(entry_id, result_data)
@@ -362,7 +447,8 @@ def add_result_to_entry(entry_id: int, result_data):
         return result_id
     else:
         ...
-        
+
+
 # Remove a result from a patient entry
 def remove_result_from_entry(result_id: int):
     success = crud_results.delete_result(result_id)
@@ -370,16 +456,17 @@ def remove_result_from_entry(result_id: int):
         return True
     else:
         ...
-        
-# --- Experts Management ---
 
+
+# --- Experts Management ---
 def get_expert(expert_id: int):
     expert = crud_experts.get_expert_by_id(expert_id)
     if expert:
         return expert
     else:
         ...
-        
+
+
 # Get all experts
 def get_all_experts():
     experts = crud_experts.get_all_experts()
@@ -387,7 +474,8 @@ def get_all_experts():
         return experts
     else:
         ...
-        
+
+
 # Add an expert to the database
 def add_expert(name: str, is_available: bool):
     expert_id = crud_experts.create_expert(name, is_available)
@@ -395,7 +483,8 @@ def add_expert(name: str, is_available: bool):
         return expert_id
     else:
         ...
-        
+
+
 # Remove an expert from the database
 def remove_expert(expert_id: int):
     success = crud_experts.delete_expert(expert_id)
@@ -404,6 +493,7 @@ def remove_expert(expert_id: int):
     else:
         ...
 
+
 # Get experts for result
 def get_experts_for_result(result_id: int):
     experts = crud_experts.get_experts_for_result(result_id)
@@ -411,7 +501,8 @@ def get_experts_for_result(result_id: int):
         return experts
     else:
         ...
-        
+
+
 # Add an expert to a result
 def add_expert_to_result(result_id: int, expert_data):
     expert_id = crud_experts.create_expert(result_id, expert_data)
@@ -419,7 +510,8 @@ def add_expert_to_result(result_id: int, expert_data):
         return expert_id
     else:
         ...
-        
+
+
 # Remove an expert from a result
 def remove_expert_from_result(expert_id: int, result_id: int):
     success = crud_experts.remove_expert_from_result(expert_id, result_id)
@@ -427,9 +519,9 @@ def remove_expert_from_result(expert_id: int, result_id: int):
         return True
     else:
         ...
-        
-# --- Examination Management ---
 
+
+# --- Examination Management ---
 def get_all_examinations():
     examinations = crud_examinations.get_all_examinations()
     if examinations:
@@ -437,13 +529,15 @@ def get_all_examinations():
     else:
         ...
 
+
 def get_examination_by_id(examination_id: int):
     examination = crud_examinations.get_examination_by_id(examination_id)
     if examination:
         return examination
     else:
         ...
-        
+
+
 # Add an examination to the database
 def add_examination(name: str, is_available: bool):
     examination_id = crud_examinations.create_examination(name, is_available)
@@ -451,7 +545,8 @@ def add_examination(name: str, is_available: bool):
         return examination_id
     else:
         ...
-        
+
+
 # Remove an examination from the database
 def remove_examination(examination_id: int):
     success = crud_examinations.delete_examination(examination_id)
@@ -460,6 +555,7 @@ def remove_examination(examination_id: int):
     else:
         ...
 
+
 # Get all examinations for a result
 def get_examinations_for_result(result_id: int):
     examinations = crud_examinations.get_examinations_for_result(result_id)
@@ -467,18 +563,24 @@ def get_examinations_for_result(result_id: int):
         return examinations
     else:
         ...
-        
+
+
 # Add an examination to a result
 def add_examination_to_result(examination_id: int, result_id: int):
-    examination_id = crud_examinations.add_examination_to_result(examination_id, result_id)
+    examination_id = crud_examinations.add_examination_to_result(
+        examination_id, result_id
+    )
     if examination_id:
         return examination_id
     else:
         ...
-        
+
+
 # Remove an examination from a result
 def remove_examination_from_result(examination_id: int, result_id: int):
-    success = crud_examinations.remove_examination_from_result(examination_id, result_id)
+    success = crud_examinations.remove_examination_from_result(
+        examination_id, result_id
+    )
     if success:
         return True
     else:

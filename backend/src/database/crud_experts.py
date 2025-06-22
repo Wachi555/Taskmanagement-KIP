@@ -1,5 +1,6 @@
-from database.session import SessionLocal
 from database.orm_models import Expert
+from database.session import SessionLocal
+
 
 def get_expert_by_id(expert_id: int):
     session = SessionLocal()
@@ -7,11 +8,13 @@ def get_expert_by_id(expert_id: int):
     session.close()
     return expert
 
+
 def get_all_experts():
     session = SessionLocal()
     experts = session.query(Expert).all()
     session.close()
     return experts
+
 
 def create_expert(name: str, is_available: bool):
     session = SessionLocal()
@@ -21,6 +24,7 @@ def create_expert(name: str, is_available: bool):
     session.refresh(new_expert)
     session.close()
     return new_expert.id
+
 
 def delete_expert(expert_id: int):
     session = SessionLocal()
@@ -34,11 +38,13 @@ def delete_expert(expert_id: int):
         session.close()
         return False
 
+
 # def get_experts_for_result(result_id: int):
 #     session = SessionLocal()
 #     experts = session.query(Expert).join(ExpertToResult).filter(ExpertToResult.result_id == result_id).all()
 #     session.close()
 #     return experts
+
 
 # def add_expert_to_result(expert_id: int, result_id: int):
 #     session = SessionLocal()
@@ -48,6 +54,7 @@ def delete_expert(expert_id: int):
 #     session.refresh(new_expert_to_result)
 #     session.close()
 #     return new_expert_to_result.id
+
 
 # def remove_expert_from_result(expert_id: int, result_id: int):
 #     session = SessionLocal()

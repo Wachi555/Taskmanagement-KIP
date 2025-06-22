@@ -1,16 +1,16 @@
 from common.pydantic_models import EvaluationInput
 
 extraction_prompt = """
-You are given a german text about a patient in a hospital. 
-Your task is to extract all of the following information that the text contains. 
-If the text does not contain a certain information, just leave it blank. 
+You are given a german text about a patient in a hospital.
+Your task is to extract all of the following information that the text contains.
+If the text does not contain a certain information, just leave it blank.
 Do not try and come up with information that is not provided in the text.
 1. History
 2. Medications
 3. Allergies
 4. Additional Notes
 Keep the answers in the german language.
-Here is the text: 
+Here is the text:
 """
 
 evaluation_prompt = """
@@ -26,9 +26,12 @@ There can be multiple examinations with the same priority, since the priority is
 Keep the results in german.
 """
 
+
 def build_evaluation_input(input_contents: EvaluationInput) -> str:
     patient_info = (
-        f"Age: {input_contents.age}\n" if input_contents.age > -1 else "Age: Unknown\n"
+        f"Age: {input_contents.age}\n"
+        if input_contents.age > -1
+        else "Age: Unknown\n"
         f"Symptoms: {', '.join(input_contents.symptoms)}\n"
         f"History: {input_contents.history}\n"
         f"Medications: {', '.join(input_contents.medications)}\n"

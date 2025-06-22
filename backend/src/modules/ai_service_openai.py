@@ -1,8 +1,8 @@
 import os
 
-from common.pydantic_models import LLMResult, EvaluationInput, ExtractedContent
+from common.pydantic_models import EvaluationInput, ExtractedContent, LLMResult
 from dotenv import load_dotenv
-from modules.prompts import extraction_prompt, evaluation_prompt, build_evaluation_input
+from modules.prompts import build_evaluation_input, evaluation_prompt, extraction_prompt
 from openai import OpenAI
 
 load_dotenv()
@@ -10,12 +10,15 @@ load_dotenv()
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
 if not openai_api_key:
-    raise ValueError("OpenAI API key is not set. Please set the OPENAI_API_KEY environment variable.")
+    raise ValueError(
+        "OpenAI API key is not set. Please set the OPENAI_API_KEY environment variable."
+    )
 
 endpoint = "https://models.inference.ai.azure.com"
 model_name = "gpt-4o"
 
 client = OpenAI(base_url=endpoint, api_key=openai_api_key)
+
 
 def extract_contents(input_text: str) -> ExtractedContent:
     response = client.beta.chat.completions.parse(
@@ -35,10 +38,10 @@ def extract_contents(input_text: str) -> ExtractedContent:
     )
     result = response.choices[0].message.parsed
 
-    
     if result:
         return result
     raise ValueError("No response text found.")
+
 
 def generate_anamnesis_response(input_contents: EvaluationInput) -> LLMResult:
     try:

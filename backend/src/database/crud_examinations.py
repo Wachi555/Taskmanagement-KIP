@@ -1,17 +1,22 @@
-from database.session import SessionLocal
 from database.orm_models import Examination
-    
+from database.session import SessionLocal
+
+
 def get_all_examinations():
     session = SessionLocal()
     examinations = session.query(Examination).all()
     session.close()
     return examinations
 
+
 def get_examination_by_id(examination_id: int):
     session = SessionLocal()
-    examination = session.query(Examination).filter(Examination.id == examination_id).first()
+    examination = (
+        session.query(Examination).filter(Examination.id == examination_id).first()
+    )
     session.close()
     return examination
+
 
 def create_examination(name: str, is_available: bool):
     session = SessionLocal()
@@ -22,9 +27,12 @@ def create_examination(name: str, is_available: bool):
     session.close()
     return new_examination.id
 
+
 def delete_examination(examination_id: int):
     session = SessionLocal()
-    examination = session.query(Examination).filter(Examination.id == examination_id).first()
+    examination = (
+        session.query(Examination).filter(Examination.id == examination_id).first()
+    )
     if examination:
         session.delete(examination)
         session.commit()
@@ -33,12 +41,14 @@ def delete_examination(examination_id: int):
     else:
         session.close()
         return False
-    
+
+
 # def get_examinations_for_result(result_id: int):
 #     session = SessionLocal()
 #     examinations = session.query(Examination).join(ExaminationToResult).filter(ExaminationToResult.result_id == result_id).all()
 #     session.close()
 #     return examinations
+
 
 # def add_examination_to_result(examination_id: int, result_id: int):
 #     session = SessionLocal()
@@ -48,6 +58,7 @@ def delete_examination(examination_id: int):
 #     session.refresh(new_examination_to_result)
 #     session.close()
 #     return new_examination_to_result.id
+
 
 # def remove_examination_from_result(examination_id: int, result_id: int):
 #     session = SessionLocal()
