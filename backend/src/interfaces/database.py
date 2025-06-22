@@ -420,66 +420,53 @@ def remove_expert(expert_id: int):
 
 
 # --- Examination Management ---
-def get_all_examinations():
+def get_all_examinations() -> List[Examination]:
     examinations = crud_examinations.get_all_examinations()
-    if examinations:
-        return examinations
-    else:
-        ...
+    return examinations
 
 
-def get_examination_by_id(examination_id: int):
+def get_examination_by_id(examination_id: int) -> Examination:
     examination = crud_examinations.get_examination_by_id(examination_id)
-    if examination:
-        return examination
-    else:
-        ...
+    return examination
 
 
 # Add an examination to the database
-def add_examination(name: str, is_available: bool):
+def add_examination(name: str, is_available: bool) -> int:
     examination_id = crud_examinations.create_examination(name, is_available)
-    if examination_id:
-        return examination_id
-    else:
-        ...
+    return examination_id
 
 
 # Remove an examination from the database
 def remove_examination(examination_id: int):
-    success = crud_examinations.delete_examination(examination_id)
-    if success:
-        return True
-    else:
-        ...
+    crud_examinations.delete_examination(examination_id)
 
 
-# Get all examinations for a result
-def get_examinations_for_result(result_id: int):
-    examinations = crud_examinations.get_examinations_for_result(result_id)
-    if examinations:
-        return examinations
-    else:
-        ...
+# # Get all examinations for a result
+# def get_examinations_for_result(result_id: int):
+#     examinations = crud_examinations.get_examinations_for_result(result_id)
+#     if examinations:
+#         return examinations
+#     else:
+#         ...
 
 
-# Add an examination to a result
-def add_examination_to_result(examination_id: int, result_id: int):
-    examination_id = crud_examinations.add_examination_to_result(
-        examination_id, result_id
-    )
-    if examination_id:
-        return examination_id
-    else:
-        ...
+# # Add an examination to a result
+# def add_examination_to_result(examination_id: int, result_id: int):
+#     examination_id = crud_examinations.add_examination_to_result(
+#         examination_id, result_id
+#     )
+#     if examination_id:
+#         return examination_id
+#     else:
+#         ...
 
 
-# Remove an examination from a result
-def remove_examination_from_result(examination_id: int, result_id: int):
-    success = crud_examinations.remove_examination_from_result(
-        examination_id, result_id
-    )
-    if success:
-        return True
-    else:
-        ...
+# # Remove an examination from a result
+# def remove_examination_from_result(examination_id: int, result_id: int):
+#     success = crud_examinations.remove_examination_from_result(
+#         examination_id, result_id
+#     )
+#     if success:
+#         return True
+#     else:
+#         ...
