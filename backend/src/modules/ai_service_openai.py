@@ -6,17 +6,13 @@ from modules.prompts import build_evaluation_input, evaluation_prompt, extractio
 from openai import OpenAI
 
 load_dotenv()
-
 openai_api_key = os.getenv("OPENAI_API_KEY")
-
 if not openai_api_key:
     raise ValueError(
         "OpenAI API key is not set. Please set the OPENAI_API_KEY environment variable."
     )
-
 endpoint = "https://models.inference.ai.azure.com"
 model_name = "gpt-4o"
-
 client = OpenAI(base_url=endpoint, api_key=openai_api_key)
 
 

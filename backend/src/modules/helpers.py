@@ -21,8 +21,8 @@ def calculate_age(birth_year: str) -> int:
         return -1
 
 
-def stitch_together(a: List[str], b: List[str]) -> str:
-    print(f"Stitching together: {a} and {b}")
+def stitch_together(a: str | List[str], b: str | List[str]) -> str:
+    # print(f"Stitching together: {a} and {b}")
     res = ""
     if isinstance(a, str):
         a = [a]
@@ -34,8 +34,8 @@ def stitch_together(a: List[str], b: List[str]) -> str:
         if res:
             res += ", "
         res += ", ".join(b)
-    print(f"Stitched result: {res}")
-    return res if res else ""
+    # print(f"Stitched result: {res}")
+    return res
 
 
 def parse_med_server_json(json_data: str) -> tuple[list[str], list[tuple[str, int]]]:

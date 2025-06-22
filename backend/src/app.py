@@ -56,10 +56,10 @@ async def process_input(input_model: InputAnamnesis, selected_patient_id: int):
         }
 
     patient_entry = db.get_latest_patient_entry(selected_patient_id)
-    result = db.get_results_for_entry(patient_entry.id) if patient_entry else None
+    result = db.get_results_for_entry(patient_entry.id) if patient_entry else None  # type: ignore
     result = result[0] if result else None
 
-    diagnoses = db.get_diagnoses_for_entry(result.id) if result else []
+    diagnoses = db.get_diagnoses_for_entry(result.id) if result else []  # type: ignore
     examinations = result.examinations if result else []
     experts = result.experts if result else []
     treatments = result.treatments if result else []
@@ -99,7 +99,7 @@ model = whisper.load_model("base")  # Options: tiny, base, small, medium, large
 @app.post("/transcribe")
 async def transcribe(file: UploadFile = File(...)):
     # Get the original extension (e.g. .mp3, .wav, .webm)
-    _, ext = os.path.splitext(file.filename)
+    _, ext = os.path.splitext(file.filename)  # type: ignore
     if not ext:
         ext = ".webm"  # fallback
     with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as temp_audio:
@@ -117,13 +117,12 @@ async def get_patients():
     if not patients:
         return []
 
-    patients_dict = {patient.id: patient for patient in patients}
+    # patients_dict = {patient.id: patient for patient in patients}
     # Get triage information from patient entries
     for patient in patients:
         patient_id = patient.id
-        last_entry = db.get_latest_patient_entry(patient_id)
-        triage_level = last_entry.triage_level if last_entry else -1
-        patient.last_triage_level = triage_level
+        last_entry = db.get_latest_patient_entry(patient_id)  # type: ignore
+        patient.last_triage_level = last_entry.triage_level
 
     return patients
 
@@ -132,15 +131,11 @@ async def get_patients():
 async def get_patient(patient_id: int):
     patient = db.get_patient(patient_id)
     patient_entry = db.get_latest_patient_entry(patient_id)
-    if patient_entry:
-        patient.last_triage_level = patient_entry.triage_level
-    else:
-        patient.last_triage_level = -1
-    patient_result = (
-        db.get_results_for_entry(patient_entry.id) if patient_entry else None
-    )  # TODO: Handle multiple results -> Improve this with "latest_result_id" in patient_entry
+    patient.last_triage_level = patient_entry.triage_level
+    patient_result = db.get_results_for_entry(patient_entry.id)  # type: ignore
+    # TODO: Handle multiple results -> Improve this with "latest_result_id" in patient_entry
     patient_result = patient_result[0] if patient_result else None
-    diagnoses = db.get_diagnoses_for_entry(patient_result.id) if patient_result else []
+    diagnoses = db.get_diagnoses_for_entry(patient_result.id) if patient_result else []  # type: ignore
     result_dict = {
         "patient": patient,
         "latest_entry": patient_entry,
