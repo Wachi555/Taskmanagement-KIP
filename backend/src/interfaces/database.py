@@ -193,71 +193,60 @@ def update_patient(patient_id: int, **kwargs):
 
 # --- Patient Entry Management ---
 # Get all entries for a patient
-def get_patient_entries(patient_id: int):
-    entries = crud_paitent_entries.get_patient_entries(patient_id)
-    if entries:
-        return entries
-    else:
-        ...
+def get_patient_entries(patient_id: int) -> List[PatientEntry]:
+    entries = crud_patient_entries.get_patient_entries(patient_id)
+    return entries
 
 
 # Get the latest entry for a patient
-def get_latest_patient_entry(patient_id: int):
-    entries = crud_paitent_entries.get_patient_entries(patient_id)
-    if entries:
-        latest_entry = max(entries, key=lambda entry: entry.entry_date)
-        return latest_entry
-    else:
-        ...
+def get_latest_patient_entry(patient_id: int) -> PatientEntry:
+    entry = crud_patient_entries.get_latest_patient_entry(patient_id)
+    return entry
 
 
 # Get a specific entry for a patient
-def get_patient_entry(entry_id: int):
-    entry = crud_paitent_entries.get_patient_entry(entry_id)
-    if entry:
-        return entry
-    else:
-        ...
+def get_patient_entry(entry_id: int) -> PatientEntry:
+    entry = crud_patient_entries.get_patient_entry(entry_id)
+    return entry
 
 
-# # Add an entry for a patient
-# def add_patient_entry(
-#     patient_id: int,
-#     date: str,
-#     patient_history: str,
-#     additional_notes: str,
-#     symptoms: str,
-#     medications: str,
-#     content_json: str,
-# ):
-#     entry_id = crud_paitent_entries.create_patient_entry(
-#         patient_id,
-#         date,
-#         patient_history,
-#         additional_notes,
-#         content_json,
-#         symptoms,
-#         medications,
-#     )
-#     if entry_id:
-#         return entry_id
-#     else:
-#         ...
+# Add an entry for a patient
+# TODO: Not utilized yet
+def add_patient_entry(
+    patient_id: int,
+    entry_date: str,
+    patient_history: str,
+    additional_notes: str,
+    extracted_contents_json: str,
+    symptoms: str,
+    medications: str,
+    triage_level: int,
+) -> int:
+    entry_id = crud_patient_entries.create_patient_entry(
+        patient_id,
+        entry_date,
+        patient_history,
+        additional_notes,
+        extracted_contents_json,
+        symptoms,
+        medications,
+        triage_level,
+    )
+    return entry_id
 
 
 # Update an entry for a patient
-# Not implemented
 def update_patient_entry(
     entry_id: int,
-    entry_date: str | None = None,
-    patient_history: str | None = None,
-    additional_notes: str | None = None,
-    extracted_contents_json: str | None = None,
-    symptoms: str | None = None,
-    medications: str | None = None,
-    triage_level: int | None = None,
+    entry_date: Optional[str] = None,
+    patient_history: Optional[str] = None,
+    additional_notes: Optional[str] = None,
+    extracted_contents_json: Optional[str] = None,
+    symptoms: Optional[str] = None,
+    medications: Optional[str] = None,
+    triage_level: Optional[int] = None,
 ):
-    updated_entry = crud_paitent_entries.update_patient_entry(
+    crud_patient_entries.update_patient_entry(
         entry_id,
         entry_date=entry_date,
         patient_history=patient_history,
@@ -267,29 +256,21 @@ def update_patient_entry(
         medications=medications,
         triage_level=triage_level,
     )
-    if updated_entry:
-        return updated_entry
-    else:
-        ...
 
 
 # Remove an entry for a patient
 def remove_patient_entry(entry_id: int):
-    success = crud_paitent_entries.delete_patient_entry(entry_id)
-    if success:
-        return True
-    else:
-        ...
+    crud_patient_entries.delete_patient_entry(entry_id)
 
 
-# --- Symptom Management ---
-# Get all symptoms for a patient entry
-def get_symptoms_for_entry(entry_id: int):
-    symptoms = crud_symptoms.get_symptoms_for_entry(entry_id)
-    if symptoms:
-        return symptoms
-    else:
-        ...
+# # --- Symptom Management ---
+# # Get all symptoms for a patient entry
+# def get_symptoms_for_entry(entry_id: int):
+#     symptoms = crud_symptoms.get_symptoms_for_entry(entry_id)
+#     if symptoms:
+#         return symptoms
+#     else:
+#         ...
 
 
 # Add a symptom to a patient entry
