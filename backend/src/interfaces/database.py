@@ -344,6 +344,8 @@ def get_results_for_entry(entry_id: int) -> List[Result]:
 # Get the latest result for a patient entry
 def get_latest_result_for_entry(entry_id: int) -> Optional[Result]:
     entry = crud_patient_entries.get_patient_entry(entry_id)
+    if entry.latest_result_id is None:
+        return None
     result = crud_results.get_result_by_id(entry.latest_result_id)
     exams = result.examinations
     exams = (
