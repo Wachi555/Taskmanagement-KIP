@@ -31,56 +31,37 @@ import backend.src.database.crud_patient_entries as crud_patient_entries
 # --- General Database Functions ---
 def save_extracted_contents(patient_id: int, contents: ExtractedContent):
     latest_entry = get_latest_patient_entry(patient_id)
-    if not latest_entry:
-        print(
-            f"Error: No entries found for patient with ID {patient_id}. Cannot save extracted contents."
-        )
-        return None
-    entry_id = latest_entry.id
-    crud_paitent_entries.update_patient_entry(
-        entry_id,
+    crud_patient_entries.update_patient_entry(
+        latest_entry.id,  # type: ignore
         extracted_contents_json=contents.model_dump_json(),
-        patient_history=stitch_together(latest_entry.patient_history, contents.history),
+        patient_history=stitch_together(latest_entry.patient_history, contents.history),  # type: ignore
         additional_notes=stitch_together(
-            latest_entry.additional_notes, contents.additional_notes
+            latest_entry.additional_notes, contents.additional_notes  # type: ignore
         ),
-        medications=stitch_together(latest_entry.medications, contents.medications),
+        medications=stitch_together(latest_entry.medications, contents.medications),  # type: ignore
     )
 
     patient = get_patient(patient_id)
-    if not patient:
-        print(
-            f"Error: Patient with ID {patient_id} not found. Cannot update allergies."
-        )
-        return None
     crud_patients.update_patient(
-        patient_id,
-        allergies=stitch_together(patient.allergies, contents.allergies),
+        patient_id, allergies=stitch_together(patient.allergies, contents.allergies)  # type: ignore
     )
 
 
 def save_anamnesis_response(patient_id: int, response: LLMResult):
-    patient = get_patient(patient_id)
-    if not patient:
-        print(f"Error: Patient with ID {patient_id} not found.")
-        return None
-    latest_entry = get_latest_patient_entry(patient_id)
-    if not latest_entry:
-        print(f"Error: No entries found for patient with ID {patient_id}.")
-        return None
+    # # Create new result in database:
+    # # TODO: Remove this when Openai is used again
+    # response.experts = [Expert(type="Allgemeinmedizin"), Expert(type="Dermatologie")]
+    # response.examinations = [
+    #     Examination(name="Hautuntersuchung", priority=1),
+    #     Examination(name="Blutuntersuchung", priority=2),
+    # ]
+    # response.diagnoses = [
+    #     Diagnosis(name="Hautausschlag", reason="Allergische Reaktion", confidence=0.85),
+    # ]
+    # response.treatments = ["Antihistaminikum", "Kühlen der betroffenen Stelle"]
+    # print(f"DEBUG: type: {type(response)}, resp: {response}", flush=True)
 
-    # Create new result in database:
-    # TODO: Remove this when Openai is used again
-    response.experts = [Expert(type="Allgemeinmedizin"), Expert(type="Dermatologie")]
-    response.examinations = [
-        Examination(name="Hautuntersuchung", priority=1),
-        Examination(name="Blutuntersuchung", priority=2),
-    ]
-    response.diagnoses = [
-        Diagnosis(name="Hautausschlag", reason="Allergische Reaktion", confidence=0.85),
-    ]
-    response.treatments = ["Antihistaminikum", "Kühlen der betroffenen Stelle"]
-    print(f"DEBUG: type: {type(response)}, resp: {response}", flush=True)
+    latest_entry = get_latest_patient_entry(patient_id)
     experts_string_list = [expert.type for expert in response.experts]
     examinations_dict_list = [
         {"name": examination.name, "priority": examination.priority}
@@ -91,19 +72,16 @@ def save_anamnesis_response(patient_id: int, response: LLMResult):
         json.dumps(examination) for examination in examinations_dict_list if examination
     ]
     result_id = crud_results.create_result(
-        latest_entry.id,
+        latest_entry.id,  # type: ignore
         ", ".join(experts_string_list),
         "; ".join(examinations_string_list),
         treatments=", ".join(response.treatments),
     )
-    if not result_id:
-        print(f"Error: Could not create result for patient with ID {patient_id}.")
-        return None
 
     # Create diagnoses for the result
     for diagnosis in response.diagnoses:
         crud_diagnoses.create_diagnosis(
-            result_id, diagnosis.name, diagnosis.reason, diagnosis.confidence
+            result_id, diagnosis.name, diagnosis.reason, diagnosis.confidence  # type: ignore
         )
 
 
