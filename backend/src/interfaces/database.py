@@ -329,7 +329,8 @@ def get_results_for_entry(entry_id: int) -> List[Result]:
             if exams  # type: ignore
             else []
         )
-        result.examinations = "; ".join([json.dumps(exam) for exam in exams])  # type: ignore
+        result.examinations = exams 
+        # result.examinations = "; ".join([json.dumps(exam) for exam in exams])  # type: ignore # TODO: Soll das wieder rein? Wenn ja wieso?
     return results
 
 
