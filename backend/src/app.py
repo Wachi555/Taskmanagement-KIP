@@ -65,6 +65,7 @@ async def process_input(input_model: InputAnamnesis, selected_patient_id: int):
     examinations = result.examinations if result else []
     experts = result.experts if result else []
     treatments = result.treatments if result else []
+    patient.allgergies = ["Pollen", "Alles"]
 
     # Debug print
     print(f"DEBUG: patient entry: {patient_entry}")
