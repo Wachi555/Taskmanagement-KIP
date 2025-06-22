@@ -321,30 +321,22 @@ def remove_medication_from_entry(medication_id: int):
 
 # --- Diagnosis Management ---
 # Get all diagnoses for a patient entry
-def get_diagnoses_for_entry(entry_id: int):
+def get_diagnoses_for_entry(entry_id: int) -> List[Diagnosis]:
     diagnoses = crud_diagnoses.get_diagnoses_for_entry(entry_id)
-    if diagnoses:
-        return diagnoses
-    else:
-        ...
+    return diagnoses  # type: ignore
 
 
 # Add a diagnosis to a patient entry
-def add_diagnosis_to_entry(entry_id: int, diagnosis_data):
-    diagnosis_id = crud_diagnoses.create_diagnosis(entry_id, diagnosis_data)
-    if diagnosis_id:
-        return diagnosis_id
-    else:
-        ...
+def add_diagnosis_to_entry(
+    entry_id: int, name: str, reason: str, confidence: float
+) -> int:
+    diagnosis_id = crud_diagnoses.create_diagnosis(entry_id, name, reason, confidence)
+    return diagnosis_id
 
 
 # Remove a diagnosis from a patient entry
 def remove_diagnosis_from_entry(diagnosis_id: int):
-    success = crud_diagnoses.delete_diagnosis(diagnosis_id)
-    if success:
-        return True
-    else:
-        ...
+    crud_diagnoses.delete_diagnosis(diagnosis_id)
 
 
 # --- Result Management ---
