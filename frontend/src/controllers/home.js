@@ -478,65 +478,94 @@ router.delete('/patient/:id', async (req, res) => {
   }
 });
 
-
-// Patient Overview (Übersicht)
+// --- Patient Overview (Übersicht) ---
 router.get('/patient/:id/overview', async (req, res) => {
   const id = parseInt(req.params.id, 10);
 
   try {
-    // Daten vom Backend holen
-    const result  = await fetchPatientById(id);
-    const patient = result.patient;
-    const latest  = result.latest_entry || result.latestResult || result.latessult || {};
+    // 1) Daten vom Backend holen
+    const result       = await fetchPatientById(id);
+    const patient      = result.patient;
+    const latestEntry  = result.latest_entry  || {};
+    const latestResult = result.latest_result || {};
+    const diagnoses    = result.diagnoses     || [];
 
-    const symptoms = (latest.symptoms || '')
+    // 2) Symptome parsen
+    const symptoms = (latestEntry.symptoms || '')
       .split(',')
       .map(s => s.trim())
       .filter(Boolean);
 
-    // Erfolgreiches Rendern
+    // 3) Allergien parsen (entweder aus String-Feld oder aus extracted_contents_json)
+    let allergies = [];
+    if (latestEntry.extracted_contents_json) {
+      try {
+        const extracted = JSON.parse(latestEntry.extracted_contents_json);
+        allergies = Array.isArray(extracted.allergies)
+          ? extracted.allergies
+          : [];
+      } catch (e) { /* ignore */ }
+    } else if (patient.allergies) {
+      allergies = typeof patient.allergies === 'string'
+        ? patient.allergies.split(',').map(s=>s.trim()).filter(Boolean)
+        : (Array.isArray(patient.allergies) ? patient.allergies : []);
+    }
+
+    // 4) Rendern
     return res.render('patient-overview', {
       layout: 'patient',
       appName: 'Notaufnahme Universitätsklinikum Regensburg',
       showHome: true,
       showSidebarToggle: false,
+
+      // Patient-Grunddaten
       data: {
         name:         `${patient.first_name} ${patient.last_name}`,
         dob:          patient.date_of_birth,
-        gender:       patient.gender || 'unbekannt',
+        gender:       patient.gender      || 'unbekannt',
         adresse:      patient.address,
         krankenkasse: patient.health_insurance
       },
-      diagnosis: latest.diagnosis   || [],
-      triage:    latest.triage      ?? null,
-      exams:     patient.examinations || [],
-      experts:   patient.treatments   || [],
+
+      // Ergebnisse
+      diagnoses:   diagnoses,  // Array von { name, confidence, … }
+      triage:      latestEntry.triage_level ?? patient.last_triage_level,
+      exams:       latestResult.examinations || [],
+      treatments:  typeof latestResult.treatments === 'string'
+                     ? latestResult.treatments.split(',').map(s=>s.trim())
+                     : (Array.isArray(latestResult.treatments) ? latestResult.treatments : []),
+      experts:     typeof latestResult.experts === 'string'
+                     ? latestResult.experts.split(',').map(s=>s.trim())
+                     : (Array.isArray(latestResult.experts) ? latestResult.experts : []),
       symptoms,
+      allergies,   // neu!
+
       errorMessage: null
     });
 
   } catch (error) {
     console.error(`Fehler beim Laden der Übersicht von Patient ${id}:`, error);
 
-    // ab hier: immer patient-overview rendern – keine 404-Seite
+    // Fallback mit leeren Daten
     return res.render('patient-overview', {
       layout: 'patient',
       appName: 'Notaufnahme Universitätsklinikum Regensburg',
       showHome: true,
       showSidebarToggle: false,
-      data:      {},
-      diagnosis: [],
-      triage:    null,
-      exams:     [],
-      experts:   [],
-      symptoms:  [],
+
+      data:        {},
+      diagnoses:   [],
+      triage:      null,
+      exams:       [],
+      treatments:  [],
+      experts:     [],
+      symptoms:    [],
+      allergies:   [],
+
       errorMessage: 'Patient nicht gefunden oder fehlerhafte Daten'
     });
   }
 });
-
-
-
 
 
 
