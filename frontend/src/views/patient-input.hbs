@@ -37,22 +37,36 @@
 
     <!-- Rechte Spalte: Nur Ergebnisse mit Footer -->
     <div class="col-12 col-md-6 d-flex flex-column h-100">
-      <div class="card flex-grow-1 d-flex flex-column" style="min-height: 60vh;">
-        <div class="card-header">
-          <h5 class="mb-0">Ergebnisse</h5>
-        </div>
-        <div class="card-body flex-grow-1 overflow-auto">
-          {{> results }}
-        </div>
-        <div class="card-footer text-end">
-        <button id="finish-btn"
-                class="btn btn-success"
-                onclick="window.location.href='/patient/update_status/{{id}}/0';">
-          <i class="bi bi-check-lg me-1"></i> Abschließen
-        </button>
-        </div>
+  <div class="card flex-grow-1 d-flex flex-column" style="min-height: 60vh;">
+
+    {{!-- HEADER mit Titel und Kreisen nebeneinander --}}
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Ergebnisse</h5>
+      <div class="triage-indicator">
+        {{!-- über die Triage-Level 1–5 iterieren --}}
+        {{#each levels}}
+          <div
+            class="triage-circle level-{{this}} {{#if (eq ../triage this)}}active{{/if}}">
+          </div>
+        {{/each}}
       </div>
     </div>
+
+    <div class="card-body flex-grow-1 overflow-auto">
+      {{> results }}
+    </div>
+
+    {{!-- FOOTER nur mit Button --}}
+    <div class="card-footer text-end">
+      <button id="finish-btn"
+              class="btn btn-success"
+              onclick="window.location.href='/patient/update_status/{{id}}/0';">
+        <i class="bi bi-check-lg me-1"></i> Abschließen
+      </button>
+    </div>
+
+  </div>
+  </div>
   </div>
 
   <!-- Offcanvas: Patientendaten -->
