@@ -110,148 +110,85 @@ def save_anamnesis_response(patient_id: int, response: LLMResult):
 # --- Patient Management ---
 # Add a patient to the database
 def add_patient(patient: InputPatient) -> int:
-
-    # Check if patient already exists
-    existing_patient = crud_patients.get_patient_by_name_and_dob(
-        patient.first_name, patient.last_name, patient.date_of_birth
-    )
-    print(f"DEBUG: existing_patient: {existing_patient}", flush=True)
-    if existing_patient:
-        # Update the existing patient
-        patient_id = existing_patient.id
-        age = calculate_age(existing_patient.date_of_birth)
-        updated_patient = crud_patients.update_patient(
-            patient_id=patient_id,
+    try:
+        existing_patient = crud_patients.get_patient_by_name_and_dob(
+            patient.first_name, patient.last_name, patient.date_of_birth
+        )
+    except ValueError:
+        # Patient does not exist, continue with creation
+        age = calculate_age(patient.date_of_birth)
+        patient_id = crud_patients.create_patient(
+            patient.first_name,
+            patient.last_name,
+            patient.gender,
+            age,
+            patient.date_of_birth,
             is_waiting=True,
             in_treatment=False,
-            age=age,
             health_insurance=patient.health_insurance,
-            allergies=patient.allergies,
+            allergies=None,
+            address=patient.address,
+        )
+    else:
+        # Patient already exists, update their information
+        age = calculate_age(existing_patient.date_of_birth)  # type: ignore
+        crud_patients.update_patient(
+            existing_patient.id,  # type: ignore
+            age=age,
+            is_waiting=True,
+            in_treatment=False,
+            health_insurance=patient.health_insurance,
             address=patient.address,
             last_triage_level=patient.triage_level,
         )
-        if updated_patient:
-            print(f"DEBUG: Updated existing patient with ID {patient_id}", flush=True)
-            new_entry_id = crud_paitent_entries.create_patient_entry()
+        patient_id = existing_patient.id
 
-    age = calculate_age(patient.date_of_birth)
-
-    patient_id = crud_patients.create_patient(
-        first_name=patient.first_name,
-        last_name=patient.last_name,
-        gender=patient.gender,
-        age=age,
-        date_of_birth=patient.date_of_birth,
-        is_waiting=True,
-        in_treatment=False,  # Default value
-        health_insurance=patient.health_insurance,
-        allergies=None,  # Default value, can be updated later
-        address=patient.address,
-    )
-
-    # create initial patient entry
-    if patient_id is None:
-        print("Error: Could not create patient.")
-        return None
-
-    entry_id = crud_paitent_entries.create_patient_entry(
-        patient_id=patient_id,
-        entry_date=datetime.now().date(),  # TODO: Check for correct date format
+    # Create a new patient entry for the newly added or updated patient
+    # TODO: Actually input data instead of empty strings
+    crud_patient_entries.create_patient_entry(
+        patient_id,  # type: ignore
+        entry_date=datetime.now().date().strftime("%Y-%m-%d"),  # TODO: Check format
         patient_history="",
         additional_notes="",
-        extracted_contents_json="",  # Empty string for now
+        extracted_contents_json="",
         symptoms=patient.symptoms,
-        medications="",  # Empty string for now
+        medications="",
         triage_level=patient.triage_level,
     )
-
-    if entry_id is None:
-        print("Error: Could not create initial patient entry.")
-        return None
-
-    return patient_id
+    return patient_id  # type: ignore
 
 
 # Get a patient by ID
-def get_patient(patient_id: int):
+def get_patient(patient_id: int) -> Patient:
     patient = crud_patients.get_patient_by_id(patient_id)
-
-    if patient:
-        patient_age = calculate_age(patient.date_of_birth)
-        patient.age = patient_age
-        update_patient(
-            patient_id, age=patient_age
-        )  # Update the patient's age in the database
-        return patient
-    else:
-        # TODO: Maybe raise an exception or return a specific error message
-        # TODO: The none return has to caught in the frontend
-        print(f"Error: Patient with ID {patient_id} not found.")
-        return None
+    patient_age = calculate_age(patient.date_of_birth)  # type: ignore
+    patient.age = patient_age  # type: ignore
+    update_patient(patient_id, age=patient.age)
+    return patient
 
 
 # Get all patients
-def get_all_patients():
+def get_all_patients() -> List[Patient]:
     patients = crud_patients.get_all_patients()
-    if patients:
-        for patient in patients:
-            patient_age = calculate_age(patient.date_of_birth)
-            patient.age = patient_age
-            update_patient(patient.id, age=patient_age)
-        return patients
-    else:
-        ...
+    for patient in patients:
+        patient_age = calculate_age(patient.date_of_birth)  # type: ignore
+        patient.age = patient_age  # type: ignore
+        update_patient(patient.id, age=patient_age)  # type: ignore
+    return patients
 
 
 # Remove patient from the database
 def remove_patient(patient_id: int):
-    success = crud_patients.delete_patient(patient_id)
-    if success:
-        return True
-    else:
-        ...
+    crud_patients.delete_patient(patient_id)
 
 
 # Update patient information
-def update_patient(
-    patient_id: int,
-    first_name: str | None = None,
-    last_name: str | None = None,
-    age: int | None = None,
-    date_of_birth: str | None = None,
-    is_waiting: bool | None = None,
-    in_treatment: bool | None = None,
-    health_insurance: str | None = None,
-    allergies: str | None = None,
-    address: str | None = None,
-    triage_level: int | None = None,
-    gender: str | None = None,
-):
-    updated_patient = crud_patients.update_patient(
-        patient_id,
-        first_name=first_name,
-        last_name=last_name,
-        gender=gender,
-        age=age,
-        date_of_birth=date_of_birth,
-        is_waiting=is_waiting,
-        in_treatment=in_treatment,
-        health_insurance=health_insurance,
-        allergies=allergies,
-        address=address,
-        last_triage_level=triage_level,  # TODO: This sucks -> move triage back to the patient entry
-    )
+def update_patient(patient_id: int, **kwargs):
+    crud_patients.update_patient(patient_id, **kwargs)
     latest_entry = get_latest_patient_entry(patient_id)
-    if latest_entry:
-        latest_entry_id = latest_entry.id
-        crud_paitent_entries.update_patient_entry(
-            latest_entry_id, triage_level=triage_level
-        )
-
-    if updated_patient:
-        return updated_patient
-    else:
-        ...
+    crud_patient_entries.update_patient_entry(
+        latest_entry.id, triage_level=kwargs.get("triage_level")  # type: ignore
+    )
 
 
 # --- Patient Entry Management ---

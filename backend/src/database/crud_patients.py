@@ -1,22 +1,28 @@
+from typing import List
+
 from database.orm_models import Patient
 from database.session import SessionLocal
 
 
-def get_all_patients():
+def get_all_patients() -> List[Patient]:
     session = SessionLocal()
     patients = session.query(Patient).all()
     session.close()
     return patients
 
 
-def get_patient_by_id(patient_id: int):
+def get_patient_by_id(patient_id: int) -> Patient:
     session = SessionLocal()
     patient = session.query(Patient).filter(Patient.id == patient_id).first()
     session.close()
+    if patient is None:
+        raise ValueError(f"Patient with ID {patient_id} not found.")
     return patient
 
 
-def get_patient_by_name_and_dob(first_name: str, last_name: str, date_of_birth: str):
+def get_patient_by_name_and_dob(
+    first_name: str, last_name: str, date_of_birth: str
+) -> Patient:
     session = SessionLocal()
     patient = (
         session.query(Patient)
@@ -28,6 +34,11 @@ def get_patient_by_name_and_dob(first_name: str, last_name: str, date_of_birth: 
         .first()
     )
     session.close()
+    if patient is None:
+        raise ValueError(
+            f"Patient with name {first_name} {last_name} and DOB {date_of_birth} not "
+            f"found."
+        )
     return patient
 
 
@@ -40,10 +51,9 @@ def create_patient(
     is_waiting: bool,
     in_treatment: bool,
     health_insurance: str,
-    allergies: str,
+    allergies: str | None,
     address: str,
-):
-
+) -> int:
     session = SessionLocal()
     new_patient = Patient(
         first_name=first_name,
@@ -61,66 +71,32 @@ def create_patient(
     session.commit()
     session.refresh(new_patient)
     session.close()
-    return new_patient.id
+    return new_patient.id  # type: ignore
 
 
 def delete_patient(patient_id: int):
     session = SessionLocal()
     patient = session.query(Patient).filter(Patient.id == patient_id).first()
-    if patient:
-        session.delete(patient)
-        session.commit()
+    if patient is None:
         session.close()
-        return True
-    else:
-        session.close()
-        return False
+        raise ValueError(f"Patient with ID {patient_id} not found.")
+
+    session.delete(patient)
+    session.commit()
+    session.close()
 
 
-def update_patient(
-    patient_id: int,
-    first_name: str | None = None,
-    last_name: str | None = None,
-    age: int | None = None,
-    date_of_birth: str | None = None,
-    is_waiting: bool | None = None,
-    in_treatment: bool | None = None,
-    health_insurance: str | None = None,
-    allergies: str | None = None,
-    address: str | None = None,
-    last_triage_level: int | None = None,
-    gender: str | None = None,
-):
-
+def update_patient(patient_id: int, **kwargs):  # TODO: Test if kwargs work
     session = SessionLocal()
     patient = session.query(Patient).filter(Patient.id == patient_id).first()
-    if patient:
-        if first_name is not None:
-            patient.first_name = first_name
-        if last_name is not None:
-            patient.last_name = last_name
-        if age is not None:
-            patient.age = age
-        if date_of_birth is not None:
-            patient.date_of_birth = date_of_birth
-        if is_waiting is not None:
-            patient.is_waiting = is_waiting
-        if in_treatment is not None:
-            patient.in_treatment = in_treatment
-        if health_insurance is not None:
-            patient.health_insurance = health_insurance
-        if allergies is not None:
-            patient.allergies = allergies
-        if address is not None:
-            patient.address = address
-        if last_triage_level is not None:
-            patient.last_triage_level = last_triage_level
-        if gender is not None:
-            patient.gender = gender
-        session.commit()
-        session.refresh(patient)
+    if patient is None:
         session.close()
-        return patient
-    else:
-        session.close()
-        return None
+        raise ValueError(f"Patient with ID {patient_id} not found.")
+
+    for key, value in kwargs.items():
+        if hasattr(patient, key) and value is not None:
+            setattr(patient, key, value)
+
+    session.commit()
+    session.refresh(patient)
+    session.close()
