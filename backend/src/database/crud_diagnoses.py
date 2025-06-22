@@ -1,15 +1,17 @@
+from typing import List
+
 from database.orm_models import Diagnosis
 from database.session import SessionLocal
 
 
-def get_diagnoses_for_entry(result_id: int):
+def get_diagnoses_for_entry(result_id: int) -> List[Diagnosis]:
     session = SessionLocal()
     diagnoses = session.query(Diagnosis).filter(Diagnosis.result_id == result_id).all()
     session.close()
     return diagnoses
 
 
-def create_diagnosis(result_id: int, name: str, reason: str, confidence: float):
+def create_diagnosis(result_id: int, name: str, reason: str, confidence: float) -> int:
     session = SessionLocal()
     new_diagnosis = Diagnosis(
         result_id=result_id, name=name, reason=reason, confidence=confidence
@@ -18,17 +20,16 @@ def create_diagnosis(result_id: int, name: str, reason: str, confidence: float):
     session.commit()
     session.refresh(new_diagnosis)
     session.close()
-    return new_diagnosis.id
+    return new_diagnosis.id  # type: ignore
 
 
 def delete_diagnosis(diagnosis_id: int):
     session = SessionLocal()
     diagnosis = session.query(Diagnosis).filter(Diagnosis.id == diagnosis_id).first()
-    if diagnosis:
-        session.delete(diagnosis)
-        session.commit()
+    if diagnosis is None:
         session.close()
-        return True
-    else:
-        session.close()
-        return False
+        raise ValueError(f"Diagnosis with ID {diagnosis_id} not found.")
+
+    session.delete(diagnosis)
+    session.commit()
+    session.close()

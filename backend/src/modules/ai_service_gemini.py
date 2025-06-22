@@ -7,14 +7,11 @@ from google import genai
 from modules.prompts import build_evaluation_input, evaluation_prompt, extraction_prompt
 
 load_dotenv()
-
 gemini_api_key = os.getenv("GEMINI_API_KEY")
-
 if not gemini_api_key:
     raise ValueError(
         "Gemini API key is not set. Please set the GEMINI_API_KEY environment variable."
     )
-
 client = genai.Client(api_key=gemini_api_key)
 
 
@@ -36,7 +33,7 @@ def extract_contents(input_text: str) -> ExtractedContent:
     raise ValueError("No response text found.")
 
 
-def generate_anamnesis_response(input_contents: EvaluationInput) -> str:
+def generate_anamnesis_response(input_contents: EvaluationInput) -> LLMResult:
     try:
         prompt = evaluation_prompt + build_evaluation_input(input_contents)
         response = client.models.generate_content(

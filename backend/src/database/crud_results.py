@@ -1,10 +1,12 @@
+from typing import List
+
 from database.orm_models import Result
 from database.session import SessionLocal
 
 
 def create_result(
     patient_entry_id: int, experts: str, examinations: str, treatments: str
-):
+) -> int:
     session = SessionLocal()
     new_result = Result(
         patient_entry_id=patient_entry_id,
@@ -16,17 +18,19 @@ def create_result(
     session.commit()
     session.refresh(new_result)
     session.close()
-    return new_result.id
+    return new_result.id  # type: ignore
 
 
-def get_result_by_id(result_id: int):
+def get_result_by_id(result_id: int) -> Result:
     session = SessionLocal()
     result = session.query(Result).filter(Result.id == result_id).first()
     session.close()
+    if result is None:
+        raise ValueError(f"Result with ID {result_id} not found.")
     return result
 
 
-def get_results_by_patient_entry_id(patient_entry_id: int):
+def get_results_by_patient_entry_id(patient_entry_id: int) -> List[Result]:
     session = SessionLocal()
     results = (
         session.query(Result).filter(Result.patient_entry_id == patient_entry_id).all()
@@ -38,25 +42,23 @@ def get_results_by_patient_entry_id(patient_entry_id: int):
 def update_result(result_id: int, triage_level: int):
     session = SessionLocal()
     result = session.query(Result).filter(Result.id == result_id).first()
-    if result:
-        result.triage_level = triage_level
-        session.commit()
-        session.refresh(result)
+    if result is None:
         session.close()
-        return result
-    else:
-        session.close()
-        return None
+        raise ValueError(f"Result with ID {result_id} not found.")
+
+    result.triage_level = triage_level
+    session.commit()
+    session.refresh(result)
+    session.close()
 
 
 def delete_result(result_id: int):
     session = SessionLocal()
     result = session.query(Result).filter(Result.id == result_id).first()
-    if result:
-        session.delete(result)
-        session.commit()
+    if result is None:
         session.close()
-        return True
-    else:
-        session.close()
-        return False
+        raise ValueError(f"Result with ID {result_id} not found.")
+
+    session.delete(result)
+    session.commit()
+    session.close()

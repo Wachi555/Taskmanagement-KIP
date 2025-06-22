@@ -1,31 +1,35 @@
+from typing import List
+
 from database.orm_models import Examination
 from database.session import SessionLocal
 
 
-def get_all_examinations():
+def get_all_examinations() -> List[Examination]:
     session = SessionLocal()
     examinations = session.query(Examination).all()
     session.close()
     return examinations
 
 
-def get_examination_by_id(examination_id: int):
+def get_examination_by_id(examination_id: int) -> Examination:
     session = SessionLocal()
     examination = (
         session.query(Examination).filter(Examination.id == examination_id).first()
     )
     session.close()
+    if examination is None:
+        raise ValueError(f"Examination with ID {examination_id} not found.")
     return examination
 
 
-def create_examination(name: str, is_available: bool):
+def create_examination(name: str, is_available: bool) -> int:
     session = SessionLocal()
     new_examination = Examination(name=name, is_available=is_available)
     session.add(new_examination)
     session.commit()
     session.refresh(new_examination)
     session.close()
-    return new_examination.id
+    return new_examination.id  # type: ignore
 
 
 def delete_examination(examination_id: int):
@@ -33,14 +37,13 @@ def delete_examination(examination_id: int):
     examination = (
         session.query(Examination).filter(Examination.id == examination_id).first()
     )
-    if examination:
-        session.delete(examination)
-        session.commit()
+    if examination is None:
         session.close()
-        return True
-    else:
-        session.close()
-        return False
+        raise ValueError(f"Examination with ID {examination_id} not found.")
+
+    session.delete(examination)
+    session.commit()
+    session.close()
 
 
 # def get_examinations_for_result(result_id: int):
