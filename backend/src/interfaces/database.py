@@ -369,66 +369,54 @@ def remove_result_from_entry(result_id: int):
 
 
 # --- Experts Management ---
-def get_expert(expert_id: int):
+# Get an expert by ID
+def get_expert(expert_id: int) -> Expert:
     expert = crud_experts.get_expert_by_id(expert_id)
-    if expert:
-        return expert
-    else:
-        ...
+    return expert
 
 
 # Get all experts
-def get_all_experts():
+def get_all_experts() -> List[Expert]:
     experts = crud_experts.get_all_experts()
-    if experts:
-        return experts
-    else:
-        ...
+    return experts
 
 
 # Add an expert to the database
-def add_expert(name: str, is_available: bool):
+def add_expert(name: str, is_available: bool) -> int:
     expert_id = crud_experts.create_expert(name, is_available)
-    if expert_id:
-        return expert_id
-    else:
-        ...
+    return expert_id
 
 
 # Remove an expert from the database
 def remove_expert(expert_id: int):
-    success = crud_experts.delete_expert(expert_id)
-    if success:
-        return True
-    else:
-        ...
+    crud_experts.delete_expert(expert_id)
 
 
-# Get experts for result
-def get_experts_for_result(result_id: int):
-    experts = crud_experts.get_experts_for_result(result_id)
-    if experts:
-        return experts
-    else:
-        ...
+# # Get experts for result
+# def get_experts_for_result(result_id: int):
+#     experts = crud_experts.get_experts_for_result(result_id)
+#     if experts:
+#         return experts
+#     else:
+#         ...
 
 
-# Add an expert to a result
-def add_expert_to_result(result_id: int, expert_data):
-    expert_id = crud_experts.create_expert(result_id, expert_data)
-    if expert_id:
-        return expert_id
-    else:
-        ...
+# # Add an expert to a result
+# def add_expert_to_result(result_id: int, expert_data):
+#     expert_id = crud_experts.create_expert(result_id, expert_data)
+#     if expert_id:
+#         return expert_id
+#     else:
+#         ...
 
 
-# Remove an expert from a result
-def remove_expert_from_result(expert_id: int, result_id: int):
-    success = crud_experts.remove_expert_from_result(expert_id, result_id)
-    if success:
-        return True
-    else:
-        ...
+# # Remove an expert from a result
+# def remove_expert_from_result(expert_id: int, result_id: int):
+#     success = crud_experts.remove_expert_from_result(expert_id, result_id)
+#     if success:
+#         return True
+#     else:
+#         ...
 
 
 # --- Examination Management ---
