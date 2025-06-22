@@ -382,6 +382,23 @@ header .btn-outline-secondary.home-btn:hover {
   list-style-type: disc;
 }
 
+.btn-icon-clean {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0 0.25rem;
+  color: #6c757d;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.btn-icon-clean.edit:hover {
+  color: #0d6efd;
+}
+
+.btn-icon-clean.delete:hover {
+  color: #dc3545;
+}
 
 
 
