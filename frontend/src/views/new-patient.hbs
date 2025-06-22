@@ -3,7 +3,7 @@
     <div class="col-md-10 col-lg-8">
       <div class="card shadow">
         <div class="card-header text-center bg-primary text-white">
-          <h4>Neuen Patienten anlegen</h4>
+          <h4>Neuen Patienteneintrag anlegen</h4>
         </div>
         <div class="card-body">
           <form id="new-patient-form">
@@ -22,7 +22,7 @@
             <!-- Geburtsdatum -->
             <div class="mb-3">
               <label for="birthdate" class="form-label">Geburtsdatum</label>
-              <input type="date" class="form-control" id="birthdate" required>
+              <input type="date" class="form-control" id="birthdate" required max="{{today}}">
             </div>
 
             <!-- Symptome -->
@@ -73,8 +73,25 @@
 </div>
 
 <script>
+  // Setze das maximale Datum im Input-Feld auf heute
+  document.addEventListener('DOMContentLoaded', () => {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('birthdate').setAttribute('max', today);
+  });
+
   document.getElementById('new-patient-form').addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    const birthdateInput = document.getElementById('birthdate');
+    const birthdate = birthdateInput.value;
+    const today = new Date().toISOString().split('T')[0];
+
+    // Validierung: Datum muss vor heute liegen und gültig sein
+    if (!birthdate || birthdate >= today) {
+      alert("Bitte ein gültiges Geburtsdatum auswählen, das vor dem heutigen Datum liegt.");
+      birthdateInput.focus();
+      return;
+    }
 
     const data = {
       first_name: document.getElementById('vorname').value.trim(),
