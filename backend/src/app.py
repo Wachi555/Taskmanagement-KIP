@@ -4,10 +4,9 @@ import tempfile
 
 import uvicorn
 import whisper
-from common.pydantic_models import (
+from common.pydantic_models import (  # LLMResult,
     InputAnamnesis,
     InputPatient,
-    LLMResult,
     OutputModel,
     UpdatePatient,
 )

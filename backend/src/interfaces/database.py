@@ -1,23 +1,31 @@
 import json
 from datetime import datetime
+from typing import List, Optional
 
 import database.crud_diagnoses as crud_diagnoses
 import database.crud_examinations as crud_examinations
 import database.crud_experts as crud_experts
-import database.crud_medications as crud_medications
-import database.crud_paitent_entries as crud_paitent_entries
 import database.crud_patients as crud_patients
 import database.crud_results as crud_results
-import database.crud_symptoms as crud_symptoms
-from common.pydantic_models import (  # TODO: Remove, just for debugging
-    Diagnosis,
-    Examination,
-    Expert,
+
+# import database.crud_medications as crud_medications
+# import database.crud_symptoms as crud_symptoms
+from common.pydantic_models import (  # Examination,; Expert,
     ExtractedContent,
     InputPatient,
     LLMResult,
 )
+from database.orm_models import (
+    Diagnosis,
+    Examination,
+    Expert,
+    Patient,
+    PatientEntry,
+    Result,
+)
 from modules.helpers import calculate_age, stitch_together
+
+import backend.src.database.crud_patient_entries as crud_patient_entries
 
 
 # --- General Database Functions ---
