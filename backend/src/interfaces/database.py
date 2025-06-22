@@ -25,7 +25,7 @@ from database.orm_models import (
 )
 from modules.helpers import calculate_age, stitch_together
 
-import backend.src.database.crud_patient_entries as crud_patient_entries
+import database.crud_patient_entries as crud_patient_entries
 
 
 # --- General Database Functions ---
