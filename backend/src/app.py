@@ -56,6 +56,7 @@ async def process_input(input_model: InputAnamnesis, selected_patient_id: int):
             "error_message": "Processing error",
         }
 
+    patient = db.get_patient(selected_patient_id)
     patient_entry = db.get_latest_patient_entry(selected_patient_id)
     result = db.get_results_for_entry(patient_entry.id) if patient_entry else None
     result = result[0] if result else None
@@ -82,7 +83,8 @@ async def process_input(input_model: InputAnamnesis, selected_patient_id: int):
         ],
         "treatments": treatments,
         "experts": experts,
-        "triage": patient_entry.triage_level
+        "triage": patient_entry.triage_level,
+        "allergies": patient.allergies
     }
     return OutputModel(
         output=response
