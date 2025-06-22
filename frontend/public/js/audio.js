@@ -39,27 +39,44 @@ export function setupAudioRecorder() {
 
   setState("idle");
 
-  mainBtn.addEventListener("click", async () => {
-    recordedChunks = [];
-    const stream = await navigator.mediaDevices.getUserMedia({
+ mainBtn.addEventListener("click", async () => {
+  recordedChunks = [];
+  const stream = await navigator.mediaDevices.getUserMedia({
     audio: {
       sampleRate: 44100,
       channelCount: 1,
       echoCancellation: true,
       noiseSuppression: true
     }
-    });
+  });
 
-    // Use this format — FFmpeg handles this well
-    mediaRecorder = new MediaRecorder(stream, {
-      mimeType: "audio/webm;codecs=opus"
-    });
-    mediaRecorder = new MediaRecorder(stream);
-    mediaRecorder.ondataavailable = e => recordedChunks.push(e.data);
-    mediaRecorder.onstop = () => setState("stopped");
-    mediaRecorder.start();
-    setState("recording");
-    isPaused = false;
+  // Fallback-Logik für MIME-Typen
+  let mimeType = "";
+  if (MediaRecorder.isTypeSupported("audio/webm;codecs=opus")) {
+    mimeType = "audio/webm;codecs=opus";
+  } else if (MediaRecorder.isTypeSupported("audio/webm")) {
+    mimeType = "audio/webm";
+  } else if (MediaRecorder.isTypeSupported("audio/ogg")) {
+    mimeType = "audio/ogg";
+  }
+
+  let options = {};
+  if (mimeType) {
+    options.mimeType = mimeType;
+  }
+
+  try {
+    mediaRecorder = new MediaRecorder(stream, options);
+  } catch (e) {
+    showError("Audioaufnahme wird von deinem Browser nicht unterstützt.");
+    return;
+  }
+
+  mediaRecorder.ondataavailable = e => recordedChunks.push(e.data);
+  mediaRecorder.onstop = () => setState("stopped");
+  mediaRecorder.start();
+  setState("recording");
+  isPaused = false;
   });
 
   uploadBtn.addEventListener("click", () => {
