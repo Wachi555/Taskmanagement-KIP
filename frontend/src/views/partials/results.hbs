@@ -1,24 +1,6 @@
 <div class="output-box">
-  <div id="triageIndicator" class="mb-3"></div>
-
   <ul id="resultData" class="list-group list-group-flush mb-0">
-    <li class="list-group-item">
-      <strong class="me-3">Mögliche Diagnosen:</strong> –
-    </li>
-    <li class="list-group-item">
-      <strong class="me-3">Untersuchungen:</strong> –
-    </li>
-
-    <!-- NEU: Behandlungen -->
-    <li id="treatmentsItem" class="list-group-item">
-      <strong class="me-3">Behandlungen:</strong> –
-    </li>
-
-    <!-- Experten jetzt als Platzhalter für Komma-Liste -->
-    <li id="expertsItem" class="list-group-item">
-      <strong class="me-3">Experten:</strong> –
-    </li>
+    {{!-- Wird per JavaScript befüllt: 
+         Diagnosen, Untersuchungen, Behandlungen, Experten, Allergien --}}
   </ul>
 </div>
-
-<script src="/js/main.js" type="module"></script>

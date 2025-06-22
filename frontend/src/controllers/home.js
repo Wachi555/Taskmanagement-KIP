@@ -297,58 +297,67 @@ router.post('/analyse', async (req, res) => {
     if (!response.ok) throw new Error(`Backend-Fehler: ${response.status}`);
     const data = await response.json();
 
+    // frontend/controllers/home.js, im router.post('/analyse', …)
     const result = {
-      data: {
-        Name: data.output.name || '–',
-        Symptome: (data.output.symptoms || []).join(', ')
-      },
-      diagnosis: data.output.diagnosis || [],
+      diagnoses: data.output.diagnoses     || [],
+      examinations: data.output.examinations || [],
+      treatments: data.output.treatments   || "",
+      // Experten aus dem String "A, B" parsen
+      experts: typeof data.output.experts === 'string'
+        ? data.output.experts.split(',').map(s => s.trim()).filter(Boolean)
+        : (Array.isArray(data.output.experts) ? data.output.experts : []),
+      // Allergien existieren im Output zwar nicht immer – default leeres Array
+      allergies: typeof data.output.allergies === 'string'
+        ? data.output.allergies.split(',').map(s => s.trim()).filter(Boolean)
+        : (Array.isArray(data.output.allergies) ? data.output.allergies : []),
       triage: data.output.triage ?? null,
-      exams: data.output.examinations || [],
-      experts: data.output.treatments || [],
-      symptoms: data.output.symptoms || []
+      symptoms: data.output.symptoms       || []
     };
 
     res.json(result);
+
   } catch (error) {
     console.error('Analysefehler:', error);
     res.status(500).json({ error: 'Analyse fehlgeschlagen' });
   }
 });
 
+// routes/home.js
+
 // Patient Input mit Sidebar-Daten
 router.get('/patient/:id', async (req, res) => {
   const id = parseInt(req.params.id, 10);
+
   try {
     // 1) Patient holen
-    const result       = await fetchPatientById(id);
-    const patient      = result.patient;
-    const latestEntry  = result.latest_entry || {};
+    const result      = await fetchPatientById(id);
+    const patient     = result.patient;
+    const latestEntry = result.latest_entry || {};
+
+    // Symptome parsen
     const parsedSymptoms = latestEntry.symptoms
       ? latestEntry.symptoms.split(',').map(s => s.trim())
       : [];
 
-    // Bestimme das aktuelle Triage-Level (Fallback auf last_triage_level)
+    // Aktuelles Triage-Level (Fallback auf patient.last_triage_level)
     const currentTriage = latestEntry.triage ?? patient.last_triage_level;
 
-    // 2) Sidebar-Daten wie bei Registration/Coordination
+    // 2) Sidebar-Daten
     const allPatients = await fetchAllPatients();
     const waitingPatients = allPatients
       .filter(p => p.is_waiting)
       .map(p => ({
-        id:     p.id,
-        name:   `${p.first_name} ${p.last_name}`,
-        triage: p.last_triage_level
+        id:   p.id,
+        name: `${p.first_name} ${p.last_name}`
       }));
     const activePatients = allPatients
       .filter(p => p.in_treatment)
       .map(p => ({
-        id:     p.id,
-        name:   `${p.first_name} ${p.last_name}`,
-        triage: p.last_triage_level
+        id:   p.id,
+        name: `${p.first_name} ${p.last_name}`
       }));
 
-    // 3) Rendern mit Sidebar-Arrays + levels + triage
+    // 3) Rendern patient-input.hbs mit Triage im Header
     res.render('patient-input', {
       layout: 'patient',
       appName: 'Notaufnahme Universitätsklinikum Regensburg',
@@ -360,7 +369,7 @@ router.get('/patient/:id', async (req, res) => {
       activePatients,
       id,
 
-      // Für die Triage-Anzeige
+      // Triage-Indicator im Header
       levels: [1, 2, 3, 4, 5],
       triage: currentTriage,
 
@@ -377,42 +386,44 @@ router.get('/patient/:id', async (req, res) => {
       exams:   patient.examinations || [],
       experts: patient.treatments   || []
     });
+
   } catch (error) {
     console.error("Fehler beim Laden des Patienten:", error);
-    // Auch hier Sidebar-Daten mitgeben, dann nur Leerseiten rendern
+
+    // Bei Fehler: leere Sidebar-Arrays, kein Triage-Level aktiv
     const allPatients = await fetchAllPatients().catch(() => []);
     const waitingPatients = allPatients
       .filter(p => p.is_waiting)
-      .map(p => ({
-        id:     p.id,
-        name:   `${p.first_name} ${p.last_name}`,
-        triage: p.last_triage_level
-      }));
+      .map(p => ({ id: p.id, name: `${p.first_name} ${p.last_name}` }));
     const activePatients = allPatients
       .filter(p => p.in_treatment)
-      .map(p => ({
-        id:     p.id,
-        name:   `${p.first_name} ${p.last_name}`,
-        triage: p.last_triage_level
-      }));
+      .map(p => ({ id: p.id, name: `${p.first_name} ${p.last_name}` }));
+
     return res.render('patient-input', {
       layout: 'patient',
       appName: 'Notaufnahme Universitätsklinikum Regensburg',
       showHome: true,
       showSidebarToggle: true,
+
+      // Sidebar
       waitingPatients,
       activePatients,
       id,
+
+      // Triage-Indikator, aber kein aktives Level
       levels: [1, 2, 3, 4, 5],
       triage: null,
-      data:      {},
-      exams:     [],
-      experts:   [],
-      history:   [],
+
+      // Leere Daten + Fehlermeldung
+      data:         {},
+      exams:        [],
+      experts:      [],
+      history:      [],
       errorMessage: 'Patient nicht gefunden'
     });
   }
 });
+
 
 
 // --- Bearbeiten: Formular anzeigen ---
@@ -498,8 +509,8 @@ router.get('/patient/:id/overview', async (req, res) => {
       },
       diagnosis: latest.diagnosis   || [],
       triage:    latest.triage      ?? null,
-      exams:     latest.examinations || [],
-      experts:   latest.treatments   || [],
+      exams:     patient.examinations || [],
+      experts:   patient.treatments   || [],
       symptoms,
       errorMessage: null
     });

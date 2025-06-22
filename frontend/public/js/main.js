@@ -352,32 +352,39 @@ function setupSidebarSearch() {
 function displayResults(result) {
   resetResults();
   displayDiagnosis(result.diagnoses);
-  displayTriageLevel(result.triage);
   displayExams(result.examinations);
   displayTreatments(result.treatments);
   displayExperts(result.experts);
+  displayAllergies(result.allergies);
 
 }
+
+function displayAllergies(allergies) {
+  const ul = document.getElementById("resultData");
+  const li = document.createElement("li");
+  li.className = "list-group-item";
+  const list = Array.isArray(allergies) 
+    ? allergies 
+    : (allergies || "").split(",").map(s=>s.trim()).filter(Boolean);
+  li.innerHTML = `<strong class="me-3">Allergien:</strong> ${list.length ? list.join(", ") : "–"}`;
+  ul.appendChild(li);
+}
+
 
 function resetResults() {
   document.getElementById("resultData").innerHTML = "";
 }
 
 function displayTreatments(treatments) {
-  const li = document.getElementById("treatmentsItem");
-  if (!li) return;
-
-  // Wenn kein Array oder leer, setze auf Strich
-  if (!Array.isArray(treatments) || treatments.length === 0) {
-    li.innerHTML = `<strong class="me-3">Behandlungen:</strong> –`;
-    return;
-  }
-
-  // Ansonsten Komma-getrennt auflisten
-  const text = treatments.join(", ");
+  const ul = document.getElementById("resultData");
+  const li = document.createElement("li");
+  li.className = "list-group-item";
+  const text = (typeof treatments === 'string' && treatments.trim()) 
+    ? treatments 
+    : "–";
   li.innerHTML = `<strong class="me-3">Behandlungen:</strong> ${text}`;
+  ul.appendChild(li);
 }
-
 
 function displayDiagnosis(diagnoses) {
   const ul = document.getElementById("resultData");
@@ -456,21 +463,16 @@ function displayExams(exams) {
 }
 
 function displayExperts(experts) {
-  // Wir fügen das Experten-LI ganz ans Ende, deshalb kein getElementById
   const ul = document.getElementById("resultData");
   const li = document.createElement("li");
   li.className = "list-group-item";
-
-  if (!Array.isArray(experts) || experts.length === 0) {
-    li.innerHTML = `<strong class="me-3">Experten:</strong> –`;
-  } else {
-    // Extrahiere die Typen und joine sie
-    const types = experts.map(e => e.type);
-    li.innerHTML = `<strong class="me-3">Experten:</strong> ${types.join(", ")}`;
-  }
-
+  const list = Array.isArray(experts) 
+    ? experts 
+    : (experts || "").split(",").map(s=>s.trim()).filter(Boolean);
+  li.innerHTML = `<strong class="me-3">Experten:</strong> ${list.length ? list.join(", ") : "–"}`;
   ul.appendChild(li);
 }
+
 
 
 function showLoading(show) {
