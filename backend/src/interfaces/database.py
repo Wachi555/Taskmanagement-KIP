@@ -273,50 +273,50 @@ def remove_patient_entry(entry_id: int):
 #         ...
 
 
-# Add a symptom to a patient entry
-def add_symptom_to_entry(entry_id: int, symptom_data):
-    symptom_id = crud_symptoms.create_symptom(entry_id, symptom_data)
-    if symptom_id:
-        return symptom_id
-    else:
-        ...
+# # Add a symptom to a patient entry
+# def add_symptom_to_entry(entry_id: int, symptom_data):
+#     symptom_id = crud_symptoms.create_symptom(entry_id, symptom_data)
+#     if symptom_id:
+#         return symptom_id
+#     else:
+#         ...
 
 
-# Remove a symptom from a patient entry
-def remove_symptom_from_entry(symptom_id: int):
-    success = crud_symptoms.delete_symptom(symptom_id)
-    if success:
-        return True
-    else:
-        ...
+# # Remove a symptom from a patient entry
+# def remove_symptom_from_entry(symptom_id: int):
+#     success = crud_symptoms.delete_symptom(symptom_id)
+#     if success:
+#         return True
+#     else:
+#         ...
 
 
-# --- Medication Management ---
-# Get all medications for a patient entry
-def get_medications_for_entry(entry_id: int):
-    medications = crud_medications.get_medications_for_entry(entry_id)
-    if medications:
-        return medications
-    else:
-        ...
+# # --- Medication Management ---
+# # Get all medications for a patient entry
+# def get_medications_for_entry(entry_id: int):
+#     medications = crud_medications.get_medications_for_entry(entry_id)
+#     if medications:
+#         return medications
+#     else:
+#         ...
 
 
-# Add a medication to a patient entry
-def add_medication_to_entry(entry_id: int, name: str, dosage: str):
-    medication_id = crud_medications.create_medication(entry_id, name, dosage)
-    if medication_id:
-        return medication_id
-    else:
-        ...
+# # Add a medication to a patient entry
+# def add_medication_to_entry(entry_id: int, name: str, dosage: str):
+#     medication_id = crud_medications.create_medication(entry_id, name, dosage)
+#     if medication_id:
+#         return medication_id
+#     else:
+#         ...
 
 
-# Remove a medication from a patient entry
-def remove_medication_from_entry(medication_id: int):
-    success = crud_medications.delete_medication(medication_id)
-    if success:
-        return True
-    else:
-        ...
+# # Remove a medication from a patient entry
+# def remove_medication_from_entry(medication_id: int):
+#     success = crud_medications.delete_medication(medication_id)
+#     if success:
+#         return True
+#     else:
+#         ...
 
 
 # --- Diagnosis Management ---
