@@ -37,6 +37,8 @@ class PatientEntry(Base):
     symptoms = Column(String, nullable=True)  # JSON or comma-separated list
     medications = Column(String, nullable=True)  # JSON or comma-separated list
     triage_level = Column(Integer, nullable=False)
+    latest_result_id = Column(Integer, ForeignKey("results.id"), nullable=True)
+    
 
 
 class Examination(Base):

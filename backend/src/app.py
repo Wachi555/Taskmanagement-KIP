@@ -57,8 +57,9 @@ async def process_input(input_model: InputAnamnesis, selected_patient_id: int):
 
     patient = db.get_patient(selected_patient_id)
     patient_entry = db.get_latest_patient_entry(selected_patient_id)
-    result = db.get_results_for_entry(patient_entry.id) if patient_entry else None  # type: ignore
-    result = result[0] if result else None
+    result = db.get_latest_result_for_entry(patient_entry.id) if patient_entry else None  # type: ignore
+    # result = result[0] if result else None
+    print(f"DEBUG: Used result id: {result.id if result else 'None'}")  # type: ignore
 
     diagnoses = db.get_diagnoses_for_entry(result.id) if result else []  # type: ignore
     examinations = result.examinations if result else []
@@ -67,6 +68,8 @@ async def process_input(input_model: InputAnamnesis, selected_patient_id: int):
     patient.allgergies = ["Pollen", "Alles"]
 
     # Debug print
+    print(f"DEBUG: patient: {patient}")
+    print(f"DEBUG: result_id: {result.id}")
     print(f"DEBUG: patient entry: {patient_entry}")
     print(f"DEBUG: diagnoses: {diagnoses}")
     print(f"DEBUG: examinations: {examinations}")
@@ -136,9 +139,7 @@ async def get_patient(patient_id: int):
     patient = db.get_patient(patient_id)
     patient_entry = db.get_latest_patient_entry(patient_id)
     patient.last_triage_level = patient_entry.triage_level
-    patient_result = db.get_results_for_entry(patient_entry.id)  # type: ignore
-    # TODO: Handle multiple results -> Improve this with "latest_result_id" in patient_entry
-    patient_result = patient_result[0] if patient_result else None
+    patient_result = db.get_latest_result_for_entry(patient_entry.id)  # type: ignore
     diagnoses = db.get_diagnoses_for_entry(patient_result.id) if patient_result else []  # type: ignore
     result_dict = {
         "patient": patient,

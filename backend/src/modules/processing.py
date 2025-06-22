@@ -1,6 +1,6 @@
 import traceback
 
-from common.pydantic_models import EvaluationInput, LLMResult
+from common.pydantic_models import EvaluationInput, LLMResult, ExtractedContent
 from interfaces import database as db
 from modules.ai_service_openai import extract_contents, generate_anamnesis_response
 

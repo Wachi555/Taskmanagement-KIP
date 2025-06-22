@@ -46,6 +46,7 @@ def create_patient_entry(
     symptoms: str,
     medications: str,
     triage_level: int,
+    latest_result_id: int | None = None,  # Optional field for latest result ID
 ) -> int:
     session = SessionLocal()
     patient = session.query(Patient).filter(Patient.id == patient_id).first()
@@ -62,6 +63,7 @@ def create_patient_entry(
         symptoms=symptoms,
         medications=medications,
         triage_level=triage_level,
+        latest_result_id=latest_result_id
     )
     session.add(new_entry)
     session.commit()
