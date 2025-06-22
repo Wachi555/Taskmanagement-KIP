@@ -341,39 +341,31 @@ def remove_diagnosis_from_entry(diagnosis_id: int):
 
 # --- Result Management ---
 # Get all results for a patient entry
-def get_results_for_entry(entry_id: int):
+def get_results_for_entry(entry_id: int) -> List[Result]:
     results = crud_results.get_results_by_patient_entry_id(entry_id)
     for result in results:
         exams = result.examinations
-        print(f"DEBUG: result.examinations: {exams}", flush=True)
+        # print(f"DEBUG: result.examinations: {exams}", flush=True)
         exams = (
             [json.loads(exam.strip()) for exam in exams.split("; ") if exam]
-            if exams
+            if exams  # type: ignore
             else []
         )
-        result.examinations = exams
-    if results:
-        return results
-    else:
-        ...
+        result.examinations = "; ".join([json.dumps(exam) for exam in exams])  # type: ignore
+    return results
 
 
 # Add a result to a patient entry
-def add_result_to_entry(entry_id: int, result_data):
-    result_id = crud_results.create_result(entry_id, result_data)
-    if result_id:
-        return result_id
-    else:
-        ...
+def add_result_to_entry(
+    entry_id: int, experts: str, examinations: str, treatments: str
+):
+    result_id = crud_results.create_result(entry_id, experts, examinations, treatments)
+    return result_id
 
 
 # Remove a result from a patient entry
 def remove_result_from_entry(result_id: int):
-    success = crud_results.delete_result(result_id)
-    if success:
-        return True
-    else:
-        ...
+    crud_results.delete_result(result_id)
 
 
 # --- Experts Management ---
