@@ -22,18 +22,16 @@ async function deletePatientById(id) {
   const res = await fetch(`http://localhost:8000/patient/${id}`, { method: 'DELETE' });
   if (!res.ok) throw new Error(`Löschen fehlgeschlagen (${res.status})`);
 }
-async function updatePatientById(id, payload) {
-  const res = await fetch(`http://localhost:8000/patient/update/${id}`, {
-    method:  'POST',                        // ← hier POST statt PATCH
-    headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify(payload)
-  });
+async function updatePatientById(id, status) {
+  const res = await fetch(`http://localhost:8000/patient/update_status/${id}/0`);
+
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.detail || `Aktualisierung fehlgeschlagen (${res.status})`);
   }
   return res.json();
 }
+
 
 
 
@@ -130,6 +128,25 @@ router.get('/registration', async (req, res) => {
   }
 });
 
+router.get('/patient/update_status/:id/:status', async (req, res) => {
+  const { id, status } = req.params;
+  console.log(`🔥 Update Patient ${id} to status ${status}`);
+
+  try {
+    // 1. Debugging: Loggen bevor der Aufruf passiert
+    console.log("Calling backend...");
+    
+    // 2. Eigentlicher Aufruf
+    const result = await updatePatientById(id, status);
+    console.log("✅ Backend response:", result);
+
+    // 3. Redirect
+    res.redirect('/coordination');
+  } catch (error) {
+    console.error("❌ FEHLER:", error);
+    res.status(500).send(`Update fehlgeschlagen: ${error.message}`);
+  }
+});
 
 
 // Koordination
@@ -338,6 +355,7 @@ router.get('/patient/:id', async (req, res) => {
       // Sidebar
       waitingPatients,
       activePatients,
+      id,
 
       // Patient-Form-Daten
       data: {
