@@ -82,6 +82,7 @@ async def process_input(input_model: InputAnamnesis, selected_patient_id: int):
         ],
         "treatments": treatments,
         "experts": experts,
+        "triage": patient_entry.triage_level
     }
     return OutputModel(
         output=response
