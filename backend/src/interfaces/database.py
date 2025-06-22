@@ -24,7 +24,6 @@ def save_extracted_contents(patient_id: int, contents: ExtractedContent):
         print(f"Error: No entries found for patient with ID {patient_id}. Cannot save extracted contents.")
         return None
     entry_id = latest_entry.id
-    # TODO: Wann hier neuen entry erstellen? bzw. überhaupt hier ? oder wo sonst?
     crud_paitent_entries.update_patient_entry(
         entry_id,
         extracted_contents_json=contents.model_dump_json(),
@@ -314,9 +313,6 @@ def remove_medication_from_entry(medication_id: int):
         return True
     else:
         ...
-
-# --- Allergy Management ---
-# TODO
         
 # --- Diagnosis Management ---
 
