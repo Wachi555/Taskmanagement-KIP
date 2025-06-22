@@ -23,7 +23,7 @@ Your task is to identify the following data based on the information provided:
 4. the required experts: A list of experts that should be consulted for the patient. Each expert should have a type, such as "Cardiologist", "Neurologist", etc.
 
 There can be multiple examinations with the same priority, since the priority is not used to compare examinations, but to decide which patient needs it first.
-Keep the results in german.
+Keep all results in the german language.
 """
 
 
