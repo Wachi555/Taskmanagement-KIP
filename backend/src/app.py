@@ -2,7 +2,9 @@
 import os
 import tempfile
 
+import modules.helpers as helpers
 import uvicorn
+import whisper
 from common.pydantic_models import (  # LLMResult,
     InputAnamnesis,
     InputPatient,
@@ -465,5 +467,30 @@ async def insert_example_patients():
     }
 
 
+@app.get("/examinations", tags=["database"])
+async def get_examinations():
+    examinations = db.get_all_examinations()
+    return {
+        "output": examinations,
+        "success": True,
+    }
+
+
+@app.get("/experts", tags=["database"])
+async def get_experts():
+    experts = db.get_all_experts()
+    return {
+        "output": experts,
+        "success": True,
+    }
+
+
 if __name__ == "__main__":
+    available_experts, available_treatments = helpers.parse_med_server_json(
+        os.environ.get("MEDICAL_SERVER_JSON", "[]")
+    )
+    print(f"Available experts: {available_experts}")
+    print(f"Available treatments: {available_treatments}")
+    db.store_experts(available_experts)
+    db.store_examinations(available_treatments)
     uvicorn.run(app, port=8000, reload=False)
