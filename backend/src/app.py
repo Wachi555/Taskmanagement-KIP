@@ -100,20 +100,29 @@ async def process_input_debug(input_model: InputAnamnesis):
 
 
 # ==================== STT routes =============================
-model = whisper.load_model("base")  # Options: tiny, base, small, medium, large
-
-
 @app.post("/transcribe")
-async def transcribe(file: UploadFile = File(...)):
-    # Get the original extension (e.g. .mp3, .wav, .webm)
-    _, ext = os.path.splitext(file.filename)  # type: ignore
-    if not ext:
-        ext = ".webm"  # fallback
-    with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as temp_audio:
-        temp_audio.write(await file.read())
-        temp_audio.flush()
-        result = model.transcribe(temp_audio.name)
-    return {"transcription": result["text"]}
+async def transcribe(file: UploadFile = File(...)) -> OutputModel:
+    try:
+        # Get the original extension (e.g. .mp3, .wav, .webm)
+        _, ext = os.path.splitext(file.filename)  # type: ignore
+        if not ext:
+            ext = ".webm"  # fallback
+        with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as temp_audio:
+            temp_audio.write(await file.read())
+            temp_audio.flush()
+            result = whisper_model.transcribe(temp_audio.name)["text"]
+
+    except Exception as e:
+        logger.error(f"Error transcribing audio file: {e}")
+        return OutputModel(
+            output="Failed to transcribe audio file",
+            success=False,
+            error=str(e),
+            status_code=500,
+        )
+
+    logger.debug(f"Transcribed audio file {file.filename} to text: {result}")
+    return OutputModel(output=result)
 
 
 # ==================== Database routes ==========================
