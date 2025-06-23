@@ -47,7 +47,8 @@ async function fetchPatientHistoryById(id) {
   if (!res.ok) {
     throw new Error(`Patient-Historie konnte nicht geladen werden (Status ${res.status})`);
   }
-  const body = await res.json();
+  let body = await res.json();
+  body = body.output;
 
   let entries = [];
 
