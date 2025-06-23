@@ -1,12 +1,59 @@
-<div class="card">
-  <div class="card-header">Vergangene Besuche & Diagnosen</div>
+<div class="card border-0 shadow-sm">
   <ul class="list-group list-group-flush">
     {{#each history}}
-      <li class="list-group-item">
-        <strong>{{this.date}}:</strong> {{this.event}}
-      </li>
+      {{#if this.patient_history}}
+        <!-- Alternative: Kompakte Timeline-Ansicht -->
+        <li class="list-group-item px-3 py-2 {{#unless @last}}border-bottom{{/unless}} hover-bg-light transition position-relative">
+          <!-- Timeline-Marker -->
+
+          
+          <!-- Content mit Einrückung für Timeline -->
+          <div class="ms-4">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <small class="text-muted">{{formatDate this.entry_date}}</small>
+            </div>
+            
+            <div class="{{#if @first}}fw-semibold{{else}}fw-semibold{{/if}} mb-1">
+            {{this.patient_history}}
+            </div>
+            
+            {{#if this.symptoms}}
+              <div class="small text-secondary">
+                <i class="bi bi-info-circle me-1"></i>{{this.symptoms}}
+              </div>
+            {{/if}}
+          </div>
+        </li>
+      {{/if}}
     {{else}}
-      <li class="list-group-item text-muted">Keine Historie vorhanden.</li>
+      <li class="list-group-item text-center py-5 border-0">
+        <div class="text-muted">
+          <i class="bi bi-inbox display-6 d-block mb-3 opacity-50"></i>
+          <p class="mb-0">Keine Patientenhistorie vorhanden</p>
+          <small class="text-muted">Diagnosen und Besuche werden hier angezeigt</small>
+        </div>
+      </li>
     {{/each}}
   </ul>
 </div>
+
+<!-- Optional: CSS für Hover-Effekte -->
+<style>
+  .hover-bg-light:hover {
+    background-color: rgba(0, 123, 255, 0.05) !important;
+  }
+  
+  .transition {
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .list-group-item:last-child {
+    border-bottom-left-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+  }
+  
+  .list-group-item:first-child {
+    border-top-left-radius: 0.375rem;
+    border-top-right-radius: 0.375rem;
+  }
+</style>

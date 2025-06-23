@@ -5,7 +5,7 @@ You are given a german text about a patient in a hospital.
 Your task is to extract all of the following information that the text contains.
 If the text does not contain a certain information, just leave it blank.
 Do not try and come up with information that is not provided in the text.
-1. History
+1. History: This should be a short summary of the text, such as "Patient with chest pain".
 2. Medications
 3. Allergies
 4. Additional Notes
@@ -18,7 +18,7 @@ evaluation_prompt = """
 You are a medical assistant. You are given information about a patient in a hospital.
 
 Your task is to identify the following data based on the information provided:
-1. required examinations: Each examination should have a name and a priority from 1 to 5, where 5 is the highest and 1 is the lowest priority.
+1. required examinations: Each examination should have a name and a priority from 1 to 3, where 1 means low priority and 3 means high priority.
 2. possible diagnoses: Give a list of 1 to 3 possible diagnoses, that the patient might suffer from, given the input data. Each diagnosis should have a name, a confidence score between 0 and 1, and a reason for why you think the patient is affected by this disease or situation.
 3. treatments: A list of treatments that should be applied to the patient. These can be medications, therapies, or other treatments.
 4. the required experts: A list of experts that should be consulted for the patient. Each expert should have a type, such as "Cardiologist", "Neurologist", etc.

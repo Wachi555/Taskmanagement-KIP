@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 import database.crud_diagnoses as crud_diagnoses
 import database.crud_examinations as crud_examinations
@@ -47,7 +47,7 @@ def save_extracted_contents(patient_id: int, contents: ExtractedContent):
     )
 
 
-def save_anamnesis_response(patient_id: int, response: LLMResult):
+def save_anamnesis_response(patient_id: int, response: LLMResult, anamnesis_text: str):
     # # Create new result in database:
     # # TODO: Remove this when Openai is used again
     # response.experts = [Expert(type="Allgemeinmedizin"), Expert(type="Dermatologie")]
@@ -132,6 +132,7 @@ def add_patient(patient: InputPatient) -> int:
         symptoms=patient.symptoms,
         medications="",
         triage_level=patient.triage_level,
+        anamnesis_text="",
     )
     update_patient(patient_id, latest_entry_id=entry_id)
     return patient_id  # type: ignore
@@ -203,6 +204,7 @@ def add_patient_entry(
     symptoms: str,
     medications: str,
     triage_level: int,
+    anamnesis_text: str,
     latest_result_id: Optional[int] = None,
 ) -> int:
     entry_id = crud_patient_entries.create_patient_entry(
@@ -214,6 +216,7 @@ def add_patient_entry(
         symptoms,
         medications,
         triage_level,
+        anamnesis_text=anamnesis_text,
         latest_result_id=latest_result_id,
     )
     return entry_id
@@ -229,6 +232,7 @@ def update_patient_entry(
     symptoms: Optional[str] = None,
     medications: Optional[str] = None,
     triage_level: Optional[int] = None,
+    anamnesis_text: Optional[str] = None,
     latest_result_id: Optional[int] = None,
 ):
     crud_patient_entries.update_patient_entry(
@@ -240,6 +244,7 @@ def update_patient_entry(
         symptoms=symptoms,
         medications=medications,
         triage_level=triage_level,
+        anamnesis_text=anamnesis_text,
         latest_result_id=latest_result_id,
     )
 

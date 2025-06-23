@@ -30,9 +30,9 @@ def stitch_together(a: str | List[str], b: str | List[str]) -> str:
         a = [a]
     if isinstance(b, str):
         b = [b]
-    if a is not None and a != []:
+    if a is not None and a != [] and a != [""]:
         res = ", ".join(a)
-    if b is not None and b != []:
+    if b is not None and b != [] and b != [""]:
         if res:
             res += ", "
         res += ", ".join(b)
