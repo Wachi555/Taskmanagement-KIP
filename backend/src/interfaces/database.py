@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 import database.crud_diagnoses as crud_diagnoses
 import database.crud_examinations as crud_examinations
@@ -38,7 +38,7 @@ def save_extracted_contents(patient_id: int, contents: ExtractedContent):
             latest_entry.additional_notes, contents.additional_notes  # type: ignore
         ),
         medications=stitch_together(latest_entry.medications, contents.medications),  # type: ignore
-        symptoms=stitch_together(latest_entry.symptoms, contents.symptoms),
+        symptoms=stitch_together(latest_entry.symptoms, contents.symptoms),  # type: ignore
     )
 
     patient = get_patient(patient_id)
@@ -134,7 +134,7 @@ def add_patient(patient: InputPatient) -> int:
         triage_level=patient.triage_level,
         anamnesis_text="",
     )
-    update_patient(patient_id, latest_entry_id=entry_id)
+    update_patient(patient_id, latest_entry_id=entry_id)  # type: ignore
     return patient_id  # type: ignore
 
 
