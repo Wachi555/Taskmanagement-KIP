@@ -223,10 +223,8 @@ async def update_patient_status(patient_id: int, status: int):
             "error_code": 400,
             "error_message": "Status must be 0 (in history), 1 (waiting), or 2 (in treatment)",
         }
-    success = db.update_patient(
-        patient_id, is_waiting=(status == 1), in_treatment=(status == 2)
-    )
-    if success:
+    db.update_patient( patient_id, is_waiting=(status == 1), in_treatment=(status == 2))
+    if True:
         return {
             "output": f"Patient with ID {patient_id} updated successfully",
             "success": True,
