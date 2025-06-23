@@ -1,9 +1,9 @@
-import json
+# import json
 import os
 import tempfile
+from typing import Dict
 
 import uvicorn
-import whisper
 from common.pydantic_models import (  # LLMResult,
     InputAnamnesis,
     InputPatient,
@@ -14,13 +14,14 @@ from database.session import init_db
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from interfaces import database as db
-from modules.debug import test_output
-from modules.processing import process_anamnesis, process_anamnesis_default
+from modules.logger import logger
+from modules.processing import process_anamnesis  # , process_anamnesis_default
+from modules.STT_service_whisper import whisper_model
+
+# from modules.debug import test_output
 
 app = FastAPI()
 init_db()
-
-# TODO: Add ResponseModels -> Success: bool, Error-messages, etc.
 
 app.add_middleware(
     CORSMiddleware,
@@ -32,49 +33,74 @@ app.add_middleware(
 
 
 @app.get("/", tags=["default"])
-async def main():
+async def main() -> Dict[str, str]:
     return {"message": "Hello World"}
 
 
 # ==================== Processing routes ========================
-@app.post("/process_input", tags=["processing"])
-async def process_input_default(input_model: InputAnamnesis):
-    response = process_anamnesis_default(input_model.text)
-    print(f"Response from process_anamnesis_default: {response}")
-    return response
+# @app.post("/process_input", tags=["processing"])
+# async def process_input_default(input_model: InputAnamnesis):
+#     try:
+#         response = process_anamnesis_default(input_model.text)
+#     except Exception as e:
+#         logger.error(f"Error processing input: {e}")
+#         return {
+#             "output": "Failed to process input",
+#             "success": False,
+#             "error_code": 500,
+#             "error_message": str(e),
+#         }
+#     logger.debug(f"Processed input: {input_model.text}")
+#     logger.debug(f"Response: {response}")
+#     return response
 
 
 @app.post("/process_input/{selected_patient_id}", tags=["processing"])
-async def process_input(input_model: InputAnamnesis, selected_patient_id: int):
-    success = process_anamnesis(input_model.text, selected_patient_id)
-    if not success:
-        return {
-            "output": "Failed to process input",
-            "success": False,
-            "error_code": 500,
-            "error_message": "Processing error",
-        }
+async def process_input(
+    input_model: InputAnamnesis, selected_patient_id: int
+) -> OutputModel:
+    try:
+        process_anamnesis(input_model.text, selected_patient_id)
 
-    patient = db.get_patient(selected_patient_id)
-    patient_entry = db.get_latest_patient_entry(selected_patient_id)
-    result = db.get_latest_result_for_entry(patient_entry.id) if patient_entry else None  # type: ignore
-    # result = result[0] if result else None
-    print(f"DEBUG: Used result id: {result.id if result else 'None'}")  # type: ignore
+    except Exception as e:
+        logger.error(f"Error processing input for patient {selected_patient_id}: {e}")
+        return OutputModel(
+            output="Failed to process input",
+            success=False,
+            error=str(e),
+            status_code=500,
+        )
 
-    diagnoses = db.get_diagnoses_for_entry(result.id) if result else []  # type: ignore
-    examinations = result.examinations if result else []
-    experts = result.experts if result else []
-    treatments = result.treatments if result else []
-    patient.allgergies = ["Pollen", "Alles"]
+    logger.debug(
+        f"Processed input for patient {selected_patient_id}: {input_model.text}"
+    )
 
-    # Debug print
-    print(f"DEBUG: patient: {patient}")
-    print(f"DEBUG: result_id: {result.id}")
-    print(f"DEBUG: patient entry: {patient_entry}")
-    print(f"DEBUG: diagnoses: {diagnoses}")
-    print(f"DEBUG: examinations: {examinations}")
-    print(f"DEBUG: experts: {experts}")
-    print(f"DEBUG: treatments: {treatments}")
+    try:
+        patient = db.get_patient(selected_patient_id)
+        patient_entry = db.get_latest_patient_entry(selected_patient_id)
+        result = db.get_latest_result_for_entry(patient_entry.id)  # type: ignore
+        diagnoses = db.get_diagnoses_for_entry(result.id)  # type: ignore
+        examinations = result.examinations  # type: ignore
+        experts = result.experts  # type: ignore
+        treatments = result.treatments  # type: ignore
+
+    except Exception as e:
+        logger.error(f"Error retrieving data for patient {selected_patient_id}: {e}")
+        return OutputModel(
+            output="Failed to retrieve patient data",
+            success=False,
+            error=str(e),
+            status_code=500,
+        )
+
+    logger.debug(f"Retrieved data for patient ID {selected_patient_id}:")
+    logger.debug(f"Patient: {patient}")
+    logger.debug(f"Patient Entry: {patient_entry}")
+    logger.debug(f"Result: {result}")
+    logger.debug(f"Diagnoses: {diagnoses}")
+    logger.debug(f"Examinations: {examinations}")
+    logger.debug(f"Experts: {experts}")
+    logger.debug(f"Treatments: {treatments}")
 
     response = {
         "diagnoses": [
@@ -87,16 +113,14 @@ async def process_input(input_model: InputAnamnesis, selected_patient_id: int):
         "treatments": treatments,
         "experts": experts,
         "triage": patient_entry.triage_level,
-        "allergies": patient.allergies
+        "allergies": patient.allergies,
     }
-    return OutputModel(
-        output=response
-    )  # !!!! Hier weiter: Ouput muss jetzt aus db kommen, nicht mehr aus dem AI-Service
+    return OutputModel(output=response)
 
 
-@app.post("/process_input_debug", tags=["processing"])
-async def process_input_debug(input_model: InputAnamnesis):
-    return OutputModel(output=json.loads(test_output))
+# @app.post("/process_input_debug", tags=["processing"])
+# async def process_input_debug(input_model: InputAnamnesis):
+#     return OutputModel(output=json.loads(test_output))
 
 
 # ==================== STT routes =============================
