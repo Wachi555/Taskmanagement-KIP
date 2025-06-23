@@ -192,11 +192,15 @@ async def delete_patient(patient_id: int):
         }
 
 
-@app.get("/patient/{patient_id}/entries", tags=["database"])
-async def get_patient_entries(patient_id: int):
+@app.get("/patient/{patient_id}/history", tags=["database"])
+async def get_patient_history(patient_id: int):
+    res = []
     entries = db.get_patient_entries(patient_id)
     if entries:
-        return entries
+        for entry in entries:
+            result = db.get_latest_result_for_entry(entry.id)  # type: ignore
+            res.append([entry, result])
+        return res
     else:
         return {
             "output": "No entries found for this patient",
