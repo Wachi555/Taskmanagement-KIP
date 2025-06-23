@@ -46,6 +46,7 @@ def create_patient_entry(
     symptoms: str,
     medications: str,
     triage_level: int,
+    anamnesis_text: str,
     latest_result_id: Optional[int] = None,
 ) -> int:
     session = SessionLocal()
@@ -63,6 +64,7 @@ def create_patient_entry(
         symptoms=symptoms,
         medications=medications,
         triage_level=triage_level,
+        anamnesis_text=anamnesis_text,
         latest_result_id=latest_result_id,
     )
     session.add(new_entry)
