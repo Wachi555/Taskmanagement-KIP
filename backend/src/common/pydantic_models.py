@@ -58,7 +58,7 @@ class UpdatePatient(BaseModel):
 
 # What the frontend receives from the backend after processing the anamnesis text
 class OutputModel(BaseModel):
-    output: Dict
+    output: Dict | List | str
     success: bool = True
     error: str | None = None
     status_code: int | None = None
