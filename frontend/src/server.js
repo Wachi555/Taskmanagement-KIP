@@ -55,6 +55,9 @@ app.use((req, res) => {
 
 // Server starten
 const PORT = 4000;
-app.listen(PORT, () => {
-  console.log(`Server läuft auf http://localhost:${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server läuft auf http://localhost:${PORT}`);
+  });
+}
+module.exports = app;
