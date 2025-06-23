@@ -39,8 +39,6 @@ def process_anamnesis(input_text: str, current_patient_id: int) -> bool:
             ),
         )
         print(f"DEBUG: EvaluationInput: {eval_input}", flush=True)
-        print(f"DEBUG: Available experts: {db.get_available_experts()}", flush=True)
-        print(f"DEBUG: Available examinations: {db.get_available_examinations()}", flush=True)
         result = generate_anamnesis_response(eval_input)
         db.save_anamnesis_response(current_patient_id, result, input_text)  # type: ignore
         print(f"Response form extract_contents: {contents}", flush=True)
