@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Diese Setups laufen überall und finden deine <button.move-to-active>
   setupAnalyzeButton();
-  setupSidebarSearch();
+ // setupSidebarSearch();
   setupMoveButtons();
   setupFullViewSearch();
   setupAudioRecorder();
