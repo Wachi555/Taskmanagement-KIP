@@ -44,6 +44,7 @@ class PatientEntry(Base):
     latest_result_id = Column(Integer, ForeignKey("results.id"), nullable=True)
 
 
+# Examinations table (one for each examination type)
 class Examination(Base):
     __tablename__ = "examinations"
     id = Column(Integer, primary_key=True)
@@ -52,17 +53,7 @@ class Examination(Base):
     utilization = Column(Integer, nullable=False)  # 1: low, 2: medium, 3: high
 
 
-# class ExaminationToResult(Base):
-#     __tablename__ = 'examination_to_result'
-
-#     id = Column(Integer, primary_key=True)
-#     examination_id = Column(Integer, ForeignKey('examinations.id'), nullable=False)
-#     result_id = Column(Integer, ForeignKey('results.id'), nullable=False)
-#     priority = Column(Integer, nullable=False)
-#     reason = Column(String, nullable=False)
-
-
-# Chosen expert table (one for each expert for each result -> The reason will be stored with the expert)
+# Experts table (one for each type of expert)
 class Expert(Base):
     __tablename__ = "experts"
     id = Column(Integer, primary_key=True)
@@ -70,21 +61,11 @@ class Expert(Base):
     is_available = Column(Boolean, nullable=False)
 
 
-# class ExpertToResult(Base):
-#     __tablename__ = 'expert_to_result'
-
-#     id = Column(Integer, primary_key=True)
-#     expert_id = Column(Integer, ForeignKey('experts.id'), nullable=False)
-#     result_id = Column(Integer, ForeignKey('results.id'), nullable=False)
-#     reason = Column(String, nullable=False)
-
-
 # Results table (one for each patient entry -> might get more if feedback is implemented)
 class Result(Base):
     __tablename__ = "results"
     id = Column(Integer, primary_key=True)
     patient_entry_id = Column(Integer, ForeignKey("patients.id"), nullable=False)
-    # JSON or comma-separated list of expert names:
     experts = Column(String, nullable=True)
     examinations = Column(String, nullable=True)
     treatments = Column(String, nullable=True)

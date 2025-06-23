@@ -3,6 +3,7 @@ from typing import List
 from database.orm_models import Result
 from database.session import SessionLocal
 
+"""CRUD operations for the Result model in the database."""
 
 def create_result(
     patient_entry_id: int, experts: str, examinations: str, treatments: str

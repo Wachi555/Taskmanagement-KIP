@@ -3,6 +3,7 @@ from typing import List, Optional
 from database.orm_models import Patient, PatientEntry
 from database.session import SessionLocal
 
+"""CRUD operations for the PatientEntry model in the database."""
 
 def get_patient_entries(patient_id: int) -> List[PatientEntry]:
     session = SessionLocal()
@@ -13,7 +14,7 @@ def get_patient_entries(patient_id: int) -> List[PatientEntry]:
     return entries
 
 
-def get_latest_patient_entry(patient_id: int) -> PatientEntry:  # TODO: Test
+def get_latest_patient_entry(patient_id: int) -> PatientEntry: 
     session = SessionLocal()
     entry = (
         session.query(PatientEntry)
@@ -36,7 +37,6 @@ def get_patient_entry(entry_id: int) -> PatientEntry:
     return entry
 
 
-# TODO: How is the schema supposed to look like for this (parameters)?
 def create_patient_entry(
     patient_id: int,
     entry_date: str,
@@ -86,7 +86,7 @@ def delete_patient_entry(entry_id: int):
     session.close()
 
 
-def update_patient_entry(entry_id: int, **kwargs):  # TODO: Test if kwargs work
+def update_patient_entry(entry_id: int, **kwargs): 
     session = SessionLocal()
     entry = session.query(PatientEntry).filter(PatientEntry.id == entry_id).first()
     if entry is None:

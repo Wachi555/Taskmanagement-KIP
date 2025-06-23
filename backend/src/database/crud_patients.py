@@ -3,6 +3,7 @@ from typing import List
 from database.orm_models import Patient
 from database.session import SessionLocal
 
+"""CRUD operations for the Patient model in the database."""
 
 def get_all_patients() -> List[Patient]:
     session = SessionLocal()
@@ -19,7 +20,7 @@ def get_patient_by_id(patient_id: int) -> Patient:
         raise ValueError(f"Patient with ID {patient_id} not found.")
     return patient
 
-
+# Gets a patient by their first name, last name, and date of birth to check if they are already registered.
 def get_patient_by_name_and_dob(
     first_name: str, last_name: str, date_of_birth: str
 ) -> Patient:
@@ -86,7 +87,7 @@ def delete_patient(patient_id: int):
     session.close()
 
 
-def update_patient(patient_id: int, **kwargs):  # TODO: Test if kwargs work
+def update_patient(patient_id: int, **kwargs):
     session = SessionLocal()
     patient = session.query(Patient).filter(Patient.id == patient_id).first()
     if patient is None:

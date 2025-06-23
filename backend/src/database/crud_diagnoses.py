@@ -3,6 +3,7 @@ from typing import List
 from database.orm_models import Diagnosis
 from database.session import SessionLocal
 
+"""CRUD operations for the Diagnosis model in the database."""
 
 def get_diagnoses_for_entry(result_id: int) -> List[Diagnosis]:
     session = SessionLocal()
