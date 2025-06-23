@@ -45,6 +45,32 @@ async function updatePatientById(id, payload) {
   return res.json();
 };
 
+async function fetchPatientHistoryById(id) {
+  const res = await fetch(`http://localhost:8000/patient/${id}/history`);
+  if (!res.ok) {
+    throw new Error(`Patient-Historie konnte nicht geladen werden (Status ${res.status})`);
+  }
+  const body = await res.json();
+
+  let entries = [];
+
+  // Backend liefert [[Entry, Result], [Entry, Result], …]
+  if (Array.isArray(body) && body.every(item => Array.isArray(item))) {
+    entries = body
+      .map(pair => pair[0])              // erstes Element jedes Paares
+      .filter(e => e && e.patient_history); // nur, wo patient_history existiert
+  }
+  // Fallback: falls es mal ein { history: […] }-Objekt gäbe
+  else if (body.history && Array.isArray(body.history)) {
+    entries = body.history.filter(e => e.patient_history);
+  }
+  // oder doch ein flaches Array
+  else if (Array.isArray(body)) {
+    entries = body.filter(e => e.patient_history);
+  }
+
+  return entries;
+}
 
 
 
@@ -349,6 +375,8 @@ router.get('/patient/:id', async (req, res) => {
     const latestResult = result.latest_result || {};
     const diagnoses = result.diagnoses || [];
 
+    const history = await fetchPatientHistoryById(id);
+
     // Symptome parsen
     const parsedSymptoms = latestEntry.symptoms
       ? latestEntry.symptoms.split(',').map(s => s.trim())
@@ -433,7 +461,7 @@ router.get('/patient/:id', async (req, res) => {
         adresse: patient.address,
         krankenkasse: patient.health_insurance,
         symptoms: parsedSymptoms,
-        history: result.history || []
+        history: history
       },
 
       // Ergebnisse
@@ -473,7 +501,7 @@ router.get('/patient/:id', async (req, res) => {
       treatments: [],
       experts: [],
       allergies: [],
-      errorMessage: 'Patient nicht gefunden'
+      errorMessage: 'Patient oder Historie nicht gefunden'
     });
   }
 });
