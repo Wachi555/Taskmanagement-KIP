@@ -374,6 +374,7 @@ router.get('/patient/:id', async (req, res) => {
     const latestEntry = result.latest_entry || {};
     const latestResult = result.latest_result || {};
     const diagnoses = result.diagnoses || [];
+    const anamnesisText = latestEntry.anamnesis_text || "";
 
     const history = await fetchPatientHistoryById(id);
 
@@ -469,7 +470,8 @@ router.get('/patient/:id', async (req, res) => {
       exams,
       treatments,
       experts,
-      allergies
+      allergies,
+      anamnesisText
     });
 
   } catch (error) {

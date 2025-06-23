@@ -39,7 +39,7 @@ def process_anamnesis(input_text: str, current_patient_id: int) -> bool:
             ),
         )
         result = generate_anamnesis_response(eval_input)
-        db.save_anamnesis_response(current_patient_id, result)  # type: ignore
+        db.save_anamnesis_response(current_patient_id, result, input_text)  # type: ignore
         print(f"Response form extract_contents: {contents}", flush=True)
         print(f"Response from generate_anamnesis_response: {result}", flush=True)
         return True
