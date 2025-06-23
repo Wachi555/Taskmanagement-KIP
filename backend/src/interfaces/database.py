@@ -75,7 +75,9 @@ def save_anamnesis_response(patient_id: int, response: LLMResult, anamnesis_text
         "; ".join(examinations_string_list),
         treatments=", ".join(response.treatments),
     )
-    update_patient_entry(latest_entry.id, latest_result_id=result_id)  # type: ignore
+    update_patient_entry(
+        latest_entry.id, latest_result_id=result_id, anamnesis_text=anamnesis_text  # type: ignore
+    )
     # res = crud_results.get_result_by_id(result_id)
 
     # Create diagnoses for the result
