@@ -1,13 +1,11 @@
 # import json
 import os
 import tempfile
-from typing import Dict
 
 import uvicorn
 from common.pydantic_models import (  # LLMResult,
     InputAnamnesis,
     InputPatient,
-    OutputModel,
     UpdatePatient,
 )
 from database.session import init_db
@@ -33,7 +31,7 @@ app.add_middleware(
 
 
 @app.get("/", tags=["default"])
-async def main() -> Dict[str, str]:
+async def main():
     return {"message": "Hello World"}
 
 
@@ -56,20 +54,18 @@ async def main() -> Dict[str, str]:
 
 
 @app.post("/process_input/{selected_patient_id}", tags=["processing"])
-async def process_input(
-    input_model: InputAnamnesis, selected_patient_id: int
-) -> OutputModel:
+async def process_input(input_model: InputAnamnesis, selected_patient_id: int):
     try:
         process_anamnesis(input_model.text, selected_patient_id)
 
     except Exception as e:
         logger.error(f"Error processing input for patient {selected_patient_id}: {e}")
-        return OutputModel(
-            output="Failed to process input",
-            success=False,
-            error=str(e),
-            status_code=500,
-        )
+        return {
+            "output": "Failed to process input",
+            "success": False,
+            "error": str(e),
+            "status_code": 500,
+        }
 
     logger.info(
         f"Processed input for patient {selected_patient_id}: {input_model.text}"
@@ -86,12 +82,12 @@ async def process_input(
 
     except Exception as e:
         logger.error(f"Error retrieving data for patient {selected_patient_id}: {e}")
-        return OutputModel(
-            output="Failed to retrieve patient data",
-            success=False,
-            error=str(e),
-            status_code=500,
-        )
+        return {
+            "output": "Failed to retrieve patient data",
+            "success": False,
+            "error": str(e),
+            "status_code": 500,
+        }
 
     logger.info(f"Retrieved data for patient ID {selected_patient_id}")
     logger.debug(f"Patient: {patient}")
@@ -115,7 +111,12 @@ async def process_input(
         "triage": patient_entry.triage_level,
         "allergies": patient.allergies,
     }
-    return OutputModel(output=response)
+    return {
+        "output": response,
+        "success": True,
+        "error": None,
+        "status_code": 200,
+    }
 
 
 # @app.post("/process_input_debug", tags=["processing"])
@@ -125,7 +126,7 @@ async def process_input(
 
 # ==================== STT routes =============================
 @app.post("/transcribe")
-async def transcribe(file: UploadFile = File(...)) -> OutputModel:
+async def transcribe(file: UploadFile = File(...)):
     try:
         # Get the original extension (e.g. .mp3, .wav, .webm)
         _, ext = os.path.splitext(file.filename)  # type: ignore
@@ -138,21 +139,26 @@ async def transcribe(file: UploadFile = File(...)) -> OutputModel:
 
     except Exception as e:
         logger.error(f"Error transcribing audio file: {e}")
-        return OutputModel(
-            output="Failed to transcribe audio file",
-            success=False,
-            error=str(e),
-            status_code=500,
-        )
+        return {
+            "output": "Failed to transcribe audio file",
+            "success": False,
+            "error": str(e),
+            "status_code": 500,
+        }
 
     logger.info(f"Transcribed audio file {file.filename} to text: {result}")
-    return OutputModel(output=result)
+    return {
+        "output": result,
+        "success": True,
+        "error": None,
+        "status_code": 200,
+    }
 
 
 # ==================== Database routes ==========================
 # Returns all patients
 @app.get("/patients", tags=["database"])
-async def get_patients() -> OutputModel:
+async def get_patients():
     try:
         patients = db.get_all_patients()
         for patient in patients:
@@ -163,34 +169,41 @@ async def get_patients() -> OutputModel:
 
     except Exception as e:
         logger.error(f"Error retrieving patients: {e}")
-        return OutputModel(
-            output="Failed to retrieve patients",
-            success=False,
-            error=str(e),
-            status_code=500,
-        )
+        return {
+            "output": "Failed to retrieve patients",
+            "success": False,
+            "error": str(e),
+            "status_code": 500,
+        }
 
     logger.info(f"Retrieved {len(patients)} patients from the database")
-    return OutputModel(output=patients)
+    return {
+        "output": patients,
+        "success": True,
+        "error": None,
+        "status_code": 200,
+    }
 
 
 @app.get("/patient/{patient_id}", tags=["database"])
-async def get_patient(patient_id: int) -> OutputModel:
+async def get_patient(patient_id: int):
     try:
         patient = db.get_patient(patient_id)
         patient_entry = db.get_latest_patient_entry(patient_id)
         patient.last_triage_level = patient_entry.triage_level
+        logger.debug(f"Patient Entry: {patient_entry}")
         result = db.get_latest_result_for_entry(patient_entry.id)  # type: ignore
-        diagnoses = db.get_diagnoses_for_entry(result.id)  # type: ignore
+        logger.debug(f"Result: {result}")
+        diagnoses = db.get_diagnoses_for_entry(result.id) if result else []  # type: ignore
 
     except Exception as e:
         logger.error(f"Error retrieving patient {patient_id}: {e}")
-        return OutputModel(
-            output="Failed to retrieve patient data",
-            success=False,
-            error=str(e),
-            status_code=500,
-        )
+        return {
+            "output": "Failed to retrieve patient data",
+            "success": False,
+            "error": str(e),
+            "status_code": 500,
+        }
 
     logger.info(f"Retrieved data for patient ID {patient_id}")
     logger.debug(f"Patient: {patient}")
@@ -204,47 +217,62 @@ async def get_patient(patient_id: int) -> OutputModel:
         "latest_result": result,
         "diagnoses": diagnoses,
     }
-    return OutputModel(output=response)
+    return {
+        "output": response,
+        "success": True,
+        "error": None,
+        "status_code": 200,
+    }
 
 
 @app.post("/patient", tags=["database"])
-async def insert_patient(input_model: InputPatient) -> OutputModel:
+async def insert_patient(input_model: InputPatient):
     try:
         patient_id = db.add_patient(input_model)
 
     except Exception as e:
         logger.error(f"Error inserting patient: {e}")
-        return OutputModel(
-            output="Failed to insert patient",
-            success=False,
-            error=str(e),
-            status_code=500,
-        )
+        return {
+            "output": "Failed to insert patient",
+            "success": False,
+            "error": str(e),
+            "status_code": 500,
+        }
 
     logger.info(f"Inserted patient with ID {patient_id}: {input_model}")
-    return OutputModel(output={"patient_id": patient_id})
+    return {
+        "output": {"patient_id": patient_id},
+        "success": True,
+        "error": None,
+        "status_code": 200,
+    }
 
 
 @app.delete("/patient/{patient_id}", tags=["database"])
-async def delete_patient(patient_id: int) -> OutputModel:
+async def delete_patient(patient_id: int):
     try:
         db.remove_patient(patient_id)
 
     except Exception as e:
         logger.error(f"Error deleting patient {patient_id}: {e}")
-        return OutputModel(
-            output="Failed to delete patient",
-            success=False,
-            error=str(e),
-            status_code=500,
-        )
+        return {
+            "output": "Failed to delete patient",
+            "success": False,
+            "error": str(e),
+            "status_code": 500,
+        }
 
     logger.info(f"Deleted patient with ID {patient_id}")
-    return OutputModel(output=f"Patient with ID {patient_id} deleted successfully")
+    return {
+        "output": f"Patient with ID {patient_id} deleted successfully",
+        "success": True,
+        "error": None,
+        "status_code": 200,
+    }
 
 
 @app.get("/patient/{patient_id}/history", tags=["database"])
-async def get_patient_history(patient_id: int) -> OutputModel:
+async def get_patient_history(patient_id: int):
     try:
         entries = db.get_patient_entries(patient_id)
         results = []
@@ -254,24 +282,29 @@ async def get_patient_history(patient_id: int) -> OutputModel:
 
     except Exception as e:
         logger.error(f"Error retrieving history for patient {patient_id}: {e}")
-        return OutputModel(
-            output="Failed to retrieve patient history",
-            success=False,
-            error=str(e),
-            status_code=500,
-        )
+        return {
+            "output": "Failed to retrieve patient history",
+            "success": False,
+            "error": str(e),
+            "status_code": 500,
+        }
 
     if len(entries) == 0:
         logger.info(f"No entries found for patient ID {patient_id}")
-        return OutputModel(
-            output="No entries found for this patient",
-            success=False,
-            error="No entries found",
-            status_code=500,
-        )
+        return {
+            "output": "No entries found for this patient",
+            "success": False,
+            "error": "No entries found",
+            "status_code": 500,
+        }
 
     logger.info(f"Retrieved {len(entries)} entries for patient ID {patient_id}")
-    return OutputModel(output=results)
+    return {
+        "output": results,
+        "success": True,
+        "error": None,
+        "status_code": 200,
+    }
 
 
 @app.get(
@@ -279,17 +312,17 @@ async def get_patient_history(patient_id: int) -> OutputModel:
     tags=["database"],
     description="Update patient status. Status: 0 = in history, 1 = waiting, 2 = in treatment",
 )
-async def update_patient_status(patient_id: int, status: int) -> OutputModel:
+async def update_patient_status(patient_id: int, status: int):
     if status not in [0, 1, 2]:
         logger.error(
             f"Invalid status {status} for patient ID {patient_id}. Must be 0, 1, or 2."
         )
-        return OutputModel(
-            output="Invalid status",
-            success=False,
-            error="Status must be 0 (in history), 1 (waiting), or 2 (in treatment)",
-            status_code=400,
-        )
+        return {
+            "output": "Invalid status",
+            "success": False,
+            "error": "Status must be 0 (in history), 1 (waiting), or 2 (in treatment)",
+            "status_code": 400,
+        }
 
     try:
         db.update_patient(
@@ -298,74 +331,83 @@ async def update_patient_status(patient_id: int, status: int) -> OutputModel:
 
     except Exception as e:
         logger.error(f"Error updating status for patient {patient_id}: {e}")
-        return OutputModel(
-            output="Failed to update patient status",
-            success=False,
-            error=str(e),
-            status_code=500,
-        )
+        return {
+            "output": "Failed to update patient status",
+            "success": False,
+            "error": str(e),
+            "status_code": 500,
+        }
 
     logger.info(f"Updated status for patient ID {patient_id} to {status}")
-    return OutputModel(
-        output=f"Patient with ID {patient_id} status updated to {status}"
-    )
+    return {
+        "output": f"Patient with ID {patient_id} status updated to {status}",
+        "success": True,
+        "error": None,
+        "status_code": 200,
+    }
 
 
 @app.get("/patient/{patient_id}/set_triage/{triage_level}", tags=["database"])
-async def set_patient_triage(patient_id: int, triage_level: int) -> OutputModel:
+async def set_patient_triage(patient_id: int, triage_level: int):
     if triage_level < 0 or triage_level > 5:
         logger.error(
             f"Invalid triage level {triage_level} for patient ID {patient_id}. "
             f"Must be between 0 and 5."
         )
-        return OutputModel(
-            output="Invalid triage level",
-            success=False,
-            error="Triage level must be between 0 and 5",
-            status_code=400,
-        )
+        return {
+            "output": "Invalid triage level",
+            "success": False,
+            "error": "Triage level must be between 0 and 5",
+            "status_code": 400,
+        }
 
     try:
         db.update_patient(patient_id, triage_level=triage_level)
 
     except Exception as e:
         logger.error(f"Error updating triage level for patient {patient_id}: {e}")
-        return OutputModel(
-            output="Failed to update patient triage level",
-            success=False,
-            error=str(e),
-            status_code=500,
-        )
+        return {
+            "output": "Failed to update patient triage level",
+            "success": False,
+            "error": str(e),
+            "status_code": 500,
+        }
 
     logger.info(f"Updated triage level for patient ID {patient_id} to {triage_level}")
-    return OutputModel(
-        output=f"Patient with ID {patient_id} triage level updated to {triage_level}"
-    )
+    return {
+        "output": f"Patient with ID {patient_id} triage level updated to {triage_level}",
+        "success": True,
+        "error": None,
+        "status_code": 200,
+    }
 
 
 # Update patient data
 @app.post("/patient/update/{patient_id}", tags=["database"])
-async def update_patient_data(
-    patient_id: int, input_model: UpdatePatient
-) -> OutputModel:
+async def update_patient_data(patient_id: int, input_model: UpdatePatient):
     try:
         db.update_patient(patient_id, **input_model.model_dump(exclude_none=True))
 
     except Exception as e:
         logger.error(f"Error updating patient {patient_id}: {e}")
-        return OutputModel(
-            output="Failed to update patient",
-            success=False,
-            error=str(e),
-            status_code=500,
-        )
+        return {
+            "output": "Failed to update patient",
+            "success": False,
+            "error": str(e),
+            "status_code": 500,
+        }
 
     logger.info(f"Updated patient with ID {patient_id}: {input_model}")
-    return OutputModel(output=f"Patient with ID {patient_id} updated")
+    return {
+        "output": f"Patient with ID {patient_id} updated",
+        "success": True,
+        "error": None,
+        "status_code": 200,
+    }
 
 
 @app.get("/insert_example_patients", tags=["database"])
-async def insert_example_patients() -> OutputModel:
+async def insert_example_patients():
     example_patients = [
         {
             "first_name": "Json",
@@ -407,17 +449,20 @@ async def insert_example_patients() -> OutputModel:
 
     except Exception as e:
         logger.error(f"Error inserting example patients: {e}")
-        return OutputModel(
-            output="Failed to insert example patients",
-            success=False,
-            error=str(e),
-            status_code=500,
-        )
+        return {
+            "output": "Failed to insert example patients",
+            "success": False,
+            "error": str(e),
+            "status_code": 500,
+        }
 
     logger.info(f"Inserted {len(example_patients)} example patients into the database")
-    return OutputModel(
-        output=f"{len(example_patients)} example patients inserted successfully"
-    )
+    return {
+        "output": f"{len(example_patients)} example patients inserted successfully",
+        "success": True,
+        "error": None,
+        "status_code": 200,
+    }
 
 
 if __name__ == "__main__":
