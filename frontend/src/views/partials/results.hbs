@@ -8,8 +8,7 @@
             {{#each diagnoses}}
               {{this.name}}{{#unless @last}}, {{/unless}}
             {{/each}}
-          {{else}}–
-          {{/if}}
+          {{else}}–{{/if}}
         </td>
       </tr>
       <tr>
@@ -30,8 +29,7 @@
                 </li>
               {{/each}}
             </ul>
-          {{else}}–
-          {{/if}}
+          {{else}}–{{/if}}
         </td>
       </tr>
       <tr>
@@ -41,8 +39,7 @@
             {{#each treatments}}
               {{this}}{{#unless @last}}, {{/unless}}
             {{/each}}
-          {{else}}–
-          {{/if}}
+          {{else}}–{{/if}}
         </td>
       </tr>
       <tr>
@@ -52,19 +49,22 @@
             {{#each experts}}
               {{this}}{{#unless @last}}, {{/unless}}
             {{/each}}
-          {{else}}–
-          {{/if}}
+          {{else}}–{{/if}}
         </td>
       </tr>
       <tr>
         <th>Allergien:</th>
         <td>
-          {{#if allergies.length}}
-            {{#each allergies}}
-              {{this}}{{#unless @last}}, {{/unless}}
-            {{/each}}
-          {{else}}–
-          {{/if}}
+          <span
+            id="allergies"
+            data-initial="{{#if allergies.length}}{{#each allergies}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}"
+          >
+            {{#if allergies.length}}
+              {{#each allergies}}
+                {{this}}{{#unless @last}}, {{/unless}}
+              {{/each}}
+            {{else}}–{{/if}}
+          </span>
         </td>
       </tr>
     </tbody>
