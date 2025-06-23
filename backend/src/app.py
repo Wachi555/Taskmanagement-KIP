@@ -2,8 +2,8 @@
 import os
 import tempfile
 
-import uvicorn
 import modules.helpers as helpers
+import uvicorn
 from common.pydantic_models import (  # LLMResult,
     InputAnamnesis,
     InputPatient,
@@ -468,11 +468,11 @@ async def insert_example_patients():
 
 if __name__ == "__main__":
     try:
-        available_experts, available_treatments = helpers.parse_med_server_json(r"backend\src\data\availability_data.json")
+        available_experts, available_treatments = helpers.parse_med_server_json(
+            r"backend\src\data\availability_data.json"
+        )
     except Exception as e:
         available_experts, available_treatments = [], []
-    print(f"Available experts: {available_experts}")
-    print(f"Available treatments: {available_treatments}")
     db.store_experts(available_experts)
     db.store_examinations(available_treatments)
     uvicorn.run(app, port=8000, reload=False)

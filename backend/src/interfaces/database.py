@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
 
 import database.crud_diagnoses as crud_diagnoses
 import database.crud_examinations as crud_examinations
@@ -381,11 +381,12 @@ def get_available_experts() -> List[Expert]:
     experts = crud_experts.get_available_experts()
     return experts
 
+
 def store_experts(experts: List[str]):
     crud_experts.remove_all_experts()
     for expert in experts:
         crud_experts.create_expert(name=expert, is_available=True)
-    print(f"DEBUG: Stored experts: {experts}", flush=True)
+
 
 # Get an expert by ID
 def get_expert(expert_id: int) -> Expert:
@@ -442,12 +443,16 @@ def store_examinations(examinations: List[Dict[str, int]]):
     crud_examinations.remove_all_examinations()
     for examination in examinations:
         crud_examinations.create_examination(
-            name=examination["name"], is_available=True, utilization=examination["auslastung"]
+            name=examination["name"],
+            is_available=True,
+            utilization=examination["auslastung"],
         )
-    
+
+
 def get_available_examinations() -> List[Examination]:
     examinations = crud_examinations.get_available_examinations()
     return examinations
+
 
 def get_all_examinations() -> List[Examination]:
     examinations = crud_examinations.get_all_examinations()
@@ -461,7 +466,9 @@ def get_examination_by_id(examination_id: int) -> Examination:
 
 # Add an examination to the database
 def add_examination(name: str, utilization: int, is_available: bool) -> int:
-    examination_id = crud_examinations.create_examination(name, utilization, is_available)
+    examination_id = crud_examinations.create_examination(
+        name, utilization, is_available
+    )
     return examination_id
 
 
