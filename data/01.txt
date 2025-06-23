@@ -3,7 +3,7 @@ Geburtsdatum: unbekannt
 Alter: 17
 Symptome: Schmerzen und Schwellung im rechten Fuß
 Triagestufe: 4
-Anamnese: Herr Meier stellt sich selbstständig in unserer Notaufnahme vor. Er berichtet, zuhause beim Treppen hinabsteigen die letzte Stufe übersehen zu haben, dabei sei er mit dem rechten Fuß falsch aufgekommen und umgeknickt. Ein Sturz wird verneint. Seither bestehen Schmerzen und Schwellung im rechten Fuß. Keine Allergien, keine Medikamente.
+Anamnese: Der Patient stellt sich selbstständig in unserer Notaufnahme vor. Er berichtet, zuhause beim Treppen hinabsteigen die letzte Stufe übersehen zu haben, dabei sei er mit dem rechten Fuß falsch aufgekommen und umgeknickt. Ein Sturz wird verneint. Seither bestehen Schmerzen und Schwellung im rechten Fuß. Keine Allergien, keine Medikamente.
 
 # Ausgabe #
 Diagnosen: Supinationstrauma Oberes Sprunggelenk (OSG).
