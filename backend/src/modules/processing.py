@@ -40,6 +40,9 @@ def process_anamnesis(input_text: str, current_patient_id: int) -> bool:
                 latest_entry.additional_notes if latest_entry.additional_notes else ""  # type: ignore
             ),
         )
+        print(f"DEBUG: EvaluationInput: {eval_input}", flush=True)
+        print(f"DEBUG: Available experts: {db.get_available_experts()}", flush=True)
+        print(f"DEBUG: Available examinations: {db.get_available_examinations()}", flush=True)
         result = generate_anamnesis_response(eval_input, available_experts=db.get_available_experts(), available_examinations=db.get_available_examinations())  
         # result = LLMResult.model_validate_json('{"diagnoses":[{"name":"Erkrankung der Atemwege","reason":"Der Patient berichtet Atemnot. Es ist wichtig, Atemwegserkrankungen auszuschließen.","confidence":0.7},{"name":"Infektion","reason":"Die Symptome können mit einer Infektion zusammenhängen.","confidence":0.5}],"examinations":[{"name":"Blutbild","priority":5},{"name":"Lungenröntgen","priority":4}],"treatments":["Ruhe und Flüssigkeitszufuhr","Mögliche Verabreichung von Antibiotika bei Bestätigung einer bakteriellen Infektion"],"experts":[{"type":"Hausarzt"},{"type":"Pulmologe"}]}')
         # print(result.model_dump_json(), flush=True)
