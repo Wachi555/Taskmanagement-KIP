@@ -113,23 +113,11 @@
       <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Schließen"></button>
     </div>
     <div class="offcanvas-body">
-      {{#if data.history.length}}
-        <ul class="list-group list-group-flush mb-0">
-          {{#each data.history}}
-            <li class="list-group-item">
-              <div>
-                <strong>{{formatDate this.date}}</strong>
-                <span class="ms-2">{{this.findings}}</span>
-              </div>
-              <hr class="my-2">
-            </li>
-          {{/each}}
-        </ul>
-      {{else}}
-        <li class="list-group-item text-muted">Keine Einträge in der Historie.</li>
-      {{/if}}
+      {{!-- Hier binden wir das Partial ein und übergeben das Array --}}
+      {{> patient-history history=data.history}}
     </div>
   </div>
+
 </div>
 
 <script src="/js/main.js" type="module"></script>
