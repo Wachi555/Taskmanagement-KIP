@@ -399,6 +399,36 @@ header .btn-outline-secondary.home-btn:hover {
 .btn-icon-clean.delete:hover {
   color: #dc3545;
 }
+.patient-overview .info-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 0;
+}
+
+.patient-overview .info-table th,
+.patient-overview .info-table td {
+  padding: 0.5rem 0.5rem;
+  vertical-align: top;
+}
+
+.patient-overview .info-table th {
+  width: 180px;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.patient-overview .info-table tr + tr td,
+.patient-overview .info-table tr + tr th {
+  border-top: 1px solid #dee2e6;
+}
+
+.patient-overview .info-table ul {
+  margin: 0;
+  padding-left: 1rem;
+}
+
+
 
 
 
