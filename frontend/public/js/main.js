@@ -49,31 +49,51 @@ function setupDeleteButtons() {
 }
 
 function setupFullViewSearch() {
-  // Suchfunktion für "Alle Patienten"
-  const searchAll = document.getElementById('search-all');
-  if (searchAll) {
-    searchAll.addEventListener('input', () => {
-      filterPatientList(searchAll.value, '.col-md-6.border-end .list-group-item:not(.text-muted)');
-    });
-  }
+  // Generalized handler
+  const setupSearchInput = (inputId, listSelector) => {
+    const searchInput = document.getElementById(inputId);
+    if (!searchInput) return;
 
-  // Suchfunktion für "Wartende Patienten"
-  const searchWaiting = document.getElementById('search-waiting');
-  if (searchWaiting) {
-    searchWaiting.addEventListener('input', () => {
-      console.log("searchWaiting input event fired:", searchWaiting.value);
-      filterPatientList(searchWaiting.value, '#pane-waiting .list-group-item:not(.text-muted)');
-    });
-  }
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.trim().toLowerCase();
+      const items = Array.from(document.querySelectorAll(listSelector))
+        .filter(li => li.querySelector(".patient-name"));
+      
+      let anyVisible = false;
 
-  // Suchfunktion für "Aktive Patienten"
-  const searchActive = document.getElementById('search-active');
-  if (searchActive) {
-    searchActive.addEventListener('input', () => {
-      console.log("searchActive input event fired:", searchWaiting.value);
-      filterPatientList(searchActive.value, '#pane-active .list-group-item:not(.text-muted)');
+      // Remove existing no-results lines
+      const container = items[0]?.closest('ul.list-group');
+      if (container) {
+        container.querySelectorAll('.no-results').forEach(el => el.remove());
+      }
+
+      items.forEach(li => {
+        const name = (li.querySelector(".patient-name")?.textContent || "").trim().toLowerCase();
+        if (query && !name.includes(query)) {
+          li.classList.add("d-none");
+        } else {
+          li.classList.remove("d-none");
+          anyVisible = true;
+        }
+      });
+
+      if (container) {
+        if (!anyVisible) {
+          const noRes = document.createElement("li");
+          noRes.className = "list-group-item text-center text-muted no-results";
+          noRes.textContent = "Keine Patienten gefunden.";
+          container.appendChild(noRes);
+        } else {
+          const existingNoResults = container.querySelector(".no-results");
+          if (existingNoResults) existingNoResults.remove();
+        }
+      }
     });
-  }
+  };
+
+  setupSearchInput('search-all', '.col-md-6.border-end .list-group-item:not(.text-muted)');
+  setupSearchInput('search-waiting', '#pane-waiting .list-group-item:not(.text-muted)');
+  setupSearchInput('search-active', '#pane-active .list-group-item:not(.text-muted)');
 }
 
 function filterPatientList(searchTerm, itemSelector) {
@@ -344,6 +364,9 @@ function setupSidebarSearch() {
       noRes.className = "list-group-item text-center text-muted no-results";
       noRes.textContent = "Keine Patienten gefunden.";
       ul.appendChild(noRes);
+    } else {
+      const existingNoResults = ul.querySelector(".no-results");
+      if (existingNoResults) existingNoResults.remove();
     }
   };
 
