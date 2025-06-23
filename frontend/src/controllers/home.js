@@ -22,7 +22,7 @@ async function deletePatientById(id) {
   const res = await fetch(`http://localhost:8000/patient/${id}`, { method: 'DELETE' });
   if (!res.ok) throw new Error(`Löschen fehlgeschlagen (${res.status})`);
 }
-async function updatePatientById(id, status) {
+async function updatePatientStatusById(id, status) {
   const res = await fetch(`http://localhost:8000/patient/update_status/${id}/0`);
 
   if (!res.ok) {
@@ -30,7 +30,20 @@ async function updatePatientById(id, status) {
     throw new Error(err.detail || `Aktualisierung fehlgeschlagen (${res.status})`);
   }
   return res.json();
-}
+};
+async function updatePatientById(id, payload) {
+  const res = await fetch(`http://localhost:8000/patient/update/${id}`, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload)
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || `Aktualisierung fehlgeschlagen (${res.status})`);
+  }
+  return res.json();
+};
 
 
 
@@ -137,7 +150,7 @@ router.get('/patient/update_status/:id/:status', async (req, res) => {
     console.log("Calling backend...");
     
     // 2. Eigentlicher Aufruf
-    const result = await updatePatientById(id, status);
+    const result = await updatePatientStatusById(id, status);
     console.log("✅ Backend response:", result);
 
     // 3. Redirect
