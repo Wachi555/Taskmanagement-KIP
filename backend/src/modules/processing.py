@@ -38,6 +38,6 @@ def process_anamnesis(input_text: str, current_patient_id: int):
             latest_entry.additional_notes if latest_entry.additional_notes else ""  # type: ignore
         ),
     )
-    result = generate_anamnesis_response(eval_input)
+    result = generate_anamnesis_response(eval_input, available_experts=db.get_available_experts(), available_examinations=db.get_available_examinations())  
     logger.debug(f"Response from generate_anamnesis_response: {result}")
     db.save_anamnesis_response(current_patient_id, result, input_text)  # type: ignore

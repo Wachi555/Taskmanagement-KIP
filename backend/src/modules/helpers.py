@@ -40,19 +40,10 @@ def stitch_together(a: str | List[str], b: str | List[str]) -> str:
     return res
 
 
-def parse_med_server_json(json_data: str) -> tuple[list[str], list[tuple[str, int]]]:
-    """
-    Parses the JSON data from the medical server and returns a list of experts and the
-    available test/treatments.
-
-    Args:
-        json_data (str): The JSON data as a string.
-
-    Returns:
-        tuple: A tuple containing two lists - experts and tests/treatments with their
-            current usage (occupancy).
-    """
+def parse_med_server_json(file_path: str) -> tuple[list[str], list[tuple[str, int]]]:
     try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            json_data = file.read()
         data = json.loads(json_data)
     except json.JSONDecodeError as e:
         raise ValueError(f"Invalid JSON format: {e}")
@@ -62,12 +53,34 @@ def parse_med_server_json(json_data: str) -> tuple[list[str], list[tuple[str, in
 
     try:
         experts = data.get("experts", [])
-        tests_treatments = data.get("tests_treatments", [])
+        examinations = data.get("examinations", [])
 
     except KeyError as e:
         raise ValueError(f"Missing expected key in JSON data: {e}")
 
-    if not isinstance(experts, list) or not isinstance(tests_treatments, list):
-        raise ValueError("Expected 'experts' and 'tests_treatments' to be lists.")
+    if not isinstance(experts, list) or not isinstance(examinations, list):
+        raise ValueError("Expected 'experts' and 'examinations' to be lists.")
 
-    return experts, tests_treatments
+    return experts, examinations
+
+def build_system_prompt(
+    prompt: str, available_experts: List[any], available_examinations: List[any]
+) -> str:
+    if available_experts == [] and available_examinations == []:
+        logger.info("No available experts or examinations found.")
+        return prompt
+    expert_string_list = [expert.name for expert in available_experts]
+    expert_list = ", ".join(expert_string_list)
+    examination_list = ", ".join(
+        [f"{exam.name} (Utilization: {exam.utilization})" for exam in available_examinations]
+    )
+    
+    system_prompt = (
+        f"{prompt}\n\n"
+        "The following information is available:\n"
+        f"Available experts: {expert_list}\n"
+        f"Available examinations: {examination_list}\n"
+    )
+    
+    print(f"DEBUG: System prompt built: {system_prompt}")  # Debugging output
+    return system_prompt

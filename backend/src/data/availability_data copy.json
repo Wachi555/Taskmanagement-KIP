@@ -1,0 +1,31 @@
+{
+  "experts": [
+    "Notfallarzt",
+    "Unfallchirurg",
+    "Orthopäde",
+    "Neurochirurg",
+    "Herzchirurg",
+    "Anästhesist",
+    "Pädiatrischer_Notfallarzt",
+    "Intensivmediziner",
+    "Radiologe",
+    "Kardiologe",
+    "Neurologe",
+    "HNO_Arzt",
+    "Gynäkologe",
+    "Plastischer_Chirurg",
+    "Augenarzt",
+    "Psychiater"
+  ],
+
+  "examinations" : [
+    { "name": "Blutbild", "auslastung": 2 },
+    { "name": "Röntgen-Thorax", "auslastung": 3 },
+    { "name": "EKG", "auslastung": 1 },
+    { "name": "CT Schädel", "auslastung": 2 },
+    { "name": "Ultraschall Abdomen", "auslastung": 3 },
+    { "name": "Urinuntersuchung", "auslastung": 1 },
+    { "name": "Kleines neurologisches Assessment", "auslastung": 2 },
+    { "name": "Schnittwundenversorgung", "auslastung": 2 }
+  ]
+}

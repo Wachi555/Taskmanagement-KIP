@@ -1,9 +1,12 @@
 import os
 
 from common.pydantic_models import EvaluationInput, ExtractedContent, LLMResult
+from typing import List
+from database.orm_models import Expert, Examination
 from dotenv import load_dotenv
 from modules.prompts import build_evaluation_input, evaluation_prompt, extraction_prompt
 from openai import OpenAI
+import modules.helpers as helpers
 
 load_dotenv()
 openai_api_key = os.getenv("OPENAI_API_KEY")
@@ -39,13 +42,14 @@ def extract_contents(input_text: str) -> ExtractedContent:
     raise ValueError("No response text found.")
 
 
-def generate_anamnesis_response(input_contents: EvaluationInput) -> LLMResult:
+def generate_anamnesis_response(input_contents: EvaluationInput, available_experts: List[Expert], available_examinations: List[Examination]) -> LLMResult:
     user_prompt = build_evaluation_input(input_contents)
+    system_prompt = helpers.build_system_prompt(evaluation_prompt, available_experts, available_examinations)
     response = client.beta.chat.completions.parse(
         messages=[
             {
                 "role": "system",
-                "content": evaluation_prompt,
+                "content": system_prompt,
             },
             {
                 "role": "user",
