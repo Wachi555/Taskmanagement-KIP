@@ -152,95 +152,126 @@ async def transcribe(file: UploadFile = File(...)) -> OutputModel:
 # ==================== Database routes ==========================
 # Returns all patients
 @app.get("/patients", tags=["database"])
-async def get_patients():
-    patients = db.get_all_patients()
-    if not patients:
-        return []
+async def get_patients() -> OutputModel:
+    try:
+        patients = db.get_all_patients()
+        for patient in patients:
+            # Get triage information from patient entries
+            patient_id = patient.id
+            last_entry = db.get_latest_patient_entry(patient_id)  # type: ignore
+            patient.last_triage_level = last_entry.triage_level
 
-    # patients_dict = {patient.id: patient for patient in patients}
-    # Get triage information from patient entries
-    for patient in patients:
-        patient_id = patient.id
-        last_entry = db.get_latest_patient_entry(patient_id)  # type: ignore
-        patient.last_triage_level = last_entry.triage_level
+    except Exception as e:
+        logger.error(f"Error retrieving patients: {e}")
+        return OutputModel(
+            output="Failed to retrieve patients",
+            success=False,
+            error=str(e),
+            status_code=500,
+        )
 
-    return patients
+    logger.debug(f"Retrieved {len(patients)} patients from the database")
+    return OutputModel(output=patients)
 
 
 @app.get("/patient/{patient_id}", tags=["database"])
-async def get_patient(patient_id: int):
-    patient = db.get_patient(patient_id)
-    patient_entry = db.get_latest_patient_entry(patient_id)
-    patient.last_triage_level = patient_entry.triage_level
-    patient_result = db.get_latest_result_for_entry(patient_entry.id)  # type: ignore
-    diagnoses = db.get_diagnoses_for_entry(patient_result.id) if patient_result else []  # type: ignore
-    result_dict = {
+async def get_patient(patient_id: int) -> OutputModel:
+    try:
+        patient = db.get_patient(patient_id)
+        patient_entry = db.get_latest_patient_entry(patient_id)
+        patient.last_triage_level = patient_entry.triage_level
+        result = db.get_latest_result_for_entry(patient_entry.id)  # type: ignore
+        diagnoses = db.get_diagnoses_for_entry(result.id)  # type: ignore
+
+    except Exception as e:
+        logger.error(f"Error retrieving patient {patient_id}: {e}")
+        return OutputModel(
+            output="Failed to retrieve patient data",
+            success=False,
+            error=str(e),
+            status_code=500,
+        )
+
+    logger.debug(f"Retrieved data for patient ID {patient_id}:")
+    logger.debug(f"Patient: {patient}")
+    logger.debug(f"Patient Entry: {patient_entry}")
+    logger.debug(f"Result: {result}")
+    logger.debug(f"Diagnoses: {diagnoses}")
+
+    response = {
         "patient": patient,
         "latest_entry": patient_entry,
-        "latest_result": patient_result,
+        "latest_result": result,
         "diagnoses": diagnoses,
     }
-    if patient:
-        return result_dict
-    else:
-        return {
-            "output": "Patient not found",
-            "success": False,
-            "error_code": 404,
-            "error_message": "Patient not found",
-        }
+    return OutputModel(output=response)
 
 
 @app.post("/patient", tags=["database"])
-async def insert_patient(input_model: InputPatient):
-    patient_id = db.add_patient(input_model)
-    if patient_id:
-        return {
-            "output": f"Patient with ID {patient_id} inserted successfully",
-            "success": True,
-        }
-    else:
-        return {
-            "output": "Failed to insert patient",
-            "success": False,
-            "error_code": 500,
-            "error_message": "Database error",
-        }
+async def insert_patient(input_model: InputPatient) -> OutputModel:
+    try:
+        patient_id = db.add_patient(input_model)
+
+    except Exception as e:
+        logger.error(f"Error inserting patient: {e}")
+        return OutputModel(
+            output="Failed to insert patient",
+            success=False,
+            error=str(e),
+            status_code=500,
+        )
+
+    logger.debug(f"Inserted patient with ID {patient_id}: {input_model}")
+    return OutputModel(output={"patient_id": patient_id})
 
 
 @app.delete("/patient/{patient_id}", tags=["database"])
-async def delete_patient(patient_id: int):
-    success = db.remove_patient(patient_id)
-    if success:
-        return {
-            "output": f"Patient with ID {patient_id} deleted successfully",
-            "success": True,
-        }
-    else:
-        return {
-            "output": "Failed to delete patient",
-            "success": False,
-            "error_code": 500,
-            "error_message": "Database error",
-        }
+async def delete_patient(patient_id: int) -> OutputModel:
+    try:
+        db.remove_patient(patient_id)
+
+    except Exception as e:
+        logger.error(f"Error deleting patient {patient_id}: {e}")
+        return OutputModel(
+            output="Failed to delete patient",
+            success=False,
+            error=str(e),
+            status_code=500,
+        )
+
+    logger.debug(f"Deleted patient with ID {patient_id}")
+    return OutputModel(output=f"Patient with ID {patient_id} deleted successfully")
 
 
 @app.get("/patient/{patient_id}/history", tags=["database"])
-async def get_patient_history(patient_id: int):
-    res = []
-    entries = db.get_patient_entries(patient_id)
-    if entries:
+async def get_patient_history(patient_id: int) -> OutputModel:
+    try:
+        entries = db.get_patient_entries(patient_id)
+        results = []
         for entry in entries:
             result = db.get_latest_result_for_entry(entry.id)  # type: ignore
-            res.append([entry, result])
-        return res
-    else:
-        return {
-            "output": "No entries found for this patient",
-            "success": False,
-            "error_code": 404,
-            "error_message": "No entries found",
-        }
+            results.append([entry, result])
+
+    except Exception as e:
+        logger.error(f"Error retrieving history for patient {patient_id}: {e}")
+        return OutputModel(
+            output="Failed to retrieve patient history",
+            success=False,
+            error=str(e),
+            status_code=500,
+        )
+
+    if len(entries) == 0:
+        logger.debug(f"No entries found for patient ID {patient_id}")
+        return OutputModel(
+            output="No entries found for this patient",
+            success=False,
+            error="No entries found",
+            status_code=500,
+        )
+
+    logger.debug(f"Retrieved {len(entries)} entries for patient ID {patient_id}")
+    return OutputModel(output=results)
 
 
 @app.get(
@@ -248,88 +279,93 @@ async def get_patient_history(patient_id: int):
     tags=["database"],
     description="Update patient status. Status: 0 = in history, 1 = waiting, 2 = in treatment",
 )
-async def update_patient_status(patient_id: int, status: int):
+async def update_patient_status(patient_id: int, status: int) -> OutputModel:
     if status not in [0, 1, 2]:
-        return {
-            "output": "Invalid status",
-            "success": False,
-            "error_code": 400,
-            "error_message": "Status must be 0 (in history), 1 (waiting), or 2 (in treatment)",
-        }
-    success = db.update_patient(
-        patient_id, is_waiting=(status == 1), in_treatment=(status == 2)
+        logger.error(
+            f"Invalid status {status} for patient ID {patient_id}. Must be 0, 1, or 2."
+        )
+        return OutputModel(
+            output="Invalid status",
+            success=False,
+            error="Status must be 0 (in history), 1 (waiting), or 2 (in treatment)",
+            status_code=400,
+        )
+
+    try:
+        db.update_patient(
+            patient_id, is_waiting=(status == 1), in_treatment=(status == 2)
+        )
+
+    except Exception as e:
+        logger.error(f"Error updating status for patient {patient_id}: {e}")
+        return OutputModel(
+            output="Failed to update patient status",
+            success=False,
+            error=str(e),
+            status_code=500,
+        )
+
+    logger.debug(f"Updated status for patient ID {patient_id} to {status}")
+    return OutputModel(
+        output=f"Patient with ID {patient_id} status updated to {status}"
     )
-    if success:
-        return {
-            "output": f"Patient with ID {patient_id} updated successfully",
-            "success": True,
-        }
-    else:
-        return {
-            "output": "Failed to update patient",
-            "success": False,
-            "error_code": 500,
-            "error_message": "Database error",
-        }
 
 
 @app.get("/patient/{patient_id}/set_triage/{triage_level}", tags=["database"])
-async def set_patient_triage(patient_id: int, triage_level: int):
+async def set_patient_triage(patient_id: int, triage_level: int) -> OutputModel:
     if triage_level < 0 or triage_level > 5:
-        return {
-            "output": "Invalid triage level",
-            "success": False,
-            "error_code": 400,
-            "error_message": "Triage level must be between 0 and 5",
-        }
-    success = db.update_patient(patient_id, triage_level=triage_level)
-    if success:
-        return {
-            "output": f"Patient with ID {patient_id} triage level updated to {triage_level}",
-            "success": True,
-        }
-    else:
-        return {
-            "output": "Failed to update patient triage level",
-            "success": False,
-            "error_code": 500,
-            "error_message": "Database error",
-        }
+        logger.error(
+            f"Invalid triage level {triage_level} for patient ID {patient_id}. "
+            f"Must be between 0 and 5."
+        )
+        return OutputModel(
+            output="Invalid triage level",
+            success=False,
+            error="Triage level must be between 0 and 5",
+            status_code=400,
+        )
+
+    try:
+        db.update_patient(patient_id, triage_level=triage_level)
+
+    except Exception as e:
+        logger.error(f"Error updating triage level for patient {patient_id}: {e}")
+        return OutputModel(
+            output="Failed to update patient triage level",
+            success=False,
+            error=str(e),
+            status_code=500,
+        )
+
+    logger.debug(f"Updated triage level for patient ID {patient_id} to {triage_level}")
+    return OutputModel(
+        output=f"Patient with ID {patient_id} triage level updated to {triage_level}"
+    )
 
 
 # Update patient data
 @app.post("/patient/update/{patient_id}", tags=["database"])
-async def update_patient_data(patient_id: int, input_model: UpdatePatient):
-    print(
-        f"DEBUG: Updating patient with ID {patient_id} with data: {input_model}",
-        flush=True,
-    )
-    success = db.update_patient(
-        patient_id,
-        first_name=input_model.first_name,
-        last_name=input_model.last_name,
-        # gender=input_model.gender,
-        date_of_birth=input_model.date_of_birth,
-        health_insurance=input_model.health_insurance,
-        address=input_model.address,
-        # triage_level=input_model.triage_level
-    )
-    if success:
-        return {
-            "output": f"Patient with ID {patient_id} updated successfully",
-            "success": True,
-        }
-    else:
-        return {
-            "output": "Failed to update patient",
-            "success": False,
-            "error_code": 500,
-            "error_message": "Database error",
-        }
+async def update_patient_data(
+    patient_id: int, input_model: UpdatePatient
+) -> OutputModel:
+    try:
+        db.update_patient(patient_id, **input_model.model_dump(exclude_none=True))
+
+    except Exception as e:
+        logger.error(f"Error updating patient {patient_id}: {e}")
+        return OutputModel(
+            output="Failed to update patient",
+            success=False,
+            error=str(e),
+            status_code=500,
+        )
+
+    logger.debug(f"Updated patient with ID {patient_id}: {input_model}")
+    return OutputModel(output=f"Patient with ID {patient_id} updated")
 
 
 @app.get("/insert_example_patients", tags=["database"])
-async def insert_example_patients():
+async def insert_example_patients() -> OutputModel:
     example_patients = [
         {
             "first_name": "Json",
@@ -365,12 +401,23 @@ async def insert_example_patients():
             "symptoms": "akute Alkoholsucht",
         },
     ]
-    for patient in example_patients:
-        db.add_patient(InputPatient(**patient))
-    return {
-        "output": f"{len(example_patients)} example patients inserted successfully",
-        "success": True,
-    }
+    try:
+        for patient in example_patients:
+            db.add_patient(InputPatient(**patient))
+
+    except Exception as e:
+        logger.error(f"Error inserting example patients: {e}")
+        return OutputModel(
+            output="Failed to insert example patients",
+            success=False,
+            error=str(e),
+            status_code=500,
+        )
+
+    logger.debug(f"Inserted {len(example_patients)} example patients into the database")
+    return OutputModel(
+        output=f"{len(example_patients)} example patients inserted successfully"
+    )
 
 
 if __name__ == "__main__":
