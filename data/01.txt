@@ -1,0 +1,18 @@
+# Eingabe #
+Geburtsdatum: unbekannt
+Alter: 17
+Symptome: Schmerzen und Schwellung im rechten Fuß
+Triagestufe: 4
+Anamnese: Herr Meier stellt sich selbstständig in unserer Notaufnahme vor. Er berichtet, zuhause beim Treppen hinabsteigen die letzte Stufe übersehen zu haben, dabei sei er mit dem rechten Fuß falsch aufgekommen und umgeknickt. Ein Sturz wird verneint. Seither bestehen Schmerzen und Schwellung im rechten Fuß. Keine Allergien, keine Medikamente.
+
+# Ausgabe #
+Diagnosen: Supinationstrauma Oberes Sprunggelenk (OSG).
+Untersuchungen: Körperliche Untersuchung, Röntgen (radiologische Bildgebung).
+Behandlungen: Anlage OSG-Orthese, Kühlung, Schonung, Hochlagerung, bedarfsadaptierte Analgesie (z.B. Ibuprofen 400 mg oder Novaminsulfon 500 mg bis zu 3x täglich).
+Experten: Niedergelassener Facharzt (für MRT bei Beschwerdepersistenz).
+
+# Weitere Informationen #
+Befund: Schwellung und Hämatomverfärbung über Malleolus lateralis und lateralem Mittelfuß auf Höhe des 4. und 5. Strahls rechts, Druckschmerz über Malleolus lateralis, Mittelfuß und Basis Metatarsale V, kein Druckschmerz über proximaler Fibula/Tibia, Malleolus medialis, keine Überwärmung, Talusvorschub negativ, pDMS intakt.
+ROM: Dorsalextension/Plantarflexion 15-0-40, Supination/Pronation 30-0-5.
+Röntgenbefund: Kein Hinweis auf Fraktur, Syndesmosespalt nicht pathologisch verbreitert, deutliche Weichteilschwellung über Malleolus lateralis.
+Procedere: OSG-Orthese kann bei Besserung der Beschwerden, spätestens aber nach 6 Wochen abgelegt werden. Bei Beschwerdepersistenz wird MRT zur Beurteilung der Bandstrukturen empfohlen.

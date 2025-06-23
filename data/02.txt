@@ -1,0 +1,17 @@
+# Eingabe #
+Geburtsdatum: unbekannt
+Alter: 45
+Symptome: Schnittverletzung am linken Ringfinger
+Triagestufe: 3
+Anamnese: Die Patientin stellt sich selbstständig in unserer Notaufnahme vor. Sie berichtet, beim Brot schneiden mit dem Messer abgerutscht zu sein und sich dabei in den linken Ringfinger geschnitten zu haben.
+
+# Ausgabe #
+Diagnosen: Schnittverletzung D4 links
+Untersuchungen: Körperliche Untersuchung
+Behandlungen: Spülung und Säuberung der Wunde mit NaCl 0,9%, Wundexploration, chirurgische Wundversorgung mit adaptierenden Nähten (Ethilon 4-0, nicht resorbierbar), Lokalanästhesie (Oberst-Block), Fettgaze, Lavanid-Wundgel, Verband, Auffrischung der Tetanusimpfung (Td-pur), Kühlung, Schonung, Hochlagerung, bedarfsgerechte Analgesie (z. B. Ibuprofen 400 mg / Novaminsulfon 500 mg bis zu 3x täglich).
+Experten: Hausarzt (für Wundkontrolle und Fadenentfernung nach 8–10 Tagen)
+
+# Weitere Informationen #
+Befund: ca. 2,5 cm lange, glattrandige Schnittwunde an D4 links radialseitig über Grund- und Mittelglied, kein freiliegender Knochen, kein Hinweis auf knöcherne Verletzung, kapilläre Blutung, keine aktive arterielle Blutung, pDMS intakt, Rekap-Zeit <2 s, Flexion/Extension in D4 vollständig und kräftig möglich.
+Tetanusimpfstatus: letzte Impfung vor mehr als 10 Jahren, Auffrischung gewünscht.
+Procedere: Bei Entzündungszeichen wie starke Rötung, Schwellung, Überwärmung, Eiteraustritt, Fieber oder Schüttelfrost wird um umgehende Wiedervorstellung gebeten.

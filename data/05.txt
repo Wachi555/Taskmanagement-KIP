@@ -1,0 +1,23 @@
+# Eingabe #
+Geburtsdatum: unbekannt
+Alter: 80
+Symptome: starke Schmerzen im linken Handgelenk
+Triagestufe: 4
+Anamnese: Die Patientin stellt sich in Begleitung ihrer Enkelin in der Notaufnahme vor. Sie sei zuhause über eine Teppichkante gestolpert und habe sich mit beiden Armen bzw. Händen in Extensionsstellung abgestützt. Seither bestehen starke Schmerzen im linken Handgelenk. Ein Kopfaufprall wird glaubhaft verneint, sonst keine weiteren Beschwerden.
+
+# Ausgabe #
+Diagnosen: distale Radiusfraktur links (gering disloziert, nicht abgekippt, nicht eingestaucht)
+Untersuchungen: Körperliche Untersuchung, radiologische Bildgebung (Röntgen Ellenbogen/Unterarm und Handgelenk/Mittelhand)
+Behandlungen: konservative Therapie, geschlossene Reposition unter Ketanest/Midazolam, Anlage eines Weißgipses, Schonung, Hochlagerung, bedarfsgerechte Analgesie (z. B. Ibuprofen 600 mg 1-1-1 + Pantoprazol 20 mg 1-0-0 oder Novaminsulfon 500 mg 1-1-1-1), Röntgenkontrollen nach 1, 3 und 6 Wochen
+Experten: niedergelassener Facharzt für Orthopädie/Unfallchirurgie
+
+# Weitere Informationen #
+Befund: 
+- Keine offenen Verletzungen
+- Schwellung und Hämatomverfärbung radiodorsalseitig über dem linken Handgelenk
+- Druckschmerz über distalem Radius, kein Druckschmerz über Ellenbogen oder proximalem Radius/Ulna
+- Finger frei beweglich, pDMS intakt
+Röntgen:
+- Ellenbogen/Unterarm links: kein Hinweis auf knöcherne Verletzung
+- Handgelenk links: gering dislozierte, nicht abgekippte, nicht eingestauchte Fraktur des distalen Radius, kein intraartikulärer Bruch
+Hinweis: Bei neu auftretenden Sensibilitätsstörungen wird um umgehende Wiedervorstellung gebeten

@@ -1,0 +1,18 @@
+# Eingabe #
+Geburtsdatum: unbekannt  
+Alter: 27  
+Symptome: Schmerzen am rechten Finger D3, Schwellung, Bewegungseinschränkung  
+Triagestufe: 4  
+Anamnese: Der Patient stellte sich selbstständig nach Volleyballtrauma in der Notaufnahme vor. Beim axialen Ballkontakt kam es zur Einstauchung der Finger D2–D4. Seitdem bestehen Schmerzen am rechten Finger D3.
+
+# Ausgabe #
+Diagnosen: V. a. knöcherner Strecksehnenausriss D3 rechts  
+Untersuchungen: Körperliche Untersuchung, Röntgenbild der rechten Hand  
+Behandlungen: Anlage einer Stack’schen Schiene, konservative Maßnahmen (Kühlung, Schonung, Hochlagerung, Analgesie)  
+Experten: Bei anhaltenden Beschwerden Vorstellung beim niedergelassenen Handchirurgen empfohlen
+
+# Weitere Informationen #
+- Befunde: Schwellung und Hämatom am PIP/DIP-Gelenk D3, Bewegung schmerzbedingt eingeschränkt, pDMS intakt  
+- Röntgen: Verdacht auf knöchernen Ausriss der Strecksehne, keine Fehlstellung im Gelenk  
+- Therapiehinweis: Stacksche Schiene für 4–6 Wochen, Streckstellung auch beim Händewaschen zwingend einhalten  
+- Analgetikaempfehlung nicht näher spezifiziert, aber bedarfsgerechte Einnahme empfohlen  

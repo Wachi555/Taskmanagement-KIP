@@ -1,0 +1,26 @@
+# Eingabe #
+Geburtsdatum: unbekannt  
+Alter: 21  
+Symptome: starke Schmerzen in der linken Schulter  
+Triagestufe: 3  
+Anamnese: Der Patient wird mittels Rettungsdienst in der Notaufnahme vorgestellt. Er berichtet, beim Mountainbiken gestürzt zu sein und auf die linke Schulter gefallen zu sein. Dabei sei er einige Meter den Berg hinabgerollt. Ein Helm wurde getragen, ansonsten keine Schutzkleidung. Seitdem bestehen starke Schmerzen in der linken Schulter.
+
+# Ausgabe #
+Diagnosen: Schulterluxation links (anterior-inferior), Verdacht auf Bankart-Läsion  
+Untersuchungen: Körperliche Untersuchung, radiologische Bildgebung (Röntgen Schulter links in 2 Ebenen)  
+Behandlungen: Geschlossene Reposition nach Milch unter Analgesie (Ketanest/Midazolam), Anlage eines Gilchrist-Verbandes für 3–4 Wochen, Tetanus-Auffrischimpfung mit Td-pur, Schonung, bedarfsgerechte Analgesie, frühfunktionelle Physiotherapie empfohlen  
+Experten: niedergelassener Orthopäde zur Abklärung weiterer Bildgebung/ggf. operativer Refixation des Labrums
+
+# Weitere Informationen #
+Befund Schulter links:
+- Oberflächliche Schürfwunden am linken Oberarm dorsolateral
+- Druckschmerz im Bereich des linken Glenohumeralgelenks
+- Humeruskopf anterior-inferior luxiert
+- Bewegungsausmaß stark eingeschränkt
+- Kein Druckschmerz über distalem Humerus, Clavicula oder Scapula
+- pDMS intakt
+Röntgenbefund:
+- Keine regelrechte Gelenkstellung
+- Luxation nach anterior-inferior
+- Verdacht auf Bankart-Läsion des Glenoids
+Hinweis: Bei neu auftretenden Sensibilitätsstörungen wird um umgehende Wiedervorstellung gebeten.

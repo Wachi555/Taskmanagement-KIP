@@ -1,0 +1,19 @@
+# Eingabe #
+Geburtsdatum: unbekannt  
+Alter: 48  
+Symptome: Knieschmerzen rechts beim Auftreten, Schmerz medialer Gelenkspalt  
+Triagestufe: 4  
+Anamnese: Die Patientin stellte sich 2 Tage nach einem Skiunfall selbstständig in der Notaufnahme vor. Sie war gestürzt und hat sich dabei das rechte Knie verdreht. Seither bestehen Schmerzen beim Auftreten und im Bereich des medialen Gelenkspalts.
+
+# Ausgabe #
+Diagnosen: V. a. Innenmeniskusriss rechts  
+Untersuchungen: Körperliche Untersuchung, fokussierte Notfallsonografie, Röntgen (Knie in 2 Ebenen)  
+Behandlungen: Ruhigstellung mittels 4-Punkt-Schiene in 0°-Position, Unterarmgehstützen (UAGS), Thromboseprophylaxe mit Enoxaparin 4000 I.E.  
+Experten: Niedergelassener Orthopäde zur MRT-Auswertung und Therapieentscheidung; Hausarzt zur weiteren Rezeptierung von Enoxaparin
+
+# Weitere Informationen #
+- Klinische Zeichen: Hämatom medial in Kniekehle, leichte Schwellung, schmerzhaft eingeschränkte Flexion, Druckschmerz medialer Gelenkspalt, Steinmann I und Payr positiv, Seitenbänder stabil, pDMS intakt  
+- Sonografie: kleiner Gelenkerguss  
+- Röntgen: Kein Nachweis einer knöchernen Verletzung  
+- Empfehlung: MRT zur Abklärung der Verdachtsdiagnose und Vorstellung beim Orthopäden zur weiteren Planung (konservativ oder operativ)  
+- Entlastung des Beins empfohlen, Thromboseprophylaxe fortzuführen

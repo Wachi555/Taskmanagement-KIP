@@ -1,0 +1,19 @@
+# Eingabe #
+Geburtsdatum: unbekannt  
+Alter: 74  
+Symptome: Platzwunde am Kopf, leichte Kopfschmerzen  
+Triagestufe: 3  
+Anamnese: Der Patient wird in Begleitung seines Sohns in der Notaufnahme vorstellig. Er berichtet, über einen Blumentopf im Garten gestolpert zu sein und dabei mit dem Kopf auf eine Steinkante am Beet-Rand gefallen zu sein. Er nimmt Apixaban aufgrund von paroxysmalem Vorhofflimmern. Der Tetanusschutz ist anamnestisch intakt. Es besteht keine Bewusstlosigkeit, keine Übelkeit, keine Diplopie, kein Schwindel und keine neu aufgetretenen neurologischen Defizite. Leichte Kopfschmerzen.
+
+# Ausgabe #
+Diagnosen: Kopfplatzwunde  
+Untersuchungen: Körperliche Untersuchung, Wundexploration, cCT/HWS  
+Behandlungen: Spülung und Wundsäuberung mit NaCl 0,9 %, adaptierende Hautnaht mit Ethilon 4-0 unter Lokalanästhesie, Verband, Schonung, Kühlung, bedarfsgerechte Analgesie (z. B. Ibuprofen 600 mg 1-1-1 + Pantoprazol 20 mg 1-0-0)  
+Experten: Hausarzt zur Wundkontrolle und Fadenzug nach 7–10 Tagen
+
+# Weitere Informationen #
+- Wunde: ca. 4–5 cm lange, glattberandete Platzwunde temporal-linksseitig, kein Fremdkörper sichtbar  
+- Kein Kalottendruckschmerz, HWS frei beweglich, kein Wirbelsäulenklopfschmerz  
+- cCT/HWS: Kein Nachweis einer Schädelkalottenfraktur, keine intrakranielle Blutung (ICB)  
+- Apixaban-Einnahme bei bekanntem paroxysmalem Vorhofflimmern  
+- Hinweis: Bei Rötung, Schwellung, Eiteraustritt, Fieber, Schüttelfrost sowie bei neu auftretenden Wesensveränderungen, starker Übelkeit mit Erbrechen oder starken Kopfschmerzen wird eine umgehende ärztliche Vorstellung empfohlen.

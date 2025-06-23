@@ -1,0 +1,20 @@
+# Eingabe #
+Geburtsdatum: unbekannt
+Alter: 17
+Symptome: starke Kopfschmerzen, leichte Übelkeit
+Triagestufe: 3
+Anamnese: Der Patient stellt sich selbstständig in der Notaufnahme vor. Er berichtet, beim Boxtraining mehrere Schläge gegen den Schädel bekommen zu haben. Nun habe er starke Kopfschmerzen und empfinde eine leichte Übelkeit. Kein Erbrechen, keine Amnesie, keine Bewusstlosigkeit, keine Diplopie, keine neu aufgetretenen neurologischen Defizite, keine äußeren Verletzungszeichen.
+
+# Ausgabe #
+Diagnosen: Schädelprellung
+Untersuchungen: Körperliche Untersuchung
+Behandlungen: Körperliche Schonung für mindestens 48 h, Bildschirmkarenz, bedarfsgerechte Analgesie (z. B. Ibuprofen 400 mg 1-1-1 + Pantoprazol 20 mg 1-0-0 oder Novaminsulfon 500 mg 1-1-1), Verzicht auf Boxtraining für mindestens 2 Wochen.
+Experten: keine spezifischen Experten genannt; Wiedervorstellung bei Verschlechterung empfohlen
+
+# Weitere Informationen #
+Befund: GCS 15, wach, ansprechbar, zugewandt, 4-fach orientiert  
+Pupillen: mittelweit, isokor, direkt/indirekt prompt lichtreagibel  
+Kein Kalottendruckschmerz, kein Kieferdruckschmerz, keine offenen Hautläsionen  
+HWS: frei beweglich, kein Hartspann paravertebral, kein Wirbelsäulenklopfschmerz  
+CT: nicht durchgeführt (altersbedingt)  
+Hinweis: Bei neu auftretenden Bewusstseinsveränderungen, neurologischen Defiziten (z. B. Sprach-/Sprechstörung), starker Übelkeit mit Erbrechen wird um umgehende Wiedervorstellung gebeten

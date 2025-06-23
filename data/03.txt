@@ -1,0 +1,27 @@
+# Eingabe #
+Geburtsdatum: unbekannt
+Alter: 67
+Symptome: Schmerzen im Bereich der Lendenwirbelsäule und des linken Oberschenkels
+Triagestufe: 1
+Anamnese: Der Patient wird mittels Rettungsdienst in Notarztbegleitung in unserer Notaufnahme vorgestellt. Er habe auf dem Dach seines Wohnhauses Dachziegel ausgetauscht und sei dabei abgerutscht und vom Dach (Höhe ca. 4 m) gefallen. Die Landung habe primär mit den Füßen voraus stattgefunden. Es bestand keine Bewusstlosigkeit, keine Amnesie, kein Kopfsturz, keine Übelkeit, kein Erbrechen, keine Atemnot, keine Annahme suizidale Absicht. Schmerzen bestehen im Bereich der Lendenwirbelsäule und des linken Oberschenkels.
+
+# Ausgabe #
+Diagnosen: Femurschaftfraktur links, Deckplattenimpressionsfraktur LWK 4
+Untersuchungen: Körperliche Untersuchung, eFAST, Polytrauma-CT
+Behandlungen: 1000 ml Ringer i.v., 0,08 mg Fentanyl, operative Therapie (geplant, unfallchirurgisch)
+Experten: Unfallchirurgie
+
+# Weitere Informationen #
+Vitalparameter: allzeit stabil  
+Medikation: Ramipril 2,5 mg 1-0-0, Atorvastatin 20 mg 0-0-1  
+Allergie: Penicillin  
+Befunde:
+- Kopf/Hals: GCS 15, 4-fach orientiert, Pupillen isokor und prompt lichtreagibel, keine Schädelverletzungen, HWS frei beweglich  
+- Thorax: kein Pneumothorax, keine Schmerzen, Schultern frei  
+- Abdomen: weich, keine freie Flüssigkeit  
+- Wirbelsäule: Klopfschmerz über mittlerer LWS  
+- Becken: stabil, kein Hinweis auf open-book-Verletzung  
+- obere Extremitäten: oberflächliche Schürfwunde Hand links palmar proximal  
+- untere Extremitäten: links Hämatom/Schwellung mittleres Oberschenkeldrittel, Untersuchung schmerzbedingt eingeschränkt  
+Bildgebung (Polytrauma-CT, Notfallbefund): Deckplattenimpressionsfraktur LWK 4 (Vorder- und Hinterkante), Femurschaftfraktur links (geringgradig disloziert)  
+Procedere: Schockraumversorgung, Übergabe an Unfallchirurgie zur operativen Weiterbehandlung

@@ -1,0 +1,18 @@
+# Eingabe #
+Geburtsdatum: unbekannt  
+Alter: 64  
+Symptome: Schmerzen und Schwellung im Bereich der linken Achillessehne, eingeschränkte Plantarflexion  
+Triagestufe: 4  
+Anamnese: Patient berichtet, beim Fußballspiel zuzusehen und beim Zurücktreten ein schnalzendes Geräusch an der linken Achillessehne gehört zu haben, seitdem starke Schmerzen und Funktionseinschränkung.
+
+# Ausgabe #
+Diagnosen: Achillessehnenruptur links  
+Untersuchungen: Körperliche Untersuchung, Thompson-Test, fokussierte Notfallsonografie, Röntgen (kein knöcherner Befund)  
+Behandlungen: Anlage eines Vaco-Ped-Stiefels in 20° Spitzfußstellung für 6–8 Wochen, strenge Einhaltung der Plantarflexion, UAGS, Entlastung, Thromboseprophylaxe mit Enoxaparin 4000 I.E. einmal täglich  
+Experten: Vorstellung und Verlaufskontrolle beim niedergelassenen Orthopäden empfohlen
+
+# Weitere Informationen #
+- Sonografie zeigt Sehnenunterbrechung mit echoarmer Flüssigkeit und annähernden Sehnenstümpfen bei passiver Plantarflexion  
+- Röntgen schließt knöcherne Begleitverletzungen aus  
+- Wichtig: Plantarflexion auch beim Ablegen des Stiefels (z. B. beim Duschen) unbedingt beibehalten  
+- Thromboseprophylaxe aufgrund Immobilisation  
