@@ -58,9 +58,9 @@
 
           <li class="list-group-item">
             <strong class="me-3">Mögliche Diagnosen:</strong>
-            {{#if diagnosis.length}}
-              {{#each diagnosis}}
-                {{this}}{{#unless @last}}, {{/unless}}
+            {{#if diagnoses.length}}
+              {{#each diagnoses}}
+                {{this.name}}{{#unless @last}}, {{/unless}}
               {{/each}}
             {{else}}–{{/if}}
           </li>
