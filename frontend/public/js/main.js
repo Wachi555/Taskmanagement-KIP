@@ -143,6 +143,7 @@ function setupAnalyzeButton() {
   processBtn.addEventListener("click", async () => {
     try {
       await processInput();
+      window.location.reload();
     } catch (error) {
       console.error("Analyse fehlgeschlagen:", error);
       showError(error.message);
