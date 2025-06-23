@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
 
 import database.crud_diagnoses as crud_diagnoses
 import database.crud_examinations as crud_examinations
@@ -59,8 +59,6 @@ def save_anamnesis_response(patient_id: int, response: LLMResult, anamnesis_text
     #     Diagnosis(name="Hautausschlag", reason="Allergische Reaktion", confidence=0.85),
     # ]
     # response.treatments = ["Antihistaminikum", "Kühlen der betroffenen Stelle"]
-    # print(f"DEBUG: type: {type(response)}, resp: {response}", flush=True)
-
     latest_entry = get_latest_patient_entry(patient_id)
     experts_string_list = [expert.type for expert in response.experts]
     examinations_dict_list = [
@@ -77,10 +75,8 @@ def save_anamnesis_response(patient_id: int, response: LLMResult, anamnesis_text
         "; ".join(examinations_string_list),
         treatments=", ".join(response.treatments),
     )
-    update_patient_entry(latest_entry.id, latest_result_id=result_id, anamnesis_text=anamnesis_text)  # type: ignore
-    print(f"DEBUG: result_id: {result_id}", flush=True)
-    res = crud_results.get_result_by_id(result_id)
-    print(f"DEBUG: res: {res.experts}", flush=True)
+    update_patient_entry(latest_entry.id, latest_result_id=result_id)  # type: ignore
+    # res = crud_results.get_result_by_id(result_id)
 
     # Create diagnoses for the result
     for diagnosis in response.diagnoses:
@@ -136,7 +132,7 @@ def add_patient(patient: InputPatient) -> int:
         symptoms=patient.symptoms,
         medications="",
         triage_level=patient.triage_level,
-        anamnesis_text=""
+        anamnesis_text="",
     )
     update_patient(patient_id, latest_entry_id=entry_id)
     return patient_id  # type: ignore
@@ -340,7 +336,6 @@ def get_results_for_entry(entry_id: int) -> List[Result]:
     results = crud_results.get_results_by_patient_entry_id(entry_id)
     for result in results:
         exams = result.examinations
-        # print(f"DEBUG: result.examinations: {exams}", flush=True)
         exams = (
             [json.loads(exam.strip()) for exam in exams.split("; ") if exam]
             if exams  # type: ignore

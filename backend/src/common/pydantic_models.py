@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -54,14 +54,6 @@ class UpdatePatient(BaseModel):
     address: Optional[str] = None
     # gender: Optional[str] = None
     health_insurance: Optional[str] = None
-
-
-# What the frontend receives from the backend after processing the anamnesis text
-class OutputModel(BaseModel):
-    output: Dict
-    success: bool = True
-    error: str | None = None
-    status_code: int | None = None
 
 
 # ===============================================================

@@ -27,41 +27,30 @@ def extract_contents(input_text: str) -> ExtractedContent:
         },
     )
 
-    if response.text:
-        return ExtractedContent.model_validate_json(response.text)
-        # return json.loads(response.text)
-    raise ValueError("No response text found.")
+    if not response.text:
+        raise ValueError("No response text found.")
+    return ExtractedContent.model_validate_json(response.text)
 
 
 def generate_anamnesis_response(input_contents: EvaluationInput) -> LLMResult:
-    try:
-        prompt = evaluation_prompt + build_evaluation_input(input_contents)
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=prompt,
-            config={
-                "response_mime_type": "application/json",
-                "response_schema": LLMResult,
-            },
-        )
-        if response.text:
-            return LLMResult.model_validate_json(response.text)
+    prompt = evaluation_prompt + build_evaluation_input(input_contents)
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=prompt,
+        config={
+            "response_mime_type": "application/json",
+            "response_schema": LLMResult,
+        },
+    )
+    if not response.text:
         raise ValueError("No response text found.")
-    except Exception as e:
-        print(f"Error while trying to generate a response for the anamnesis: {e}")
-        print(f"Input contents: {input_contents}")
-        raise e
+    return LLMResult.model_validate_json(response.text)
 
 
 def ask_anything2(input_text: str) -> str:
-    try:
-        response = client.models.generate_content(
-            model="gemini-2.0-flash", contents=input_text
-        )
-        if response.text:
-            return response.text
-        else:
-            return "No response text found."
-    except Exception as e:
-        print(f"Error: {e}")
-        return "An error occurred while processing your request."
+    response = client.models.generate_content(
+        model="gemini-2.0-flash", contents=input_text
+    )
+    if not response.text:
+        return "No response text found."
+    return response.text

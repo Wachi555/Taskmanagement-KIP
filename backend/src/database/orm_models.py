@@ -42,7 +42,6 @@ class PatientEntry(Base):
     triage_level = Column(Integer, nullable=False)
     anamnesis_text = Column(String, nullable=False)
     latest_result_id = Column(Integer, ForeignKey("results.id"), nullable=True)
-    
 
 
 class Examination(Base):

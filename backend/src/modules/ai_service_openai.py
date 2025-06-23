@@ -40,28 +40,23 @@ def extract_contents(input_text: str) -> ExtractedContent:
 
 
 def generate_anamnesis_response(input_contents: EvaluationInput) -> LLMResult:
-    try:
-        user_prompt = build_evaluation_input(input_contents)
-        response = client.beta.chat.completions.parse(
-            messages=[
-                {
-                    "role": "system",
-                    "content": evaluation_prompt,
-                },
-                {
-                    "role": "user",
-                    "content": user_prompt,
-                },
-            ],
-            model=model_name,
-            # temperature=0.7,
-            response_format=LLMResult,
-        )
-        result = response.choices[0].message.parsed
-        if result:
-            return result
+    user_prompt = build_evaluation_input(input_contents)
+    response = client.beta.chat.completions.parse(
+        messages=[
+            {
+                "role": "system",
+                "content": evaluation_prompt,
+            },
+            {
+                "role": "user",
+                "content": user_prompt,
+            },
+        ],
+        model=model_name,
+        # temperature=0.7,
+        response_format=LLMResult,
+    )
+    result = response.choices[0].message.parsed
+    if not result:
         raise ValueError("No response text found.")
-    except Exception as e:
-        print(f"Error while trying to generate a response for the anamnesis: {e}")
-        print(f"Input contents: {input_contents}")
-        raise e
+    return result
