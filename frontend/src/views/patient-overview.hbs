@@ -16,35 +16,36 @@
 {{/if}}
 
 <div class="row gx-4 gy-4 mt-2">
-  <div class="col-12 col-md-6">
+  <div class="col-12 col-md-6 patient-overview">
+
     {{!-- Patientendaten --}}
     <div class="card mb-4 w-100">
       <div class="card-header">
         <h5 class="mb-0">Patientendaten</h5>
       </div>
       <div class="card-body overflow-auto" style="max-height: 60vh;">
-        <ul class="list-group list-group-flush mb-0">
-          <li class="list-group-item">
-            <strong class="me-3">Geburtsdatum:</strong>
-            {{#if data.dob}}{{formatDate data.dob}}{{else}}–{{/if}}
-          </li>
-          <li class="list-group-item">
-            <strong class="me-3">Adresse:</strong>
-            {{#if data.adresse}}{{data.adresse}}{{else}}–{{/if}}
-          </li>
-          <li class="list-group-item">
-            <strong class="me-3">Krankenkasse:</strong>
-            {{#if data.krankenkasse}}{{data.krankenkasse}}{{else}}–{{/if}}
-          </li>
-          <li class="list-group-item">
-            <strong class="me-3">Aktuelle Symptome:</strong>
-            {{#if symptoms.length}}
-              {{#each symptoms}}
-                {{this}}{{#unless @last}}, {{/unless}}
-              {{/each}}
-            {{else}}–{{/if}}
-          </li>
-        </ul>
+        <table class="info-table">
+          <tr>
+            <th>Geburtsdatum:</th>
+            <td>{{#if data.dob}}{{formatDate data.dob}}{{else}}–{{/if}}</td>
+          </tr>
+          <tr>
+            <th>Adresse:</th>
+            <td>{{#if data.adresse}}{{data.adresse}}{{else}}–{{/if}}</td>
+          </tr>
+          <tr>
+            <th>Krankenkasse:</th>
+            <td>{{#if data.krankenkasse}}{{data.krankenkasse}}{{else}}–{{/if}}</td>
+          </tr>
+          <tr>
+            <th>Aktuelle Symptome:</th>
+            <td>
+              {{#if symptoms.length}}
+                {{#each symptoms}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+              {{else}}–{{/if}}
+            </td>
+          </tr>
+        </table>
       </div>
     </div>
 
@@ -54,69 +55,65 @@
         <h5 class="mb-0">Bisherige Ergebnisse</h5>
       </div>
       <div class="card-body overflow-auto" style="max-height: 60vh;">
-        <ul class="list-group list-group-flush mb-0">
-
-          <li class="list-group-item">
-            <strong class="me-3">Mögliche Diagnosen:</strong>
-            {{#if diagnosis.length}}
-              {{#each diagnosis}}
-                {{this}}{{#unless @last}}, {{/unless}}
-              {{/each}}
-            {{else}}–{{/if}}
-          </li>
-
-          <li class="list-group-item">
-            <strong class="me-3">Triagestufe:</strong>
-            {{#if triage}}
-              {{triage}}
-            {{else}}–{{/if}}
-          </li>
-
-          <li class="list-group-item">
-            <strong class="me-3">Untersuchungen:</strong>
-            {{#if exams.length}}
-              <ul class="mt-1 ms-3">
-                {{#each exams}}
-                  <li>
-                    {{this.name}}
-                    <span class="badge bg-secondary">{{this.priority}}</span>
-                  </li>
+        <table class="info-table">
+          <tr>
+            <th>Mögliche Diagnosen:</th>
+            <td>
+              {{#if diagnoses.length}}
+                {{#each diagnoses}}
+                  {{this.name}}{{#unless @last}}, {{/unless}}
                 {{/each}}
-              </ul>
-            {{else}}–{{/if}}
-          </li>
-
-          <li class="list-group-item">
-            <strong class="me-3">Behandlungen:</strong>
-            {{#if treatments.length}}
-              {{#each treatments}}
-                {{this}}{{#unless @last}}, {{/unless}}
-              {{/each}}
-            {{else}}–{{/if}}
-          </li>
-
-          <li class="list-group-item">
-            <strong class="me-3">Experten:</strong>
-            {{#if experts.length}}
-              <ul class="mt-1 ms-3">
-                {{#each experts}}
-                  <li>{{this}}</li>
-                {{/each}}
-              </ul>
-            {{else}}–{{/if}}
-          </li>
-
-          <li class="list-group-item">
-            <strong class="me-3">Allergien:</strong>
-            {{#if allergies.length}}
-              {{#each allergies}}
-                {{this}}{{#unless @last}}, {{/unless}}
-              {{/each}}
-            {{else}}–{{/if}}
-          </li>
-
-        </ul>
+              {{else}}–
+              {{/if}}
+            </td>
+          </tr>
+          <tr>
+            <th>Triagestufe:</th>
+            <td>{{#if triage}}{{triage}}{{else}}–{{/if}}</td>
+          </tr>
+          <tr>
+            <th>Untersuchungen:</th>
+            <td>
+              {{#if exams.length}}
+                <ul>
+                  {{#each exams}}
+                    <li>{{this.name}} <span class="badge bg-secondary">{{this.priority}}</span></li>
+                  {{/each}}
+                </ul>
+              {{else}}–
+              {{/if}}
+            </td>
+          </tr>
+          <tr>
+            <th>Behandlungen:</th>
+            <td>
+              {{#if treatments.length}}
+                {{#each treatments}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+              {{else}}–
+              {{/if}}
+            </td>
+          </tr>
+          <tr>
+            <th>Experten:</th>
+            <td>
+              {{#if experts.length}}
+                {{#each experts}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+              {{else}}–
+              {{/if}}
+            </td>
+          </tr>
+          <tr>
+            <th>Allergien:</th>
+            <td>
+              {{#if allergies.length}}
+                {{#each allergies}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+              {{else}}–
+              {{/if}}
+            </td>
+          </tr>
+        </table>
       </div>
     </div>
+
   </div>
 </div>

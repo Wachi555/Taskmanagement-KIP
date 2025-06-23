@@ -5,6 +5,7 @@ from typing import List, Optional
 import database.crud_diagnoses as crud_diagnoses
 import database.crud_examinations as crud_examinations
 import database.crud_experts as crud_experts
+import database.crud_patient_entries as crud_patient_entries
 import database.crud_patients as crud_patients
 import database.crud_results as crud_results
 
@@ -24,8 +25,6 @@ from database.orm_models import (
     Result,
 )
 from modules.helpers import calculate_age, stitch_together
-
-import database.crud_patient_entries as crud_patient_entries
 
 
 # --- General Database Functions ---
@@ -78,7 +77,7 @@ def save_anamnesis_response(patient_id: int, response: LLMResult):
         "; ".join(examinations_string_list),
         treatments=", ".join(response.treatments),
     )
-    update_patient_entry(latest_entry.id, latest_result_id=result_id)  
+    update_patient_entry(latest_entry.id, latest_result_id=result_id)  # type: ignore
     print(f"DEBUG: result_id: {result_id}", flush=True)
     res = crud_results.get_result_by_id(result_id)
     print(f"DEBUG: res: {res.experts}", flush=True)
@@ -208,7 +207,7 @@ def add_patient_entry(
     symptoms: str,
     medications: str,
     triage_level: int,
-    last_result_id: Optional[int] = None,
+    latest_result_id: Optional[int] = None,
 ) -> int:
     entry_id = crud_patient_entries.create_patient_entry(
         patient_id,
@@ -219,7 +218,7 @@ def add_patient_entry(
         symptoms,
         medications,
         triage_level,
-        last_result_id=last_result_id,
+        latest_result_id=latest_result_id,
     )
     return entry_id
 
@@ -342,24 +341,25 @@ def get_results_for_entry(entry_id: int) -> List[Result]:
             if exams  # type: ignore
             else []
         )
-        result.examinations = exams 
-        # result.examinations = "; ".join([json.dumps(exam) for exam in exams])  # type: ignore # TODO: Soll das wieder rein? Wenn ja wieso?
+        result.examinations = exams  # type: ignore
     return results
+
 
 # Get the latest result for a patient entry
 def get_latest_result_for_entry(entry_id: int) -> Optional[Result]:
     entry = crud_patient_entries.get_patient_entry(entry_id)
     if entry.latest_result_id is None:
         return None
-    result = crud_results.get_result_by_id(entry.latest_result_id)
+    result = crud_results.get_result_by_id(entry.latest_result_id)  # type: ignore
     exams = result.examinations
     exams = (
         [json.loads(exam.strip()) for exam in exams.split("; ") if exam]
         if exams  # type: ignore
         else []
     )
-    result.examinations = exams 
+    result.examinations = exams  # type: ignore
     return result
+
 
 # Add a result to a patient entry
 def add_result_to_entry(
