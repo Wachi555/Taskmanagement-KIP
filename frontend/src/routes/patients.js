@@ -7,15 +7,17 @@ const router = express.Router();
 // Alle Patienten vom Backend holen
 async function fetchAllPatients() {
   const res = await fetch("http://localhost:8000/patients");
-  if (!res.ok) throw new Error("Patienten konnten nicht geladen werden");
-  return await res.json();
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error || "Patienten konnten nicht geladen werden");
+  return json.output;
 }
 
 // Einzelnen Patienten vom Backend holen
 async function fetchPatientById(id) {
   const res = await fetch(`http://localhost:8000/patient/${id}`);
-  if (!res.ok) throw new Error("Patient nicht gefunden");
-  return await res.json();
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error || "Patient nicht gefunden");
+  return json.output;
 }
 
 // Detail-Seite für Patienten-Eingabe

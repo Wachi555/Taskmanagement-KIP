@@ -9,22 +9,25 @@ let patients = []; // In-Memory-Cache
 // Alle Patienten laden und cachen
 async function loadFromBackend() {
   const res = await fetch(`${BASE_URL}/patients`);
-  if (!res.ok) throw new Error("Fehler beim Laden der Patienten");
-  patients = await res.json();
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error || "Fehler beim Laden der Patienten");
+  patients = json.output;
 }
 
 // Einzelnen Patienten mit Details laden
 async function getPatient(id) {
   const res = await fetch(`${BASE_URL}/patient/${id}`);
-  if (!res.ok) throw new Error(`Patient ${id} nicht gefunden`);
-  return await res.json(); // enthält: patient, latest_entry, latessult
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error || `Patient ${id} nicht gefunden`);
+  return json.output;
 }
 
 // Historie für Patient
 async function getPatientEntries(id) {
   const res = await fetch(`${BASE_URL}/patient/${id}/entries`);
-  if (!res.ok) throw new Error("Fehler beim Laden der Einträge");
-  return await res.json();
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error || "Fehler beim Laden der Einträge");
+  return json.output;
 }
 
 // ==============================
@@ -40,8 +43,8 @@ async function addPatient(data) {
   });
 
   const json = await res.json();
-  if (!json.success) throw new Error(json.error_message || "Fehler beim Anlegen");
-  return json;
+  if (!json.success) throw new Error(json.error || "Fehler beim Anlegen");
+  return json.output;
 }
 
 // Patienten löschen
@@ -50,8 +53,8 @@ async function deletePatient(id) {
     method: "DELETE"
   });
   const json = await res.json();
-  if (!json.success) throw new Error(json.error_message || "Löschen fehlgeschlagen");
-  return json;
+  if (!json.success) throw new Error(json.error || "Löschen fehlgeschlagen");
+  return json.output;
 }
 
 // ==============================
@@ -62,8 +65,8 @@ async function deletePatient(id) {
 async function setTriage(id, level) {
   const res = await fetch(`${BASE_URL}/patient/${id}/set_triage/${level}`);
   const json = await res.json();
-  if (!json.success) throw new Error(json.error_message || "Triage-Update fehlgeschlagen");
-  return json;
+  if (!json.success) throw new Error(json.error || "Triage-Update fehlgeschlagen");
+  return json.output;
 }
 
 // Patientenstatus setzen
@@ -71,8 +74,8 @@ async function setTriage(id, level) {
 async function setStatus(id, status) {
   const res = await fetch(`${BASE_URL}/patient/update_status/${id}/${status}`);
   const json = await res.json();
-  if (!json.success) throw new Error(json.error_message || "Status-Update fehlgeschlagen");
-  return json;
+  if (!json.success) throw new Error(json.error || "Status-Update fehlgeschlagen");
+  return json.output;
 }
 
 // ==============================
@@ -88,6 +91,7 @@ async function analyze(id, text) {
   });
 
   const json = await res.json();
+  if (!json.success) throw new Error(json.error || "Fehler bei der Anamnese-Verarbeitung");
   return json.output;
 }
 
@@ -100,6 +104,7 @@ async function analyzeDebug(text) {
   });
 
   const json = await res.json();
+  if (!json.success) throw new Error(json.error || "Fehler bei der Debug-Anamnese");
   return json.output;
 }
 

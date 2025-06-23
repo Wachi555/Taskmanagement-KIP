@@ -8,10 +8,9 @@ async function sendToWhisper(filePath) {
     body: fs.createReadStream(filePath),
   });
 
-  if (!response.ok) throw new Error("Fehler bei Whisper-API");
-
   const data = await response.json();
-  return data.transcription;
+  if (!data.success) throw new Error(data.error || "Fehler bei der Transkription");
+  return data.output;
 }
 
 async function processWithLLM(transcription) {
@@ -21,9 +20,9 @@ async function processWithLLM(transcription) {
     body: JSON.stringify({ text: transcription }),
   });
 
-  if (!response.ok) throw new Error("Fehler bei LLM-Verarbeitung");
-
-  return await response.json();
+  const data = await response.json();
+  if (!data.success) throw new Error(data.error || "Fehler bei LLM-Verarbeitung");
+  return data.output;
 }
 
 module.exports = {

@@ -14,7 +14,8 @@ router.post("/upload-audio", upload.single("file"), async (req, res) => {
     fs.unlinkSync(filePath); // cleanup temp file
 
     const result = await whisperService.processWithLLM(transcription);
-    res.json(result);
+    if (!result.success) throw new Error(result.error || "Fehler bei der Verarbeitung");
+    res.json(result.output);
   } catch (err) {
     console.error("Audio upload error:", err);
     res.status(500).json({ error: "Fehler beim Verarbeiten der Audiodatei" });

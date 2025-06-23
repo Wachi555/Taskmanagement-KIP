@@ -141,7 +141,10 @@ export function setupAudioRecorder() {
       body: formData
     });
     const result = await res.json();
-    const transcription = result.transcription;
+    if (!result.success) {
+      throw new Error(result.error || "Fehler bei der Transkription.");
+    }
+    const transcription = result.output;
     const anamneseField = document.getElementById("inputText");
     if (anamneseField) {
       anamneseField.value = transcription;

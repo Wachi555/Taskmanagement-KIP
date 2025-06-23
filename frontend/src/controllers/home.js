@@ -9,27 +9,27 @@ const router = express.Router();
 
 async function fetchAllPatients() {
   const res = await fetch("http://localhost:8000/patients");
-  if (!res.ok) throw new Error("Patienten konnten nicht geladen werden");
-  return await res.json();
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error || "Patienten konnten nicht geladen werden");
+  return json.output;
 }
 
 async function fetchPatientById(id) {
   const res = await fetch(`http://localhost:8000/patient/${id}`);
-  if (!res.ok) throw new Error("Patient nicht gefunden");
-  return await res.json();
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error || "Patient nicht gefunden");
+  return json.output;
 }
 async function deletePatientById(id) {
   const res = await fetch(`http://localhost:8000/patient/${id}`, { method: 'DELETE' });
-  if (!res.ok) throw new Error(`Löschen fehlgeschlagen (${res.status})`);
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error || `Löschen fehlgeschlagen (${json.status_code})`);
 }
 async function updatePatientStatusById(id, status) {
   const res = await fetch(`http://localhost:8000/patient/update_status/${id}/0`);
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.detail || `Aktualisierung fehlgeschlagen (${res.status})`);
-  }
-  return res.json();
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error || `Aktualisierung fehlgeschlagen (${json.status_code})`);
+  return json.output;
 };
 async function updatePatientById(id, payload) {
   const res = await fetch(`http://localhost:8000/patient/update/${id}`, {
@@ -37,19 +37,10 @@ async function updatePatientById(id, payload) {
     headers: { 'Content-Type': 'application/json' },
     body:    JSON.stringify(payload)
   });
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.detail || `Aktualisierung fehlgeschlagen (${res.status})`);
-  }
-  return res.json();
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error || `Aktualisierung fehlgeschlagen (${json.status_code})`);
+  return json.output;
 };
-
-
-
-
-
-
 
 // ============================
 // ROUTEN
@@ -127,7 +118,6 @@ router.get('/registration', async (req, res) => {
     });
   } catch (error) {
     console.error("Fehler beim Laden der Patienten:", error.message);
-
     res.render('registration', {
       layout: 'main',
       appName: 'Notaufnahme Universitätsklinikum Regensburg',
@@ -307,8 +297,8 @@ router.post('/analyse', async (req, res) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: inputText })
     });
-    if (!response.ok) throw new Error(`Backend-Fehler: ${response.status}`);
     const data = await response.json();
+    if (!data.success) throw new Error(data.error || `Backend-Fehler: ${data.status_code}`);
 
     // frontend/controllers/home.js, im router.post('/analyse', …)
     const result = {
@@ -328,7 +318,6 @@ router.post('/analyse', async (req, res) => {
     };
 
     res.json(result);
-
   } catch (error) {
     console.error('Analysefehler:', error);
     res.status(500).json({ error: 'Analyse fehlgeschlagen' });
