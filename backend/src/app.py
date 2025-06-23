@@ -71,7 +71,7 @@ async def process_input(
             status_code=500,
         )
 
-    logger.debug(
+    logger.info(
         f"Processed input for patient {selected_patient_id}: {input_model.text}"
     )
 
@@ -93,7 +93,7 @@ async def process_input(
             status_code=500,
         )
 
-    logger.debug(f"Retrieved data for patient ID {selected_patient_id}:")
+    logger.info(f"Retrieved data for patient ID {selected_patient_id}")
     logger.debug(f"Patient: {patient}")
     logger.debug(f"Patient Entry: {patient_entry}")
     logger.debug(f"Result: {result}")
@@ -145,7 +145,7 @@ async def transcribe(file: UploadFile = File(...)) -> OutputModel:
             status_code=500,
         )
 
-    logger.debug(f"Transcribed audio file {file.filename} to text: {result}")
+    logger.info(f"Transcribed audio file {file.filename} to text: {result}")
     return OutputModel(output=result)
 
 
@@ -170,7 +170,7 @@ async def get_patients() -> OutputModel:
             status_code=500,
         )
 
-    logger.debug(f"Retrieved {len(patients)} patients from the database")
+    logger.info(f"Retrieved {len(patients)} patients from the database")
     return OutputModel(output=patients)
 
 
@@ -192,7 +192,7 @@ async def get_patient(patient_id: int) -> OutputModel:
             status_code=500,
         )
 
-    logger.debug(f"Retrieved data for patient ID {patient_id}:")
+    logger.info(f"Retrieved data for patient ID {patient_id}")
     logger.debug(f"Patient: {patient}")
     logger.debug(f"Patient Entry: {patient_entry}")
     logger.debug(f"Result: {result}")
@@ -221,7 +221,7 @@ async def insert_patient(input_model: InputPatient) -> OutputModel:
             status_code=500,
         )
 
-    logger.debug(f"Inserted patient with ID {patient_id}: {input_model}")
+    logger.info(f"Inserted patient with ID {patient_id}: {input_model}")
     return OutputModel(output={"patient_id": patient_id})
 
 
@@ -239,7 +239,7 @@ async def delete_patient(patient_id: int) -> OutputModel:
             status_code=500,
         )
 
-    logger.debug(f"Deleted patient with ID {patient_id}")
+    logger.info(f"Deleted patient with ID {patient_id}")
     return OutputModel(output=f"Patient with ID {patient_id} deleted successfully")
 
 
@@ -262,7 +262,7 @@ async def get_patient_history(patient_id: int) -> OutputModel:
         )
 
     if len(entries) == 0:
-        logger.debug(f"No entries found for patient ID {patient_id}")
+        logger.info(f"No entries found for patient ID {patient_id}")
         return OutputModel(
             output="No entries found for this patient",
             success=False,
@@ -270,7 +270,7 @@ async def get_patient_history(patient_id: int) -> OutputModel:
             status_code=500,
         )
 
-    logger.debug(f"Retrieved {len(entries)} entries for patient ID {patient_id}")
+    logger.info(f"Retrieved {len(entries)} entries for patient ID {patient_id}")
     return OutputModel(output=results)
 
 
@@ -305,7 +305,7 @@ async def update_patient_status(patient_id: int, status: int) -> OutputModel:
             status_code=500,
         )
 
-    logger.debug(f"Updated status for patient ID {patient_id} to {status}")
+    logger.info(f"Updated status for patient ID {patient_id} to {status}")
     return OutputModel(
         output=f"Patient with ID {patient_id} status updated to {status}"
     )
@@ -337,7 +337,7 @@ async def set_patient_triage(patient_id: int, triage_level: int) -> OutputModel:
             status_code=500,
         )
 
-    logger.debug(f"Updated triage level for patient ID {patient_id} to {triage_level}")
+    logger.info(f"Updated triage level for patient ID {patient_id} to {triage_level}")
     return OutputModel(
         output=f"Patient with ID {patient_id} triage level updated to {triage_level}"
     )
@@ -360,7 +360,7 @@ async def update_patient_data(
             status_code=500,
         )
 
-    logger.debug(f"Updated patient with ID {patient_id}: {input_model}")
+    logger.info(f"Updated patient with ID {patient_id}: {input_model}")
     return OutputModel(output=f"Patient with ID {patient_id} updated")
 
 
@@ -414,7 +414,7 @@ async def insert_example_patients() -> OutputModel:
             status_code=500,
         )
 
-    logger.debug(f"Inserted {len(example_patients)} example patients into the database")
+    logger.info(f"Inserted {len(example_patients)} example patients into the database")
     return OutputModel(
         output=f"{len(example_patients)} example patients inserted successfully"
     )

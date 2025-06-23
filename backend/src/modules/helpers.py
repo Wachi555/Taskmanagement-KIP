@@ -2,6 +2,8 @@ import json
 from datetime import datetime
 from typing import List
 
+from modules.logger import logger
+
 
 def calculate_age(birth_year: str) -> int:
     try:
@@ -14,7 +16,7 @@ def calculate_age(birth_year: str) -> int:
         )
         return age
     except ValueError:
-        print(
+        logger.error(
             f"Invalid date format for birth year: {birth_year}. "
             f"Expected format is 'yyyy-mm-dd'."
         )
