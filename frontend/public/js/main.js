@@ -24,8 +24,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 function setupDeleteButtons() {
-  document
-    .getElementById('all-patient-list')
+  const list = document.getElementById('all-patient-list');
+  if (!list) {
+    console.warn('Element mit ID "all-patient-list" nicht gefunden');
+    return;
+  } // Prevent error if element doesn't exist
+  list
     .addEventListener('click', async e => {
       const btn = e.target.closest('.delete-patient');
       if (!btn) return;
@@ -57,6 +61,7 @@ function setupFullViewSearch() {
   const searchWaiting = document.getElementById('search-waiting');
   if (searchWaiting) {
     searchWaiting.addEventListener('input', () => {
+      console.log("searchWaiting input event fired:", searchWaiting.value);
       filterPatientList(searchWaiting.value, '#pane-waiting .list-group-item:not(.text-muted)');
     });
   }
@@ -65,12 +70,14 @@ function setupFullViewSearch() {
   const searchActive = document.getElementById('search-active');
   if (searchActive) {
     searchActive.addEventListener('input', () => {
+      console.log("searchActive input event fired:", searchWaiting.value);
       filterPatientList(searchActive.value, '#pane-active .list-group-item:not(.text-muted)');
     });
   }
 }
 
 function filterPatientList(searchTerm, itemSelector) {
+  console.log("filterPatientList called with:", searchTerm, itemSelector);
   const term = searchTerm.toLowerCase();
   const items = document.querySelectorAll(itemSelector);
 
@@ -300,40 +307,38 @@ function setupMoveButtons() {
 
 function setupSidebarSearch() {
   const searchInput = document.getElementById("sidebar-search");
-  const tabList     = document.getElementById("sidebarTabs");
+  const tabList = document.getElementById("sidebarTabs");
   if (!searchInput) return;
 
   const filterSidebar = () => {
     const query = searchInput.value.trim().toLowerCase();
-    // nur das aktive Tab-Pane greifen
-    const activePane = document.querySelector(
-      "#sidebarTabsContent .tab-pane.active"
-    );
+
+    const activePane = document.querySelector("#sidebarTabsContent .tab-pane.active");
     if (!activePane) return;
 
     const ul = activePane.querySelector("ul.list-group");
     if (!ul) return;
 
-    // alte No-Results entfernen
+    // Remove any existing "no results" lines
     ul.querySelectorAll(".no-results").forEach(el => el.remove());
 
-    // alle echten Patient-li sammeln
-    const items = Array.from(ul.children)
-      .filter(li => li.classList.contains("list-group-item"));
+    // Filter only patient list items (must contain .patient-name)
+    const items = Array.from(ul.querySelectorAll("li.list-group-item"))
+      .filter(li => li.querySelector(".patient-name"));
 
     let anyVisible = false;
+
     items.forEach(li => {
-      const a    = li.querySelector("a.patient-name");
+      const a = li.querySelector(".patient-name");
       const name = (a?.textContent || "").trim().toLowerCase();
+
       if (query && !name.includes(query)) {
-        li.style.display = "none";
+        li.classList.add("d-none");
       } else {
-        li.style.display = "";
-        anyVisible = true;
+        li.classList.remove("d-none");
       }
     });
 
-    // wenn nichts sichtbar ist, eine entsprechende Zeile anhängen
     if (!anyVisible) {
       const noRes = document.createElement("li");
       noRes.className = "list-group-item text-center text-muted no-results";
@@ -342,9 +347,7 @@ function setupSidebarSearch() {
     }
   };
 
-  // bei jeder Eingabe filtern
   searchInput.addEventListener("input", filterSidebar);
-  // beim Tab-Wechsel auch filtern (Suche bleibt im Feld erhalten)
   tabList?.addEventListener("shown.bs.tab", filterSidebar);
 }
 
