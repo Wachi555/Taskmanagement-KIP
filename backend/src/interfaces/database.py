@@ -38,6 +38,7 @@ def save_extracted_contents(patient_id: int, contents: ExtractedContent):
             latest_entry.additional_notes, contents.additional_notes  # type: ignore
         ),
         medications=stitch_together(latest_entry.medications, contents.medications),  # type: ignore
+        symptoms=stitch_together(latest_entry.symptoms, contents.symptoms),
     )
 
     patient = get_patient(patient_id)
@@ -122,7 +123,7 @@ def add_patient(patient: InputPatient) -> int:
 
     # Create a new patient entry for the newly added or updated patient
     # TODO: Actually input data instead of empty strings
-    crud_patient_entries.create_patient_entry(
+    entry_id = crud_patient_entries.create_patient_entry(
         patient_id,  # type: ignore
         entry_date=datetime.now().date().strftime("%Y-%m-%d"),  # TODO: Check format
         patient_history="",
@@ -132,6 +133,7 @@ def add_patient(patient: InputPatient) -> int:
         medications="",
         triage_level=patient.triage_level,
     )
+    update_patient(patient_id, latest_entry_id=entry_id)
     return patient_id  # type: ignore
 
 
@@ -177,7 +179,10 @@ def get_patient_entries(patient_id: int) -> List[PatientEntry]:
 
 # Get the latest entry for a patient
 def get_latest_patient_entry(patient_id: int) -> PatientEntry:
-    entry = crud_patient_entries.get_latest_patient_entry(patient_id)
+    patient = crud_patients.get_patient_by_id(patient_id)
+    if patient.latest_entry_id is None:
+        raise ValueError(f"No entries found for patient with ID {patient_id}.")
+    entry = crud_patient_entries.get_patient_entry(patient.latest_entry_id)  # type: ignore
     return entry
 
 

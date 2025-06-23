@@ -348,59 +348,71 @@ function setupSidebarSearch() {
   tabList?.addEventListener("shown.bs.tab", filterSidebar);
 }
 
-
 function displayResults(result) {
   resetResults();
-  displayDiagnosis(result.diagnoses);
-  displayExams(result.examinations);
-  displayTreatments(result.treatments);
-  displayExperts(result.experts);
-  displayAllergies(result.allergies);
 
-}
+  // Diagnosen: { name: "xyz" } → ["xyz"]
+  const diagnoses = Array.isArray(result.diagnoses)
+    ? result.diagnoses.map(d => d.name)
+    : toArray(result.diagnoses);
+  document.getElementById("diagnoses").textContent =
+    diagnoses.length ? diagnoses.join(", ") : "–";
 
-function displayAllergies(allergies) {
-  const ul = document.getElementById("resultData");
-  const li = document.createElement("li");
-  li.className = "list-group-item";
-  const list = Array.isArray(allergies) 
-    ? allergies 
-    : (allergies || "").split(",").map(s=>s.trim()).filter(Boolean);
-  li.innerHTML = `<strong class="me-3">Allergien:</strong> ${list.length ? list.join(", ") : "–"}`;
-  ul.appendChild(li);
+  // Untersuchungen: als Liste mit Priorität-Badge
+  const examsEl = document.getElementById("examinations");
+  examsEl.innerHTML = "";
+  if (Array.isArray(result.examinations) && result.examinations.length > 0) {
+    result.examinations.forEach(e => {
+      const li = document.createElement("li");
+      li.innerHTML = `${e.name} <span class="badge bg-secondary">${e.priority}</span>`;
+      examsEl.appendChild(li);
+    });
+  } else {
+    examsEl.innerHTML = "<li>–</li>";
+  }
+
+  // Behandlungen
+  const treatments = toArray(result.treatments);
+  document.getElementById("treatments").textContent =
+    treatments.length ? treatments.join(", ") : "–";
+
+  // Experten
+  const experts = toArray(result.experts);
+  document.getElementById("experts").textContent =
+    experts.length ? experts.join(", ") : "–";
+
+  // Allergien (mit Fallback auf initial aus Template)
+  // const allergiesEl = document.getElementById("allergies");
+  const newAllergies = toArray(result.allergies);
+  // if (newAllergies.length) {
+  document.getElementById("allergies").textContent =
+    newAllergies.length ? newAllergies.join(", "):"-";
+  // } else {
+    // const fallback = allergiesEl.dataset.initial;
+    // allergiesEl.textContent =
+      // fallback && fallback.trim() !== "" ? fallback : "–";
+  // }
 }
 
 
 function resetResults() {
-  document.getElementById("resultData").innerHTML = "";
+  document.getElementById("diagnoses").textContent = "–";
+  document.getElementById("examinations").innerHTML = "";
+  document.getElementById("treatments").textContent = "–";
+  document.getElementById("experts").textContent = "–";
+  document.getElementById("allergies").textContent = "–";
 }
 
-function displayTreatments(treatments) {
-  const ul = document.getElementById("resultData");
-  const li = document.createElement("li");
-  li.className = "list-group-item";
-  const text = (typeof treatments === 'string' && treatments.trim()) 
-    ? treatments 
-    : "–";
-  li.innerHTML = `<strong class="me-3">Behandlungen:</strong> ${text}`;
-  ul.appendChild(li);
-}
-
-function displayDiagnosis(diagnoses) {
-  const ul = document.getElementById("resultData");
-  // Immer einen LI erzeugen – mit Liste oder Strich
-  const li = document.createElement("li");
-  li.className = "list-group-item";
-
-  if (!Array.isArray(diagnoses) || diagnoses.length === 0) {
-    li.innerHTML = `<strong class="me-2">Mögliche Diagnosen:</strong> –`;
-  } else {
-    const names = diagnoses.map(d => d.name).join(", ");
-    li.innerHTML = `<strong class="me-2">Mögliche Diagnosen:</strong> ${names}`;
+// Hilfsfunktion: wandelt Strings wie "A, B" in ["A", "B"]
+function toArray(input) {
+  if (Array.isArray(input)) return input;
+  if (typeof input === "string") {
+    return input.split(",").map(s => s.trim()).filter(Boolean);
   }
-
-  ul.appendChild(li);
+  return [];
 }
+
+
 
 function displayTriageLevel(triageLevel) {
   const triageContainer = document.getElementById("triageIndicator");

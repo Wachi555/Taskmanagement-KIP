@@ -1,6 +1,72 @@
-<div class="output-box">
-  <ul id="resultData" class="list-group list-group-flush mb-0">
-    {{!-- Wird per JavaScript befüllt: 
-         Diagnosen, Untersuchungen, Behandlungen, Experten, Allergien --}}
-  </ul>
+<div class="output-box patient-overview">
+  <table class="info-table">
+    <tbody>
+      <tr>
+        <th>Mögliche Diagnosen:</th>
+        <td>
+          {{#if diagnoses.length}}
+            {{#each diagnoses}}
+              {{this.name}}{{#unless @last}}, {{/unless}}
+            {{/each}}
+          {{else}}–{{/if}}
+        </td>
+      </tr>
+      <tr>
+        <th>Triagestufe:</th>
+        <td>{{#if triage}}{{triage}}{{else}}–{{/if}}</td>
+      </tr>
+      <tr>
+        <th>Untersuchungen:</th>
+        <td>
+          {{#if exams.length}}
+            <ul>
+              {{#each exams}}
+                <li class="form-check mb-1">
+                  <input class="form-check-input" type="checkbox" id="exam-{{@index}}" name="exams[]" value="{{this.name}}">
+                  <label class="form-check-label" for="exam-{{@index}}">
+                    {{this.name}} <span class="badge bg-secondary">{{this.priority}}</span>
+                  </label>
+                </li>
+              {{/each}}
+            </ul>
+          {{else}}–{{/if}}
+        </td>
+      </tr>
+      <tr>
+        <th>Behandlungen:</th>
+        <td>
+          {{#if treatments.length}}
+            {{#each treatments}}
+              {{this}}{{#unless @last}}, {{/unless}}
+            {{/each}}
+          {{else}}–{{/if}}
+        </td>
+      </tr>
+      <tr>
+        <th>Experten:</th>
+        <td>
+          {{#if experts.length}}
+            {{#each experts}}
+              {{this}}{{#unless @last}}, {{/unless}}
+            {{/each}}
+          {{else}}–{{/if}}
+        </td>
+      </tr>
+      <tr>
+        <th>Allergien:</th>
+        <td>
+          <span
+            id="allergies"
+            data-initial="{{#if allergies.length}}{{#each allergies}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}"
+          >
+            {{#if allergies.length}}
+              {{#each allergies}}
+                {{this}}{{#unless @last}}, {{/unless}}
+              {{/each}}
+            {{else}}–{{/if}}
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>

@@ -22,7 +22,7 @@ async function deletePatientById(id) {
   const res = await fetch(`http://localhost:8000/patient/${id}`, { method: 'DELETE' });
   if (!res.ok) throw new Error(`Löschen fehlgeschlagen (${res.status})`);
 }
-async function updatePatientById(id, status) {
+async function updatePatientStatusById(id, status) {
   const res = await fetch(`http://localhost:8000/patient/update_status/${id}/0`);
 
   if (!res.ok) {
@@ -30,7 +30,20 @@ async function updatePatientById(id, status) {
     throw new Error(err.detail || `Aktualisierung fehlgeschlagen (${res.status})`);
   }
   return res.json();
-}
+};
+async function updatePatientById(id, payload) {
+  const res = await fetch(`http://localhost:8000/patient/update/${id}`, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload)
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || `Aktualisierung fehlgeschlagen (${res.status})`);
+  }
+  return res.json();
+};
 
 
 
@@ -137,7 +150,7 @@ router.get('/patient/update_status/:id/:status', async (req, res) => {
     console.log("Calling backend...");
     
     // 2. Eigentlicher Aufruf
-    const result = await updatePatientById(id, status);
+    const result = await updatePatientStatusById(id, status);
     console.log("✅ Backend response:", result);
 
     // 3. Redirect
@@ -330,16 +343,55 @@ router.get('/patient/:id', async (req, res) => {
 
   try {
     // 1) Patient holen
-    const result      = await fetchPatientById(id);
-    const patient     = result.patient;
+    const result = await fetchPatientById(id);
+    const patient = result.patient;
     const latestEntry = result.latest_entry || {};
+    const latestResult = result.latest_result || {};
+    const diagnoses = result.diagnoses || [];
 
     // Symptome parsen
     const parsedSymptoms = latestEntry.symptoms
       ? latestEntry.symptoms.split(',').map(s => s.trim())
       : [];
 
-    // Aktuelles Triage-Level (Fallback auf patient.last_triage_level)
+      // Alten Code ersetzen durch
+      let allergies = [];
+
+      // 1) Versuche, aus extracted_contents_json zu lesen
+      if (latestEntry.extracted_contents_json) {
+        try {
+          const extracted = JSON.parse(latestEntry.extracted_contents_json);
+          if (Array.isArray(extracted.allergies) && extracted.allergies.length > 0) {
+            // Nur übernehmen, wenn wirklich Allergien drinstehen
+            allergies = extracted.allergies;
+          }
+        } catch (e) {
+          console.warn("⚠️ Allergie-Parsing fehlgeschlagen:", e.message);
+        }
+      }
+
+      // 2) Fallback auf patient.allergies, wenn extracted leer oder nicht vorhanden
+      if (allergies.length === 0 && patient.allergies) {
+        allergies = typeof patient.allergies === 'string'
+          ? patient.allergies.split(',').map(s => s.trim()).filter(Boolean)
+          : (Array.isArray(patient.allergies) ? patient.allergies : []);
+      }
+
+
+    // Behandlungen & Experten als Array (auch wenn als String gespeichert)
+    const treatments = typeof latestResult.treatments === 'string'
+      ? latestResult.treatments.split(',').map(s => s.trim()).filter(Boolean)
+      : (Array.isArray(latestResult.treatments) ? latestResult.treatments : []);
+
+    const experts = typeof latestResult.experts === 'string'
+      ? latestResult.experts.split(',').map(s => s.trim()).filter(Boolean)
+      : (Array.isArray(latestResult.experts) ? latestResult.experts : []);
+
+    const exams = Array.isArray(latestResult.examinations)
+      ? latestResult.examinations.sort((a, b) => a.priority - b.priority)
+      : [];
+
+    // Aktuelles Triage-Level
     const currentTriage = latestEntry.triage ?? patient.last_triage_level;
 
     // 2) Sidebar-Daten
@@ -347,17 +399,17 @@ router.get('/patient/:id', async (req, res) => {
     const waitingPatients = allPatients
       .filter(p => p.is_waiting)
       .map(p => ({
-        id:   p.id,
+        id: p.id,
         name: `${p.first_name} ${p.last_name}`
       }));
     const activePatients = allPatients
       .filter(p => p.in_treatment)
       .map(p => ({
-        id:   p.id,
+        id: p.id,
         name: `${p.first_name} ${p.last_name}`
       }));
 
-    // 3) Rendern patient-input.hbs mit Triage im Header
+    // 3) Rendern patient-input.hbs mit Triage + Ergebnissen
     res.render('patient-input', {
       layout: 'patient',
       appName: 'Notaufnahme Universitätsklinikum Regensburg',
@@ -373,24 +425,28 @@ router.get('/patient/:id', async (req, res) => {
       levels: [1, 2, 3, 4, 5],
       triage: currentTriage,
 
-      // Patient-Form-Daten
+      // Patientendaten
       data: {
-        name:         `${patient.first_name} ${patient.last_name}`,
-        dob:          patient.date_of_birth,
-        gender:       patient.gender,
-        adresse:      patient.address,
+        name: `${patient.first_name} ${patient.last_name}`,
+        dob: patient.date_of_birth,
+        gender: patient.gender,
+        adresse: patient.address,
         krankenkasse: patient.health_insurance,
-        symptoms:     parsedSymptoms,
-        history:      result.history || []
+        symptoms: parsedSymptoms,
+        history: result.history || []
       },
-      exams:   patient.examinations || [],
-      experts: patient.treatments   || []
+
+      // Ergebnisse
+      diagnoses,
+      exams,
+      treatments,
+      experts,
+      allergies
     });
 
   } catch (error) {
     console.error("Fehler beim Laden des Patienten:", error);
 
-    // Bei Fehler: leere Sidebar-Arrays, kein Triage-Level aktiv
     const allPatients = await fetchAllPatients().catch(() => []);
     const waitingPatients = allPatients
       .filter(p => p.is_waiting)
@@ -405,24 +461,23 @@ router.get('/patient/:id', async (req, res) => {
       showHome: true,
       showSidebarToggle: true,
 
-      // Sidebar
       waitingPatients,
       activePatients,
       id,
-
-      // Triage-Indikator, aber kein aktives Level
       levels: [1, 2, 3, 4, 5],
       triage: null,
 
-      // Leere Daten + Fehlermeldung
-      data:         {},
-      exams:        [],
-      experts:      [],
-      history:      [],
+      data: {},
+      diagnoses: [],
+      exams: [],
+      treatments: [],
+      experts: [],
+      allergies: [],
       errorMessage: 'Patient nicht gefunden'
     });
   }
 });
+
 
 
 
@@ -497,19 +552,27 @@ router.get('/patient/:id/overview', async (req, res) => {
       .filter(Boolean);
 
     // 3) Allergien parsen (entweder aus String-Feld oder aus extracted_contents_json)
-    let allergies = [];
-    if (latestEntry.extracted_contents_json) {
-      try {
-        const extracted = JSON.parse(latestEntry.extracted_contents_json);
-        allergies = Array.isArray(extracted.allergies)
-          ? extracted.allergies
-          : [];
-      } catch (e) { /* ignore */ }
-    } else if (patient.allergies) {
-      allergies = typeof patient.allergies === 'string'
-        ? patient.allergies.split(',').map(s=>s.trim()).filter(Boolean)
-        : (Array.isArray(patient.allergies) ? patient.allergies : []);
-    }
+      let allergies = [];
+
+      // Versuch, aus extracted_contents_json zu lesen
+      if (latestEntry.extracted_contents_json) {
+        try {
+          const extracted = JSON.parse(latestEntry.extracted_contents_json);
+          // Nur übernehmen, wenn tatsächlich Allergien vorhanden sind
+          if (Array.isArray(extracted.allergies) && extracted.allergies.length > 0) {
+            allergies = extracted.allergies;
+          }
+        } catch (e) {
+          console.warn("⚠️ Allergie-Parsing fehlgeschlagen:", e.message);
+        }
+      }
+
+      // Fallback, falls keine Allergien im JSON waren
+      if (allergies.length === 0 && patient.allergies) {
+        allergies = typeof patient.allergies === 'string'
+          ? patient.allergies.split(',').map(s => s.trim()).filter(Boolean)
+          : (Array.isArray(patient.allergies) ? patient.allergies : []);
+      }
 
     // 4) Rendern
     return res.render('patient-overview', {
