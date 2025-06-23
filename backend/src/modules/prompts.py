@@ -5,7 +5,7 @@ You are given a german text about a patient in a hospital.
 Your task is to extract all of the following information that the text contains.
 If the text does not contain a certain information, just leave it blank.
 Do not try and come up with information that is not provided in the text.
-1. History
+1. History: This should be a short summary of the text, such as "Patient with chest pain".
 2. Medications
 3. Allergies
 4. Additional Notes
