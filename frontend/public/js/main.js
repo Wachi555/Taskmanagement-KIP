@@ -381,11 +381,19 @@ function displayResults(result) {
   document.getElementById("experts").textContent =
     experts.length ? experts.join(", ") : "–";
 
-  // Allergien
-  const allergies = toArray(result.allergies);
+  // Allergien (mit Fallback auf initial aus Template)
+  // const allergiesEl = document.getElementById("allergies");
+  const newAllergies = toArray(result.allergies);
+  // if (newAllergies.length) {
   document.getElementById("allergies").textContent =
-    allergies.length ? allergies.join(", ") : "–";
+    newAllergies.length ? newAllergies.join(", "):"-";
+  // } else {
+    // const fallback = allergiesEl.dataset.initial;
+    // allergiesEl.textContent =
+      // fallback && fallback.trim() !== "" ? fallback : "–";
+  // }
 }
+
 
 function resetResults() {
   document.getElementById("diagnoses").textContent = "–";

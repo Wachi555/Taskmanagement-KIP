@@ -341,20 +341,29 @@ router.get('/patient/:id', async (req, res) => {
       ? latestEntry.symptoms.split(',').map(s => s.trim())
       : [];
 
-    // Allergien parsen
-    let allergies = [];
-    if (latestEntry.extracted_contents_json) {
-      try {
-        const extracted = JSON.parse(latestEntry.extracted_contents_json);
-        allergies = Array.isArray(extracted.allergies) ? extracted.allergies : [];
-      } catch (e) {
-        console.warn("⚠️ Allergie-Parsing fehlgeschlagen:", e.message);
+      // Alten Code ersetzen durch
+      let allergies = [];
+
+      // 1) Versuche, aus extracted_contents_json zu lesen
+      if (latestEntry.extracted_contents_json) {
+        try {
+          const extracted = JSON.parse(latestEntry.extracted_contents_json);
+          if (Array.isArray(extracted.allergies) && extracted.allergies.length > 0) {
+            // Nur übernehmen, wenn wirklich Allergien drinstehen
+            allergies = extracted.allergies;
+          }
+        } catch (e) {
+          console.warn("⚠️ Allergie-Parsing fehlgeschlagen:", e.message);
+        }
       }
-    } else if (patient.allergies) {
-      allergies = typeof patient.allergies === 'string'
-        ? patient.allergies.split(',').map(s => s.trim()).filter(Boolean)
-        : (Array.isArray(patient.allergies) ? patient.allergies : []);
-    }
+
+      // 2) Fallback auf patient.allergies, wenn extracted leer oder nicht vorhanden
+      if (allergies.length === 0 && patient.allergies) {
+        allergies = typeof patient.allergies === 'string'
+          ? patient.allergies.split(',').map(s => s.trim()).filter(Boolean)
+          : (Array.isArray(patient.allergies) ? patient.allergies : []);
+      }
+
 
     // Behandlungen & Experten als Array (auch wenn als String gespeichert)
     const treatments = typeof latestResult.treatments === 'string'
@@ -530,19 +539,27 @@ router.get('/patient/:id/overview', async (req, res) => {
       .filter(Boolean);
 
     // 3) Allergien parsen (entweder aus String-Feld oder aus extracted_contents_json)
-    let allergies = [];
-    if (latestEntry.extracted_contents_json) {
-      try {
-        const extracted = JSON.parse(latestEntry.extracted_contents_json);
-        allergies = Array.isArray(extracted.allergies)
-          ? extracted.allergies
-          : [];
-      } catch (e) { /* ignore */ }
-    } else if (patient.allergies) {
-      allergies = typeof patient.allergies === 'string'
-        ? patient.allergies.split(',').map(s=>s.trim()).filter(Boolean)
-        : (Array.isArray(patient.allergies) ? patient.allergies : []);
-    }
+      let allergies = [];
+
+      // Versuch, aus extracted_contents_json zu lesen
+      if (latestEntry.extracted_contents_json) {
+        try {
+          const extracted = JSON.parse(latestEntry.extracted_contents_json);
+          // Nur übernehmen, wenn tatsächlich Allergien vorhanden sind
+          if (Array.isArray(extracted.allergies) && extracted.allergies.length > 0) {
+            allergies = extracted.allergies;
+          }
+        } catch (e) {
+          console.warn("⚠️ Allergie-Parsing fehlgeschlagen:", e.message);
+        }
+      }
+
+      // Fallback, falls keine Allergien im JSON waren
+      if (allergies.length === 0 && patient.allergies) {
+        allergies = typeof patient.allergies === 'string'
+          ? patient.allergies.split(',').map(s => s.trim()).filter(Boolean)
+          : (Array.isArray(patient.allergies) ? patient.allergies : []);
+      }
 
     // 4) Rendern
     return res.render('patient-overview', {
