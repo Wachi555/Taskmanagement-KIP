@@ -5,7 +5,7 @@
   role="tabpanel"
   aria-labelledby="tab-waiting"
 >
-  <ul class="list-group mb-2">
+  <ul id="all-patient-list" class="list-group mb-2">
     {{#each (sortByTriage waitingPatients)}}
       <li class="list-group-item d-flex justify-content-between align-items-center">
         <a
