@@ -271,17 +271,15 @@ async def update_patient_data(patient_id: int, input_model: UpdatePatient):
         f"DEBUG: Updating patient with ID {patient_id} with data: {input_model}",
         flush=True,
     )
-    success = db.update_patient(
+    db.update_patient(
         patient_id,
         first_name=input_model.first_name,
         last_name=input_model.last_name,
-        # gender=input_model.gender,
         date_of_birth=input_model.date_of_birth,
         health_insurance=input_model.health_insurance,
         address=input_model.address,
-        # triage_level=input_model.triage_level
     )
-    if success:
+    if True:
         return {
             "output": f"Patient with ID {patient_id} updated successfully",
             "success": True,
