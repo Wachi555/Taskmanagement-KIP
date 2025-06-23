@@ -19,6 +19,8 @@ def process_anamnesis(input_text: str, current_patient_id: int) -> bool:
     try:
         # Extract text contents and store them in the database
         contents = extract_contents(input_text)
+        # contents = ExtractedContent.model_validate_json('{"history":"Der Patient berichtet über übermäßigen Alkoholkonsum.","medications":[],"allergies":[],"additional_notes":""}{"history":"Der Patient berichtet über übermäßigen Alkoholkonsum.","medications":[],"allergies":[],"additional_notes":""}')
+        # print(contents.model_dump_json(), flush=True)
         db.save_extracted_contents(current_patient_id, contents)
 
         # Process the extracted contents
@@ -38,8 +40,10 @@ def process_anamnesis(input_text: str, current_patient_id: int) -> bool:
                 latest_entry.additional_notes if latest_entry.additional_notes else ""  # type: ignore
             ),
         )
-        result = generate_anamnesis_response(eval_input)
-        db.save_anamnesis_response(current_patient_id, result)  # type: ignore
+        result = generate_anamnesis_response(eval_input, available_experts=db.get_available_experts(), available_examinations=db.get_available_examinations())  
+        # result = LLMResult.model_validate_json('{"diagnoses":[{"name":"Erkrankung der Atemwege","reason":"Der Patient berichtet Atemnot. Es ist wichtig, Atemwegserkrankungen auszuschließen.","confidence":0.7},{"name":"Infektion","reason":"Die Symptome können mit einer Infektion zusammenhängen.","confidence":0.5}],"examinations":[{"name":"Blutbild","priority":5},{"name":"Lungenröntgen","priority":4}],"treatments":["Ruhe und Flüssigkeitszufuhr","Mögliche Verabreichung von Antibiotika bei Bestätigung einer bakteriellen Infektion"],"experts":[{"type":"Hausarzt"},{"type":"Pulmologe"}]}')
+        # print(result.model_dump_json(), flush=True)
+        db.save_anamnesis_response(current_patient_id, result, input_text)  # type: ignore
         print(f"Response form extract_contents: {contents}", flush=True)
         print(f"Response from generate_anamnesis_response: {result}", flush=True)
         return True
