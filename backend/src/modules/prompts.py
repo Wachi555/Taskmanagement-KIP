@@ -9,6 +9,7 @@ Do not try and come up with information that is not provided in the text.
 2. Medications
 3. Allergies
 4. Additional Notes
+5. Symptoms
 Keep the answers in the german language.
 Here is the text:
 """

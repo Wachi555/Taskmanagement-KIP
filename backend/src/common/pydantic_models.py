@@ -71,6 +71,7 @@ class ExtractedContent(BaseModel):
     medications: List[str]
     allergies: List[str]
     additional_notes: str
+    symptoms: List[str]
 
 
 # What the model recieves to evaluate the patient
