@@ -5,6 +5,7 @@ from database.session import SessionLocal
 
 """CRUD operations for the Diagnosis model in the database."""
 
+
 def get_diagnoses_for_entry(result_id: int) -> List[Diagnosis]:
     session = SessionLocal()
     diagnoses = session.query(Diagnosis).filter(Diagnosis.result_id == result_id).all()

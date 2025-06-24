@@ -58,6 +58,7 @@ class UpdatePatient(BaseModel):
 
 # ===============================================================
 
+
 # What content the model should extract from the anamnesis text
 class ExtractedContent(BaseModel):
     history: str

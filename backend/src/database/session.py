@@ -1,8 +1,8 @@
+import logging
+
 from database.orm_models import Base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
-import logging
 
 """Database initialization and session management for the simulated ERP system."""
 

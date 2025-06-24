@@ -5,6 +5,7 @@ from database.session import SessionLocal
 
 """CRUD operations for the Patient model in the database."""
 
+
 def get_all_patients() -> List[Patient]:
     session = SessionLocal()
     patients = session.query(Patient).all()
@@ -19,6 +20,7 @@ def get_patient_by_id(patient_id: int) -> Patient:
     if patient is None:
         raise ValueError(f"Patient with ID {patient_id} not found.")
     return patient
+
 
 # Gets a patient by their first name, last name, and date of birth to check if they are already registered.
 def get_patient_by_name_and_dob(

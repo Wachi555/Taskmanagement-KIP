@@ -5,6 +5,7 @@ from database.session import SessionLocal
 
 """CRUD operations for the PatientEntry model in the database."""
 
+
 def get_patient_entries(patient_id: int) -> List[PatientEntry]:
     session = SessionLocal()
     entries = (
@@ -14,7 +15,7 @@ def get_patient_entries(patient_id: int) -> List[PatientEntry]:
     return entries
 
 
-def get_latest_patient_entry(patient_id: int) -> PatientEntry: 
+def get_latest_patient_entry(patient_id: int) -> PatientEntry:
     session = SessionLocal()
     entry = (
         session.query(PatientEntry)
@@ -86,7 +87,7 @@ def delete_patient_entry(entry_id: int):
     session.close()
 
 
-def update_patient_entry(entry_id: int, **kwargs): 
+def update_patient_entry(entry_id: int, **kwargs):
     session = SessionLocal()
     entry = session.query(PatientEntry).filter(PatientEntry.id == entry_id).first()
     if entry is None:

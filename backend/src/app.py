@@ -112,12 +112,13 @@ async def process_input(input_model: InputAnamnesis, selected_patient_id: int):
         "status_code": 200,
     }
 
+
 # ==================== STT routes =============================
 @app.post("/transcribe")
 async def transcribe(file: UploadFile = File(...)):
     """
     Transcribe an audio file using Whisper model.
-    
+
     Args:
         file (UploadFile): The audio file to transcribe.
 
@@ -158,7 +159,7 @@ async def transcribe(file: UploadFile = File(...)):
 async def get_patients():
     """
     Retrieve all patients from the database and their latest triage level.
-    
+
     Returns:
         dict: A dictionary containing the list of patients in the database.
     """
@@ -192,10 +193,10 @@ async def get_patients():
 async def get_patient(patient_id: int):
     """
     Retrieve a specific patient by ID, including their latest entry, result, and diagnoses.
-    
+
     Args:
         patient_id (int): The ID of the patient to retrieve.
-        
+
     Returns:
         dict: A dictionary containing the patient, their latest entry, result, and diagnoses.
     """
@@ -241,10 +242,10 @@ async def get_patient(patient_id: int):
 async def insert_patient(input_model: InputPatient):
     """
     Insert a new patient into the database.
-    
+
     Args:
         input_model (InputPatient): The input model containing patient data.
-        
+
     Returns:
         dict: A dictionary containing the ID of the newly inserted patient.
     """
@@ -275,7 +276,7 @@ async def delete_patient(patient_id: int):
     Delete a patient from the database by ID.
     Args:
         patient_id (int): The ID of the patient to delete.
-        
+
     Returns:
         dict: A dictionary indicating the success or failure of the deletion."""
     try:
@@ -303,10 +304,10 @@ async def delete_patient(patient_id: int):
 async def get_patient_history(patient_id: int):
     """
     Retrieve the history of a specific patient by ID, including their entries and latest results.
-    
+
     Args:
         patient_id (int): The ID of the patient to retrieve history for.
-    
+
     Returns:
         dict: A dictionary containing the patient's entries and their results.
     """
@@ -352,11 +353,11 @@ async def get_patient_history(patient_id: int):
 async def update_patient_status(patient_id: int, status: int):
     """
     Update the status of a patient by ID.
-    
+
     Args:
         patient_id (int): The ID of the patient to update.
         status (int): The new status of the patient. Must be 0 (in history), 1 (waiting), or 2 (in treatment).
-        
+
     Returns:
         dict: A dictionary indicating the success or failure of the update.
     """
@@ -398,11 +399,11 @@ async def update_patient_status(patient_id: int, status: int):
 async def set_patient_triage(patient_id: int, triage_level: int):
     """
     Set the triage level for a specific patient by ID.
-    
+
     Args:
         patient_id (int): The ID of the patient to update.
         triage_level (int): The new triage level for the patient. Must be between 0 and 5.
-        
+
     Returns:
         dict: A dictionary indicating the success or failure of the update.
     """
@@ -444,11 +445,11 @@ async def set_patient_triage(patient_id: int, triage_level: int):
 async def update_patient_data(patient_id: int, input_model: UpdatePatient):
     """
     Update patient data by ID.
-    
+
     Args:
         patient_id (int): The ID of the patient to update.
         input_model (UpdatePatient): The input model containing the updated patient data.
-    
+
     Returns:
         dict: A dictionary indicating the success or failure of the update.
     """
@@ -477,7 +478,7 @@ async def update_patient_data(patient_id: int, input_model: UpdatePatient):
 async def insert_example_patients():
     """
     Insert example patients into the database for testing purposes.
-    
+
     Returns:
         dict: A dictionary indicating the success or failure of the insertion.
     """
@@ -543,7 +544,7 @@ if __name__ == "__main__":
         available_experts, available_treatments = helpers.parse_med_server_json(
             r"backend\src\data\availability_data.json"
         )
-    except Exception as e:
+    except Exception:
         available_experts, available_treatments = [], []
     db.store_experts(available_experts)
     db.store_examinations(available_treatments)

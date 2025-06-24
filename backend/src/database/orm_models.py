@@ -21,9 +21,7 @@ class Patient(Base):
     last_triage_level = Column(
         Integer, nullable=True
     )  # Last triage level assigned to the patient
-    latest_entry_id = Column(
-        Integer, ForeignKey("patient_entries.id"), nullable=True
-    )
+    latest_entry_id = Column(Integer, ForeignKey("patient_entries.id"), nullable=True)
 
 
 # Entries table (one for each entry in the patient's history)
