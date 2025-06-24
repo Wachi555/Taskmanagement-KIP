@@ -33,29 +33,22 @@ app.add_middleware(
 
 @app.get("/", tags=["default"])
 async def main():
-    return {"message": "Hello World"}
-
-
-# ==================== Processing routes ========================
-# @app.post("/process_input", tags=["processing"])
-# async def process_input_default(input_model: InputAnamnesis):
-#     try:
-#         response = process_anamnesis_default(input_model.text)
-#     except Exception as e:
-#         logger.error(f"Error processing input: {e}")
-#         return {
-#             "output": "Failed to process input",
-#             "success": False,
-#             "error_code": 500,
-#             "error_message": str(e),
-#         }
-#     logger.debug(f"Processed input: {input_model.text}")
-#     logger.debug(f"Response: {response}")
-#     return response
+    return {"message": "This is the backend for the AI assisted ER system."}
 
 
 @app.post("/process_input/{selected_patient_id}", tags=["processing"])
 async def process_input(input_model: InputAnamnesis, selected_patient_id: int):
+    """
+    Process the input text for a specific patient and return the results.
+
+    Args:
+        input_model (InputAnamnesis): The input model containing the text to process.
+        selected_patient_id (int): The ID of the patient to process the input for.
+
+    Returns:
+        dict: A dictionary containing the processed results, diagnoses, examinations,
+            treatments, experts, triage level, and allergies.
+    """
     try:
         process_anamnesis(input_model.text, selected_patient_id)
 
@@ -119,15 +112,18 @@ async def process_input(input_model: InputAnamnesis, selected_patient_id: int):
         "status_code": 200,
     }
 
-
-# @app.post("/process_input_debug", tags=["processing"])
-# async def process_input_debug(input_model: InputAnamnesis):
-#     return OutputModel(output=json.loads(test_output))
-
-
 # ==================== STT routes =============================
 @app.post("/transcribe")
 async def transcribe(file: UploadFile = File(...)):
+    """
+    Transcribe an audio file using Whisper model.
+    
+    Args:
+        file (UploadFile): The audio file to transcribe.
+
+    Returns:
+        dict: A dictionary containing the transcription result.
+    """
     try:
         # Get the original extension (e.g. .mp3, .wav, .webm)
         _, ext = os.path.splitext(file.filename)  # type: ignore
@@ -160,6 +156,12 @@ async def transcribe(file: UploadFile = File(...)):
 # Returns all patients
 @app.get("/patients", tags=["database"])
 async def get_patients():
+    """
+    Retrieve all patients from the database and their latest triage level.
+    
+    Returns:
+        dict: A dictionary containing the list of patients in the database.
+    """
     try:
         patients = db.get_all_patients()
         for patient in patients:
@@ -188,6 +190,15 @@ async def get_patients():
 
 @app.get("/patient/{patient_id}", tags=["database"])
 async def get_patient(patient_id: int):
+    """
+    Retrieve a specific patient by ID, including their latest entry, result, and diagnoses.
+    
+    Args:
+        patient_id (int): The ID of the patient to retrieve.
+        
+    Returns:
+        dict: A dictionary containing the patient, their latest entry, result, and diagnoses.
+    """
     try:
         patient = db.get_patient(patient_id)
         patient_entry = db.get_latest_patient_entry(patient_id)
@@ -228,6 +239,15 @@ async def get_patient(patient_id: int):
 
 @app.post("/patient", tags=["database"])
 async def insert_patient(input_model: InputPatient):
+    """
+    Insert a new patient into the database.
+    
+    Args:
+        input_model (InputPatient): The input model containing patient data.
+        
+    Returns:
+        dict: A dictionary containing the ID of the newly inserted patient.
+    """
     try:
         patient_id = db.add_patient(input_model)
 
@@ -251,6 +271,13 @@ async def insert_patient(input_model: InputPatient):
 
 @app.delete("/patient/{patient_id}", tags=["database"])
 async def delete_patient(patient_id: int):
+    """
+    Delete a patient from the database by ID.
+    Args:
+        patient_id (int): The ID of the patient to delete.
+        
+    Returns:
+        dict: A dictionary indicating the success or failure of the deletion."""
     try:
         db.remove_patient(patient_id)
 
@@ -274,6 +301,15 @@ async def delete_patient(patient_id: int):
 
 @app.get("/patient/{patient_id}/history", tags=["database"])
 async def get_patient_history(patient_id: int):
+    """
+    Retrieve the history of a specific patient by ID, including their entries and latest results.
+    
+    Args:
+        patient_id (int): The ID of the patient to retrieve history for.
+    
+    Returns:
+        dict: A dictionary containing the patient's entries and their results.
+    """
     try:
         entries = db.get_patient_entries(patient_id)
         results = []
@@ -314,6 +350,16 @@ async def get_patient_history(patient_id: int):
     description="Update patient status. Status: 0 = in history, 1 = waiting, 2 = in treatment",
 )
 async def update_patient_status(patient_id: int, status: int):
+    """
+    Update the status of a patient by ID.
+    
+    Args:
+        patient_id (int): The ID of the patient to update.
+        status (int): The new status of the patient. Must be 0 (in history), 1 (waiting), or 2 (in treatment).
+        
+    Returns:
+        dict: A dictionary indicating the success or failure of the update.
+    """
     if status not in [0, 1, 2]:
         logger.error(
             f"Invalid status {status} for patient ID {patient_id}. Must be 0, 1, or 2."
@@ -350,6 +396,16 @@ async def update_patient_status(patient_id: int, status: int):
 
 @app.get("/patient/{patient_id}/set_triage/{triage_level}", tags=["database"])
 async def set_patient_triage(patient_id: int, triage_level: int):
+    """
+    Set the triage level for a specific patient by ID.
+    
+    Args:
+        patient_id (int): The ID of the patient to update.
+        triage_level (int): The new triage level for the patient. Must be between 0 and 5.
+        
+    Returns:
+        dict: A dictionary indicating the success or failure of the update.
+    """
     if triage_level < 0 or triage_level > 5:
         logger.error(
             f"Invalid triage level {triage_level} for patient ID {patient_id}. "
@@ -386,6 +442,16 @@ async def set_patient_triage(patient_id: int, triage_level: int):
 # Update patient data
 @app.post("/patient/update/{patient_id}", tags=["database"])
 async def update_patient_data(patient_id: int, input_model: UpdatePatient):
+    """
+    Update patient data by ID.
+    
+    Args:
+        patient_id (int): The ID of the patient to update.
+        input_model (UpdatePatient): The input model containing the updated patient data.
+    
+    Returns:
+        dict: A dictionary indicating the success or failure of the update.
+    """
     try:
         db.update_patient(patient_id, **input_model.model_dump(exclude_none=True))
 
@@ -409,6 +475,12 @@ async def update_patient_data(patient_id: int, input_model: UpdatePatient):
 
 @app.get("/insert_example_patients", tags=["database"])
 async def insert_example_patients():
+    """
+    Insert example patients into the database for testing purposes.
+    
+    Returns:
+        dict: A dictionary indicating the success or failure of the insertion.
+    """
     example_patients = [
         {
             "first_name": "Json",
