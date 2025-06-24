@@ -10,6 +10,7 @@ os.makedirs(log_dir, exist_ok=True)
 log_filename = datetime.now().strftime("%Y-%m-%d_%H-%M-%S.log")
 log_filepath = os.path.join(log_dir, log_filename)
 
+# Configure the logging settings
 logging.basicConfig(
     filename=log_filepath,
     level=logging.DEBUG,

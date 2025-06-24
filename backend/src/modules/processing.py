@@ -1,21 +1,22 @@
-from common.pydantic_models import EvaluationInput  # , LLMResult
+from common.pydantic_models import EvaluationInput
 from interfaces import database as db
+
+# from modules.ai_service_gemini import extract_contents, generate_anamnesis_response
 from modules.ai_service_openai import extract_contents, generate_anamnesis_response
 from modules.logger import logger
 
-# from modules.ai_service_gemini import extract_contents, generate_anamnesis_response
-
-
-# # just for testing purposes, this function is not used in the actual application
-# def process_anamnesis_default(input_text: str) -> LLMResult:
-#     # Extract text contents and store them in the database
-#     contents = extract_contents(input_text)
-#     logger.debug(f"Response from extract_contents: {contents}")
-#     result = generate_anamnesis_response(contents)  # type: ignore
-#     return result
-
 
 def process_anamnesis(input_text: str, current_patient_id: int):
+    """
+    Process the anamnesis input text for a given patient. This function extracts
+    relevant information from the input text, builds an evaluation input, and generates
+    an anamnesis response using the AI service. The results are saved in the database.
+
+    Args:
+        input_text (str): The input text containing anamnesis information.
+        current_patient_id (int): The ID of the patient for whom the anamnesis is being
+            processed.
+    """
     # Extract text contents and store them in the database
     contents = extract_contents(input_text)
     logger.debug(f"Response from extract_contents: {contents}")
@@ -38,6 +39,11 @@ def process_anamnesis(input_text: str, current_patient_id: int):
             latest_entry.additional_notes if latest_entry.additional_notes else ""  # type: ignore
         ),
     )
-    result = generate_anamnesis_response(eval_input, available_experts=db.get_available_experts(), available_examinations=db.get_available_examinations())  
+    # Build the evaluation input from the extracted contents
+    result = generate_anamnesis_response(
+        eval_input,
+        available_experts=db.get_available_experts(),
+        available_examinations=db.get_available_examinations(),
+    )
     logger.debug(f"Response from generate_anamnesis_response: {result}")
     db.save_anamnesis_response(current_patient_id, result, input_text)  # type: ignore

@@ -24,9 +24,6 @@ class LLMResult(BaseModel):
     examinations: List[Examination]
     treatments: List[str]
     experts: List[Expert]
-    # overall_priority: int
-    # TODO: They requested "prioritisation based on current capacity/utilisation of the
-    #       hospital" -> Doesn't really make sense, a patient is either important or not
 
 
 # ==== Input Output from Frontend ====

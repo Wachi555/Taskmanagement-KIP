@@ -1,16 +1,12 @@
 import pytest
 import requests
-
-# from hypothesis import given
-# from hypothesis import strategies as st
 from src.modules.helpers import calculate_age, parse_med_server_json, stitch_together
 
 # CONFIG
 BACKEND_URL = "http://localhost:8000"
 
+
 # ========== API TESTS ==========
-
-
 def test_main_route():
     r = requests.get(f"{BACKEND_URL}/")
     assert r.status_code == 200
@@ -44,8 +40,6 @@ def test_transcribe_empty_file():
 
 
 # ========== HELPER TESTS ==========
-
-
 @pytest.mark.parametrize(
     "date_str,expected",
     [
@@ -87,8 +81,6 @@ def test_parse_med_server_json_invalid(bad_json):
 
 
 # ========== EDGE-CASE DB TESTS ==========
-
-
 def test_update_patient_status_invalid_status():
     r = requests.get(f"{BACKEND_URL}/patient/update_status/1/999")
     assert r.status_code == 200
@@ -96,8 +88,6 @@ def test_update_patient_status_invalid_status():
 
 
 # ========== PROCESSING TESTS ==========
-
-
 @pytest.mark.parametrize("text", ["", "Normal symptoms"])
 def test_process_input_debug(text):
     payload = {"text": text}
